@@ -9,14 +9,14 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            $table->unsignedByInteger('user_id')->nullable()->change();
+            $table->unsignedBigInteger('user_id')->nullable()->change();
         });
     }
 
     public function down(): void
     {
         Schema::table('books', function (Blueprint $table) {
-            $table->unsignedByInteger('user_id')->nullable(false)->change();
+            $table->unsignedBigInteger('user_id')->nullable(false)->change();
         });
     }
 };
