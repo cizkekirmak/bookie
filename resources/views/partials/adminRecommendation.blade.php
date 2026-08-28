@@ -15,7 +15,7 @@
 <div class="adminRecommendation" 
     style="
         background: #cae28c;
-        border: 2px solid #737e3d; 
+        border: 2px solid #514624; 
         border-radius: 16px;
         padding: 14px;
         display: flex;

@@ -92,10 +92,10 @@ class User extends Authenticatable
         return [
             ['req' => 0,   'name' => 'gariban üye',                 'icon' => '🌱', 'desc' => 'elinden geleni yapıyor..'],
             ['req' => 3,   'name' => 'yeni başlamış',               'icon' => '☕', 'desc' => 'okuduklarını beğendin mi?'],
-            ['req' => 5,   'name' => 'meraklı minik',               'icon' => '🕯️', 'desc' => 'trnin %99undan fazla okudun'],
+            ['req' => 5,   'name' => 'meraklı minik',               'icon' => '🕯️', 'desc' => 'trnin %99undan fazla okudun !!'],
             ['req' => 10,  'name' => 'kitaplık kedisi',            'icon' => '🐾', 'desc' => 'miyav miyav'],
-            ['req' => 25,  'name' => 'kitap.sevdası34',             'icon' => '📜', 'desc' => 'kitap kurdu olma yolunda'],
-            ['req' => 50,  'name' => 'lol oynamayı bıraktım',       'icon' => '🔮', 'desc' => 'artık sadece kitap okuyor'],
+            ['req' => 25,  'name' => 'kitap.sevdası43',             'icon' => '📜', 'desc' => 'kütayhalılara özel'],
+            ['req' => 50,  'name' => 'lol oynamayı bıraktım',       'icon' => '🔮', 'desc' => 'piramidin en altından çıkış'],
             ['req' => 100, 'name' => 'bookie admini olmaya yakın',  'icon' => '👑', 'desc' => 'mail atarsanız yardımcı olurum..'],
         ];
     }

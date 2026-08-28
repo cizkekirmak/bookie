@@ -375,7 +375,7 @@
                     const remaining = allSearchResults.length - displayedCount;
                     const loadMoreHtml = `
                         <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
-                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">✨ load more (+${Math.min(PAGE_SIZE, remaining)})</button>
+                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">load more (+${Math.min(PAGE_SIZE, remaining)})</button>
                         </div>
                     `;
                     dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);

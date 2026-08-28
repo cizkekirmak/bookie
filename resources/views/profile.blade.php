@@ -256,7 +256,7 @@
                             <form action="{{ route('friends.remove', $user->id) }}" method="POST" style="margin: 0; display: flex; justify-content: center; width: 100%;">
                                 @csrf
                                 <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1px solid #1d491b; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 13px; text-align: center; display: block;">
-                                    Arkadaşlıktan Çıkar
+                                    Remove Friend
                                 </button>
                             </form>
                         </div>

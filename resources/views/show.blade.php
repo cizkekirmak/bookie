@@ -176,7 +176,7 @@
                 </div>
 
                 <span style="font-family: 'Unkempt', cursive; font-weight: bold; color: #1a3c11; font-size: 16px;">
-                    {{ $averageRating > 0 ? number_format($averageRating, 1) : 'Henüz puan yok' }}
+                    {{ $averageRating > 0 ? number_format($averageRating, 1) : 'no ratings yet' }}
                 </span>
 
                 @if($totalReviews > 0)
@@ -338,7 +338,7 @@
                         </div>
                     </div>
                 @empty
-                    <p style="color: #4a5d44; font-size: 14px;">there is no ratings for this book yet, wanna be the first one :>?</p>
+                    <p style="color: #4a5d44; font-size: 14px;">there are no ratings for this book yet, wanna be the first one :>?</p>
                 @endforelse
             </div>
 

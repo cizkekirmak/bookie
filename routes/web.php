@@ -209,7 +209,7 @@ Route::middleware(['auth'])->group(function () {
 
     return response()->json([
         'success' => true,
-        'message' => 'Kabul edildi'
+        'message' => 'Accepted'
     ]);
 })->name("friends.accept");
 
