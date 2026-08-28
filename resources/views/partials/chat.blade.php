@@ -196,7 +196,6 @@
     color: #ffeaf9;
 }
 
-/* MESAJ ALANI & WALLPAPER */
 .chat-messages-body {
     flex: 1;
     padding: 12px;
@@ -204,7 +203,11 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background: url('{{ asset("images/chat-bg.jpg") }}') repeat center center;
+    background-image: url('{{ asset('chat-bg.jpg') }}');
+    background-size: 100% 100%;          /* Kutunun genişlik ve yüksekliğine tam oturtur */
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: local;        /* veya görsel sabit kalsın istersen scroll yapabilirsin */
     background-color: #fff1f9;
 }
 .chat-empty-state {
