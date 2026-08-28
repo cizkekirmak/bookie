@@ -203,7 +203,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background-image: url('{{ asset('chat-bg.jpg') }}');
+    background-image: url('{{ asset("images/chat-bg.jpg") }}');
     background-size: 100% 100%;          /* Kutunun genişlik ve yüksekliğine tam oturtur */
     background-position: center;
     background-repeat: no-repeat;
