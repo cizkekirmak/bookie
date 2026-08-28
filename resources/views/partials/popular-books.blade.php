@@ -34,7 +34,7 @@
             </div>
         @empty
             <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #777; width: 100%; text-align: center;">
-                Popüler kitaplar yüklenemedi.
+                Couldn't load the popular books.
             </div>
         @endforelse
     </div>

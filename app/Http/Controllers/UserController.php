@@ -9,53 +9,53 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    public function searchUsers(Request $request) 
-    {
-        $query = trim($request->get('q', ''));
-        $currentUserId = auth()->id();
+   public function searchUsers(Request $request) 
+{
+    $query = trim($request->get('q', ''));
+    $currentUserId = auth()->id();
 
-        if (strlen($query) < 2) {
-            return response()->json([]);
+    if (strlen($query) < 2) {
+        return response()->json([]);
+    }
+
+    $users = User::where('id', '!=', $currentUserId)
+        ->where('username', 'LIKE', "%{$query}%")
+        ->select('id', 'username', 'avatar') // DB'den avatar sütununu çekiyoruz
+        ->limit(8)
+        ->get();
+
+    $result = $users->map(function ($user) use ($currentUserId) {
+        $friendship = friendship::where(function ($q) use ($user, $currentUserId) {
+            $q->where('user_id', $currentUserId)->where('friend_id', $user->id);
+        })->orWhere(function ($q) use ($user, $currentUserId) {
+            $q->where('user_id', $user->id)->where('friend_id', $currentUserId);
+        })->first();
+
+        $status = 'none';
+        $isSender = false;
+
+        if ($friendship) {
+            $status = $friendship->status;
+            $isSender = ($friendship->user_id == $currentUserId);
         }
 
-        $users = User::where('id', '!=', $currentUserId)
-            ->where('username', 'LIKE', "%{$query}%")
-            ->select('id', 'username', 'avatar')
-            ->limit(8)
-            ->get();
+        return [
+            'id'        => $user->id,
+            'username'  => $user->username,
+            'avatar'    => $user->avatar, // <-- EKSİK OLAN SATIR BURASI
+            'status'    => $status,
+            'is_sender' => $isSender,
+        ];
+    });
 
-        $result = $users->map(function ($user) use ($currentUserId) {
-            $friendship = friendship::where(function ($q) use ($user, $currentUserId) {
-                $q->where('user_id', $currentUserId)->where('friend_id', $user->id);
-            })->orWhere(function ($q) use ($user, $currentUserId) {
-                $q->where('user_id', $user->id)->where('friend_id', $currentUserId);
-            })->first();
-
-            $status = 'none';
-            $isSender = false;
-
-            if ($friendship) {
-                $status = $friendship->status;
-                $isSender = ($friendship->user_id == $currentUserId);
-            }
-
-            return [
-                'id' => $user->id,
-                'username' => $user->username,
-                'avatar' => $user->avatar,
-                'status' => $status,
-                'is_sender' => $isSender,
-            ];
-        });
-
-        return response()->json($result);
-    }
+    return response()->json($result);
+}
 
     public function register(Request $request)
     {
         $incomingFields = $request->validate([
             'username' => 'required|string|max:50|unique:users,username',
-            'email'    => 'required|email|max:255|unique:users,email',
+            'email'    => 'required|email: rcf,dns|max:255|unique:users,email',
             'password' => 'required|string|min:6'
         ], [
             "username.required" => "where is your username?",

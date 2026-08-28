@@ -8,6 +8,12 @@
         : null;
 
     $currentBook = $userBook ? $userBook->book : null;
+
+    // Güvenli Sayfa ve İlerleme Hesaplaması
+    $total = $currentBook ? ($currentBook->page_count ?? 0) : 0;
+    $current = $userBook ? ($userBook->current_page ?? 0) : 0;
+    $hasPercentage = ($total > 0 && $current > 0);
+    $pct = $hasPercentage ? min(100, round(($current / $total) * 100)) : null;
 @endphp
 
 <div class="continue-reading-card" 
@@ -51,15 +57,31 @@ style="
             </a>
 
             {{-- Kitap Bilgileri --}}
-            <div style="overflow: hidden; flex: 1;">
-                <h4 style="color: #1a3c11; font-size: 15px; margin: 0 0 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold;">
-                    {{ $currentBook->title }}
-                </h4>
-                <p style="color: #3b612d; font-size: 12px; margin: 0 0 8px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    {{ $currentBook->author }}
-                </p>
+            <div style="overflow: hidden; flex: 1; display: flex; flex-direction: column; justify-content: space-between; height: 140px;">
+                <div>
+                    <h4 style="color: #1a3c11; font-size: 15px; margin: 0 0 3px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold;">
+                        {{ $currentBook->title }}
+                    </h4>
+                    <p style="color: #3b612d; font-size: 12px; margin: 0 0 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        {{ $currentBook->author }}
+                    </p>
+
+                    {{-- İLERLEME ÇUBUĞU (Yalnızca toplam sayfa varsa gösterilir) --}}
+                    @if($hasPercentage)
+                        <div style="margin-bottom: 8px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #1a3c11; font-weight: bold; margin-bottom: 3px;">
+                                <span>%{{ $pct }}</span>
+                                <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} p.</span>
+                            </div>
+                            <div style="width: 95%; height: 6px; background-color: #eaf3e4; border: 1px solid #737e3d; border-radius: 6px; overflow: hidden;">
+                                <div style="width: {{ $pct }}%; height: 95%; background: #2d5a27; border-radius: 6px; transition: width 0.4s ease;"></div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
                 <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" 
-                   style="display: inline-block; background: #2d5a27; color: white; text-decoration: none; padding: 4px 10px; border-radius: 8px; font-size: 12px; font-weight: bold;">
+                   style="align-self: flex-start; background: #2d5a27; color: white; text-decoration: none; padding: 6px 14px; border-radius: 12px; font-size: 13px; font-weight: bold;">
                     Oku →
                 </a>
             </div>

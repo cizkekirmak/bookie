@@ -29,7 +29,7 @@ class FriendRequestAccepted extends Notification
             "type" => "accepted",
             "sender_id" => $this->user->id,
             "sender_name" => $this->user->username ?? $this->user->name,
-            "message" => "accepted your friendship request, yay!",
+            "message" => "accepted your friend request, yay!",
         ];
     }
 }

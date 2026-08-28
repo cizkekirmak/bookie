@@ -12,6 +12,12 @@
     if ($coverSrc && !str_starts_with($coverSrc, 'http')) {
         $coverSrc = asset($coverSrc);
     }
+
+    // Sayfa ve İlerleme Hesaplaması
+    $totalPages = $book->page_count ?? 0;
+    $currentPage = $item->current_page ?? 0;
+    $hasProgress = $item->status === 'reading' && $currentPage > 0;
+    $pct = ($totalPages > 0 && $currentPage > 0) ? min(100, round(($currentPage / $totalPages) * 100)) : null;
 @endphp
 
 <div class="book-card-item" 
@@ -51,7 +57,7 @@
                 </span>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 6px; flex-shrink: 0;">
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
                 <span style="font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: bold; background: #eaf3e4; color: #2d5a27; border: 1px solid #c2d8b7;">
                     @if($item->status === 'reading') currently reading
                     @elseif($item->status === 'read') read
@@ -59,6 +65,25 @@
                     @else {{ $item->status }}
                     @endif
                 </span>
+
+                {{-- İlerleme Çubuğu ve Sayfa Bilgisi --}}
+                @if($hasProgress)
+                    <div style="width: 105px; text-align: right;">
+                        <div style="font-size: 11px; color: #3b612d; font-weight: bold; margin-bottom: 2px;">
+                            @if($pct !== null)
+                                <span>%{{ $pct }}</span>
+                                <span style="font-weight: normal; color: #666; font-size: 10px;">({{ $currentPage }}/{{ $totalPages }})</span>
+                            @else
+                                <span>p. {{ $currentPage }}</span>
+                            @endif
+                        </div>
+                        @if($pct !== null)
+                            <div style="width: 100%; height: 5px; background: #eaf3e4; border: 1px solid #c2d8b7; border-radius: 4px; overflow: hidden;">
+                                <div style="width: {{ $pct }}%; height: 100%; background: #2d5a27; border-radius: 4px;"></div>
+                            </div>
+                        @endif
+                    </div>
+                @endif
             </div>
         </div>
 

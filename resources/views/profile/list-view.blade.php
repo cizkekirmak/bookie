@@ -35,7 +35,7 @@
             @include('profile.book-card', ['item' => $item])
         @empty
             <div style="text-align: center; color: #6c8c5a; padding: 40px 0; font-size: 15px;">
-                Henüz eklenmiş bir kitap bulunmuyor. 🌱
+                You didn't save any books yet, you should start somewhere 
             </div>
         @endforelse
     </div>

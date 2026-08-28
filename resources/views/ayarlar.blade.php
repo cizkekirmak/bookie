@@ -11,7 +11,7 @@
 
     <style>
         body {
-            background-image: url('{{ asset('images/giris.jpg') }}');
+            background-image: url('{{ asset('images/giris.png') }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -382,5 +382,6 @@
             document.getElementById('bioCharCount').innerText = `${count}/160`;
         }
     </script>
+    @include('partials.chat')
 </body>
 </html>

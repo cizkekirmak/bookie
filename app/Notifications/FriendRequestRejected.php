@@ -29,7 +29,7 @@ class FriendRequestAccepted extends Notification
             "type" => "rejected",
             "sender_id" => $this->user->id,
             "sender_name" => $this->user->username ?? $this->user->name,
-            "message" => "rejected your friendship request, sorry",
+            "message" => "rejected your friend request, sorry",
         ];
     }
 }

@@ -51,7 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         height: 100vh;
         background-color: #D1FFBD;
         margin: 0; 
-        background-image: url("{{ asset('images/arkaplan.jpg') }}");
+        background-image: url("{{ asset('images/arkaplan.png') }}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;

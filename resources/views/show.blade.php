@@ -13,7 +13,7 @@
 
     <style>
         body {
-            background-image: url('{{ asset('images/arkaplan.jpg') }}');
+            background-image: url('{{ asset('images/arkaplan.png') }}');
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
@@ -64,6 +64,30 @@
         .radio-label input {
             cursor: pointer;
         }
+
+        .page-box {
+            background: #f1f8ed;
+            border: 1.5px dashed #4c7237;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .page-input {
+            width: 80px;
+            padding: 5px 8px;
+            border-radius: 6px;
+            border: 1.5px solid #2d5a27;
+            font-family: 'Unkempt', cursive;
+            font-size: 15px;
+            text-align: center;
+            outline: none;
+            color: #1f5117;
+        }
     </style>
 </head>
 <body>
@@ -92,9 +116,37 @@
 
         {{-- SAĞ: Detaylar ve Formlar --}}
         <div style="flex: 1; min-width: 280px;">
-            <h1 style="font-family: 'Henny Penny', cursive; color: #1f5117; margin: 0 0 4px 0; font-size: 26px;">
-                {{ $title ?? 'Unknown book' }}
-            </h1>
+            
+            {{-- Başlık ve Sağdaki İndir/Oku Butonu --}}
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 4px; flex-wrap: wrap;">
+                <h1 style="font-family: 'Henny Penny', cursive; color: #1f5117; margin: 0; font-size: 26px;">
+                    {{ $title ?? 'Unknown book' }}
+                </h1>
+
+                @if(!empty($downloadUrl) || (!empty($book) && !empty($book->download_url)))
+                    <a href="{{ !empty($book) && !empty($book->download_url) ? $book->download_url : $downloadUrl }}" 
+                       target="_blank" 
+                       style="
+                           display: inline-flex; 
+                           align-items: center; 
+                           gap: 6px; 
+                           background-color: #d2f48a; 
+                           color: #101e08; 
+                           border: 1.5px solid #1d491b; 
+                           padding: 5px 12px; 
+                           border-radius: 6px; 
+                           text-decoration: none; 
+                           font-family: 'Unkempt', cursive; 
+                           font-size: 13px;
+                           white-space: nowrap;
+                           flex-shrink: 0;
+                           cursor: pointer;
+                       ">
+                        📖 <span>Kitabı Oku / İndir</span>
+                    </a>
+                @endif
+            </div>
+
             <h4 style="color: #4a5d44; margin: 0 0 12px 0; font-size: 15px; font-weight: normal;">
                 by {{ $authors ?? 'Unknown author' }}
             </h4>
@@ -144,34 +196,53 @@
                 <input type="hidden" name="title" value="{{ $title ?? 'Unknown Title' }}">
                 <input type="hidden" name="cover_image" value="{{ $coverUrl }}">
                 <input type="hidden" name="author" value="{{ $authors ?? 'Unknown author' }}">
+                <input type="hidden" name="download_url" value="{{ $downloadUrl ?? ($book->download_url ?? '') }}">
 
                 {{-- Kitap Anahtarı (Key) Tanımlaması --}}
                 @php
                     $routeKey = (string) request()->route('key');
                     $isOl = str_starts_with($routeKey, 'OL') || str_contains($routeKey, '/works/');
+                    $isGut = str_starts_with($routeKey, 'GUT_');
+                    $pageCount = $pageCount ?? ($book->page_count ?? null);
+                    $currentPage = $userBook->current_page ?? 0;
                 @endphp
+
+                {{-- Toplam Sayfa Sayısı (Hidden) --}}
+                <input type="hidden" name="page_count" value="{{ $pageCount ?? '' }}">
 
                 @if($isOl)
                     <input type="hidden" name="open_library_key" value="{{ $routeKey }}">
+                @elseif($isGut)
+                    <input type="hidden" name="gutenberg_id" value="{{ $routeKey }}">
                 @else
                     <input type="hidden" name="google_book_id" value="{{ $routeKey }}">
                 @endif
 
                 {{-- Okuma Durumu --}}
                 <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 8px;">reading progress</label>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 18px;">
+                <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px;">
                     <label class="radio-label">
-                        <input type="radio" name="status" value="reading" {{ ($userBook && $userBook->status == 'reading') ? 'checked' : '' }} required>
+                        <input type="radio" name="status" value="reading" class="status-radio" {{ ($userBook && $userBook->status == 'reading') ? 'checked' : '' }} required>
                         currently reading 
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="status" value="read" {{ ($userBook && $userBook->status == 'read') ? 'checked' : '' }}>
+                        <input type="radio" name="status" value="read" class="status-radio" {{ ($userBook && $userBook->status == 'read') ? 'checked' : '' }}>
                         read
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="status" value="want_to_read" {{ (!$userBook || $userBook->status == 'want_to_read' || $userBook->status == 'toRead') ? 'checked' : '' }}>
+                        <input type="radio" name="status" value="want_to_read" class="status-radio" {{ (!$userBook || $userBook->status == 'want_to_read' || $userBook->status == 'toRead') ? 'checked' : '' }}>
                         want to read
                     </label>
+                </div>
+
+                {{-- Sayfa İlerleme Kutusu --}}
+                <div id="page-box" class="page-box" style="display: {{ ($userBook && $userBook->status == 'reading') ? 'flex' : 'none' }};">
+                    <span style="color: #1f5117; font-size: 14px; font-weight: bold;">on page:</span>
+                    <input type="number" name="current_page" id="current_page" class="page-input" min="0" max="{{ $pageCount ?? 9999 }}" value="{{ $currentPage }}" placeholder="0">
+                    
+                    @if(!empty($pageCount) && $pageCount > 0)
+                        <span style="color: #4a5d44; font-size: 14px;">/ {{ $pageCount }} pages</span>
+                    @endif
                 </div>
 
                 {{-- 5 Renkli Puan Verme --}}
@@ -277,6 +348,7 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    // --- Yıldız Puanlama ---
     const starButtons = document.querySelectorAll('.star-rating-multi .star-btn');
     const ratingInput = document.getElementById('selected-rating');
     const ratingText = document.getElementById('rating-text');
@@ -327,6 +399,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // --- Sayfa Takip Kutu Görünürlüğü ---
+    const statusRadios = document.querySelectorAll('.status-radio');
+    const pageBox = document.getElementById('page-box');
+
+    statusRadios.forEach(radio => {
+        radio.addEventListener('change', function () {
+            if (this.value === 'reading') {
+                pageBox.style.display = 'flex';
+            } else {
+                pageBox.style.display = 'none';
+            }
+        });
+    });
 });
 
 function toggleReviewLike(reviewId, buttonElement) {
@@ -365,6 +451,6 @@ function toggleReviewLike(reviewId, buttonElement) {
     .catch(err => console.error('Beğeni hatası:', err));
 }
 </script>
-
+@include('partials.chat')
 </body>
 </html>

@@ -10,7 +10,7 @@
         box-sizing: border-box;
         font-family: 'Unkempt', cursive;">
 
-    {{-- ADIM 1: Tür Seçimi & Duran Kedi (Kedi Sağda) --}}
+    {{-- ADIM 1: Tür Seçimi & Duran Kedi --}}
     <div id="cat-step-1" style="display: flex; align-items: center; justify-content: space-between; gap: 14px; width: 100%;">
         {{-- Sol Kısım: Baloncuk ve Tür Butonları --}}
         <div style="flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: flex-end;">
@@ -35,7 +35,7 @@
         <img src="{{ asset('images/talkcat.png') }}" alt="Kedi" style="width: 170px; height: 170px; object-fit: contain; flex-shrink: 0;">
     </div>
 
-    {{-- ADIM 2: Düşünen Kedi (Kedi Sağda) --}}
+    {{-- ADIM 2: Düşünen Kedi --}}
     <div id="cat-step-2" style="display: none; align-items: center; justify-content: center; gap: 20px; width: 100%;">
         <div class="css-bubble-right" style="font-size: 20px; font-weight: bold; padding: 12px 22px;">
             <span id="cat-thinking-text">Mmmmm...</span> 💭
@@ -43,15 +43,17 @@
         <img src="{{ asset('images/thinkcat.png') }}" alt="Düşünen Kedi" style="width: 170px; height: 170px; object-fit: contain; flex-shrink: 0; animation: pulseCat 0.9s infinite alternate;">
     </div>
 
-    {{-- ADIM 3: Zıplayan Kedi & Önerilen Kitap (Kedi Sağda, Kitap Bilgisi Altta) --}}
+    {{-- ADIM 3: Zıplayan Kedi & Önerilen Kitap --}}
     <div id="cat-step-3" style="display: none; align-items: center; justify-content: space-around; gap: 14px; width: 100%;">
         
-        {{-- Sol Kısım: Önerilen Kitap Kutusu (Dikey Düzen) --}}
-        <a id="cat-rec-book-link" href="#" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; background: #ffffff; border: 1.5px solid #4c7237; padding: 8px 12px; border-radius: 12px; width: 140px; box-sizing: border-box; transition: transform 0.15s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.06);" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform='scale(1)'">
+        {{-- Sol Kısım: Önerilen Kitap Kutusu --}}
+        <a id="cat-rec-book-link" href="#" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; background: #ffffff; border: 1.5px solid #4c7237; padding: 8px 12px; border-radius: 12px; width: 145px; box-sizing: border-box; transition: transform 0.15s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.06);" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform='scale(1)'">
             <img id="cat-rec-cover" src="" alt="Kapak" style="width: 55px; height: 75px; object-fit: cover; border-radius: 4px; border: 1px solid #c2d8b7; margin-bottom: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="text-align: center; width: 100%;">
                 <div id="cat-rec-title" style="font-size: 13px; font-weight: bold; color: #1a3c11; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;"></div>
                 <div id="cat-rec-author" style="font-size: 11px; color: #527943; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;"></div>
+                {{-- Sayfa Sayısı Alanı --}}
+                <div id="cat-rec-pages" style="font-size: 10px; color: #737e3d; font-weight: bold; margin-top: 3px;"></div>
             </div>
         </a>
 
@@ -72,7 +74,6 @@
 </div>
 
 <style>
-/* Büyütülmüş Sağa Bakan Konuşma Baloncuğu */
 .css-bubble-right {
     position: relative;
     background: #ffffff;
@@ -85,7 +86,6 @@
     box-shadow: 0 3px 6px rgba(0,0,0,0.06);
 }
 
-/* Baloncuğun sivri ucu */
 .css-bubble-right::after, .css-bubble-right::before {
     content: '';
     position: absolute;
@@ -156,6 +156,10 @@ function getCatRecommendation(genre) {
                 document.getElementById('cat-rec-title').innerText = data.book.title;
                 document.getElementById('cat-rec-author').innerText = data.book.author;
                 document.getElementById('cat-rec-book-link').href = data.book.url;
+                
+                // Sayfa sayısı kontrolü (API'den page_count veya pages dönerse)
+                const pageCount = data.book.page_count || data.book.pages || data.book.number_of_pages;
+                document.getElementById('cat-rec-pages').innerText = pageCount ? `📖 ${pageCount} p.` : '';
 
                 step2.style.display = 'none';
                 step3.style.display = 'flex';

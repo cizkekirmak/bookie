@@ -26,6 +26,9 @@ class Book extends Model
         'open_library_key',
         'status',
         'cover_url',
+        'page_count',
+        'gutenberg_id',
+        'download_url',
     ];
 
     public function user()

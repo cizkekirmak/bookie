@@ -58,8 +58,8 @@
 }
 
 .notification-icon-img {
-    width: 64px;
-    height: 64px;
+    width: 54px;
+    height: 54px;
     object-fit: contain;
     margin: 0;
     display: block;

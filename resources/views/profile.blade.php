@@ -10,14 +10,81 @@
     <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            background-image: url('{{ asset('images/giris.jpg') }}');
+            background-color: #badfa0;
+            background-image: url('{{ asset('images/giris.png') }}');
             background-size: cover;
-            background-position: center;
+            background-position: center top;
             background-attachment: fixed;
             background-repeat: no-repeat;
             min-height: 100vh;
             margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        /* HEADER: Ortada OG profil-header.png, kenar boşluklarında repeat eden bosluk.png */
+        .site-header-outer {
+            width: 100%;
+            height: 76px;
+            background-color: #477c35;
+            background-image: 
+                url('{{ asset('images/profil-header.png') }}'),
+                url('{{ asset('images/bosluk.png') }}');
+            background-size: 
+                auto 100%, 
+                auto 100%;
+            background-position: 
+                center bottom, 
+                0 bottom;
+            background-repeat: 
+                no-repeat, 
+                repeat-x;
+            border-bottom: 2px solid #2d5a27;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Header İçeriği: Dashboard ile birebir aynı (kenarlara tam yaslanır) */
+        .site-header-inner {
+            width: 100%;
+            height: 100%;
+            padding: 0 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: relative;
+        }
+
+        .header-logo {
+            font-family: 'Henny Penny', cursive;
+            font-size: 48px;
+            color: #1f5117;
+            flex-shrink: 0;
+            margin-top: 10px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+            user-select: none;
+        }
+
+        /* ANA GÖVDE KAPSAYICISI */
+        .profile-container {
+            width: 100%;
+            max-width: 1520px;
+            margin: 0 auto;
+            height: calc(100vh - 76px);
+            display: flex;
+            background-color: #f7faf5;
+            overflow: hidden;
+            font-family: 'Unkempt', cursive;
+            border-left: 2px solid #4c7237;
+            border-right: 2px solid #4c7237;
+            border-bottom: 2px solid #4c7237;
         }
 
         .custom-scroll::-webkit-scrollbar {
@@ -35,58 +102,71 @@
         .custom-scroll::-webkit-scrollbar-thumb:hover {
             background: #4c7237;
         }
+
+        @keyframes popInModal {
+            0% { 
+                transform: scale(0.9); 
+                opacity: 0; 
+            }
+            100% { 
+                transform: scale(1); 
+                opacity: 1; 
+            }
+        }
+
+        @keyframes rainbowWave {
+            0% { 
+                filter: hue-rotate(0deg); 
+            }
+            100% { 
+                filter: hue-rotate(360deg); 
+            }
+        }
+
+        .admin-rainbow-badge {
+            background: linear-gradient(90deg, #ff7675, #fab1a0, #ffeaa7, #55efc4, #74b9ff, #a29bfe, #fd79a8) !important;
+            animation: rainbowWave 3s linear infinite !important;
+            border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+            color: #1a3c11 !important;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
+        }
     </style>
 </head>
 <body>
-<div style="font-family: 'Unkempt', cursive; height: 100vh; display: flex; flex-direction: column; background-color: #f7faf5; overflow: hidden; margin: 0;">
 
     {{-- HEADER --}}
-    <header style="
-        max-width: 100%;
-        margin: 0;
-        height: 95px;
-        padding: 20px 30px;
-        background-color: #d3ea76;
-        border: 2px solid #2d5a27;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        align-items: center;
-        display: flex;
-        gap: 20px;
-        box-sizing: border-box;
-        overflow: visible !important;
-        position: relative;
-        z-index: 1000;
-        justify-content: space-between;
-        flex-direction: row;
-    ">     
-        <div style="font-family: 'Henny Penny', cursive; font-size: 45px; color: #1f5117; flex-shrink: 0; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); margin-top: 5px;">
-            Bookie
-        </div>
-        
-        <div style="display: flex; align-items: center; margin-left: auto; flex-shrink: 0;">
-            <!-- Bildirim Zarfı -->
-            <div style="margin-right: 20px; display: flex; align-items: center;">
-                @include('partials.notifications')
+    <header class="site-header-outer">
+        <div class="site-header-inner">     
+            
+            {{-- LOGO --}}
+            <div class="header-logo">
+                Bookie
+            </div>
+            
+            {{-- SAĞ İKONLAR --}}
+            <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
+                <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
+                    @include('partials.notifications')
+                </div>
+
+                <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
+                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="ayarlar" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;"
+                         onmouseenter="this.style.transform='scale(1.1)';"
+                         onmouseleave="this.style.transform='scale(1)';">
+                </a>
+                
+                <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
+                    <img src="{{ asset('images/dash.jpg') }}" alt="dashboard" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;"
+                         onmouseenter="this.style.transform='scale(1.1)';"
+                         onmouseleave="this.style.transform='scale(1)';">
+                </a>
             </div>
 
-            <!-- Ayarlar -->
-            <a href="{{ route('ayarlar') }}" style="margin-right: 18px; display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease, filter 0.2s ease;">
-                <img src="{{ asset('images/ayarlar.jpg') }}" alt="ayarlar" style="width: 64px; height: 64px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;"
-                     onmouseenter="this.style.transform='scale(1.1)'; this.style.filter='drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.4))';"
-                     onmouseleave="this.style.transform='scale(1)'; this.style.filter='none';">
-            </a>
-            
-            <!-- Dashboard -->
-            <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease, filter 0.2s ease;">
-                <img src="{{ asset('images/dash.jpg') }}" alt="dashboard" style="width: 64px; height: 64px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;"
-                     onmouseenter="this.style.transform='scale(1.1)'; this.style.filter='drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.4))';"
-                     onmouseleave="this.style.transform='scale(1)'; this.style.filter='none';">
-            </a>
         </div>
     </header>
 
-    {{-- GÖVDE --}}
-    <div style="display: flex; flex: 1; overflow: hidden;">
+    {{-- GÖVDE: Boxed Container --}}
+    <div class="profile-container">
 
         {{-- SOL SABİT PROFİL PANELİ --}}
         <aside style="width: 320px; background: #8ec46f; border-right: 2px solid #4c7237; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; flex-shrink: 0; height: 100%;">
@@ -104,34 +184,35 @@
                 $title = $user->reading_title;
             @endphp
 
-            {{-- 1. Kullanıcı Adı (Altındaki boşluğu azaltmak için margin-bottom eklendi) --}}
+            {{-- 1. Kullanıcı Adı --}}
             <div style="font-family: 'Henny Penny', cursive; font-size: 28px; color: #1a3c11; margin-bottom: 2px;">
                 {{ $user->username ?? $user->name }}
             </div>
 
-            {{-- 2. Unvan Rozeti (Üstü isme yakın, altı bio'dan 6px uzak) --}}
+            {{-- 2. Unvan Rozeti --}}
             <button type="button" onclick="openTitlesModal()" style="background: none; border: none; padding: 0; cursor: pointer;">
-            <div style="
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                background-color: {{ $title['bg'] }};
-                border: 1.5px solid {{ $title['border'] }};
-                color: {{ $title['color'] }};
-                padding: 3px 12px;
-                border-radius: 16px;
-                font-family: 'Unkempt', cursive;
-                font-size: 13px;
-                font-weight: bold;
-                margin-top: 2px;
-                margin-bottom: 8px;
-                box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-                cursor: pointer;
-            ">
-                <span>{{ $title['icon'] }}</span>
-                <span>{{ $title['name'] }}</span>
-                <span style="font-size: 10px; opacity: 0.6;">▼</span>
-            </div>
+                <div class="{{ !empty($title['is_admin']) ? 'admin-rainbow-badge' : '' }}" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 6px;
+                    @if(empty($title['is_admin']))
+                        background-color: {{ $title['bg'] }};
+                        border: 1.5px solid {{ $title['border'] }};
+                        color: {{ $title['color'] }};
+                    @endif
+                    padding: 3px 12px;
+                    border-radius: 16px;
+                    font-family: 'Unkempt', cursive;
+                    font-size: 13px;
+                    font-weight: bold;
+                    margin-top: 2px;
+                    margin-bottom: 8px;
+                    cursor: pointer;
+                ">
+                    <span>{{ $title['icon'] }}</span>
+                    <span>{{ $title['name'] }}</span>
+                    <span style="font-size: 10px; opacity: 0.6;">▼</span>
+                </div>
             </button>
 
             {{-- 3. Bio Metni --}}
@@ -147,7 +228,7 @@
                         <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                             @csrf
                             <button type="submit" style="width: 100%; background-color: #2d5a27; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 15px;">
-                                + Arkadaş Ekle
+                                Add friend
                             </button>
                         </form>
                     @elseif($friendship->status === 'pending')
@@ -159,23 +240,22 @@
                                 </button>
                             </form>
                         @else
-                            <div style="display: flex; gap: 8px; width: 100%;">
+                            <div style="display: flex; gap: 5px; width: 100%;">
                                 <form action="{{ route('friends.accept', $user->id) }}" method="POST" style="flex: 1; margin: 0;">
                                     @csrf
-                                    <button type="submit" style="width: 100%; background-color: #2d5a27; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">Kabul Et</button>
+                                    <button type="submit" style="width: 100%; background-color: #25621d; color: rgb(140, 155, 25); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">Kabul Et</button>
                                 </form>
                                 <form action="{{ route('friends.reject', $user->id) }}" method="POST" style="flex: 1; margin: 0;">
                                     @csrf
-                                    <button type="submit" style="width: 100%; background-color: #c62828; color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">Reddet</button>
+                                    <button type="submit" style="width: 100%; background-color: #516a28; color: rgb(119, 131, 26); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">Reddet</button>
                                 </form>
                             </div>
                         @endif
                     @elseif($friendship->status === 'accepted')
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%;">
-                            <span style="color: #1a3c11; font-weight: bold; font-size: 15px;">✓ Arkadaşsınız</span>
-                            <form action="{{ route('friends.remove', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
+                            <form action="{{ route('friends.remove', $user->id) }}" method="POST" style="margin: 0; display: flex; justify-content: center; width: 100%;">
                                 @csrf
-                                <button type="submit" style="width: 100%; background-color: transparent; color: #c62828; border: 1px solid #c62828; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 12px;">
+                                <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1px solid #1d491b; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 13px; text-align: center; display: block;">
                                     Arkadaşlıktan Çıkar
                                 </button>
                             </form>
@@ -251,8 +331,6 @@
         </main>
 
     </div>
-
-</div>
 
 {{-- JAVASCRIPT YÖNETİMİ --}}
 <script>
@@ -351,7 +429,7 @@ function filterStatus(status, clickedBtn) {
                     color: #1a3c11;
                 "
             >
-                🌱 Arkadaşlar ({{ $friendsCount ?? ($user->friends ? $user->friends->count() : 0) }})
+                🌱 Friends ({{ $friendsCount ?? ($user->friends ? $user->friends->count() : 0) }})
             </span>
 
             <button 
@@ -433,8 +511,8 @@ function filterStatus(status, clickedBtn) {
                                 alt="{{ $friend->username ?? 'Profile' }}" 
                                 style="width: 100%; 
                                 height: 100%; 
-                                border-radius: 50%;
-                                display: block;
+                                border-radius: 50%; 
+                                display: block; 
                                 object-fit: cover;"
                                 onerror="this.onerror=null; this.src='{{ asset('images/profile.jpg') }}';">
                             @else
@@ -442,8 +520,8 @@ function filterStatus(status, clickedBtn) {
                                 alt="Profile" 
                                 style="width: 100%; 
                                 height: 100%; 
-                                border-radius: 50%;
-                                display: block;
+                                border-radius: 50%; 
+                                display: block; 
                                 object-fit: cover;">
                             @endif
                         </div>
@@ -480,7 +558,7 @@ function filterStatus(status, clickedBtn) {
                             font-weight: bold;
                         "
                     >
-                        profili gör →
+                        wanna see their profile? →
                     </span>
                 </div>
             @empty
@@ -493,25 +571,12 @@ function filterStatus(status, clickedBtn) {
                         font-size: 14px;
                     "
                 >
-                    Henüz eklenmiş bir arkadaş bulunmuyor. 🌱
+                    You dont have any friends yet :((  🌱
                 </div>
             @endforelse
         </div>
     </div>
 </div>
-
-<style>
-@keyframes popInModal {
-    0% { 
-        transform: scale(0.9); 
-        opacity: 0; 
-    }
-    100% { 
-        transform: scale(1); 
-        opacity: 1; 
-    }
-}
-</style>
 
 <script>
 function openFriendsModal() {
@@ -535,7 +600,7 @@ window.addEventListener('click', function(e) {
     }
 });
 </script>
-
+@include('partials.chat')
 </body>
 </html>
 @include('partials.title-modal')

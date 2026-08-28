@@ -14,6 +14,7 @@ class UserBook extends Model
         'status',
         'rating',
         'review',
+        'current_page',
     ];
 
     public function user()

@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MessageController;
 use Illuminate\Support\Facades\DB;
 use App\Notifications\FriendRequestRejected;
 use App\Notifications\FriendRequestAccepted;
@@ -45,9 +46,10 @@ Route::get('/api/search-users', function (Request $request) {
             $status = $friendship ? $friendship->status : "none";
 
             return [
-                "id" => $targetUser->id,
-                "username" => $targetUser->username,
-                "status" => $status,
+                "id"        => $targetUser->id,
+                "username"  => $targetUser->username,
+                "avatar"    => $targetUser->avatar, // <-- İŞTE EKSİK OLAN SATIR
+                "status"    => $status,
                 "is_sender" => $friendship ? ($friendship->user_id == $authId) : false,
             ];
         });
@@ -133,6 +135,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/search-books', [BookController::class, 'searchApi'])->name('api.books.search');
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/books/bulk-remove', [ProfileController::class, 'bulkRemoveBooks'])->name('profile.books.bulkRemove');
+
+    Route::get('/messages/friends', [MessageController::class, 'getFriends']);
+    Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount']);
+    Route::get('/messages/{friendId}', [MessageController::class, 'getMessages']);
+    Route::post('/messages/send', [MessageController::class, 'sendMessage']);
 
 
     Route::get('/ayarlar', [ProfileController::class, 'settings'])->name('ayarlar');
