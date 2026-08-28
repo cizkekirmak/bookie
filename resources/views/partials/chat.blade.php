@@ -204,7 +204,7 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background: url('{{ asset("images/chat-bg.jpeg") }}') repeat center center;
+    background: url('{{ asset("images/chat-bg.jpg") }}') repeat center center;
     background-color: #fff1f9;
 }
 .chat-empty-state {
