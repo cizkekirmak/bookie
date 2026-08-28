@@ -29,7 +29,7 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Bağımlılıkları yükle
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+RUN composer install -n --prefer-dist -o
 
 # SQLite ve Depolama için tam yazma izinleri
 RUN touch /var/www/html/database/database.sqlite \
