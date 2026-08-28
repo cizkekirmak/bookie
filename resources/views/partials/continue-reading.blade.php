@@ -19,7 +19,7 @@
 <div class="continue-reading-card" 
 style="
     background: #cae28c;
-    border: 2px solid #514624; 
+    border: 2px solid #5a8c69; 
     border-radius: 16px;
     padding: 14px;
     display: flex;
