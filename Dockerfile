@@ -30,7 +30,7 @@ COPY . /var/www/html
 
 # Bağımlılıkları yükle
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN ["composer", "install", "--no-dev", "--optimize-autoloader", "--no-interaction"]
+RUN composer install
 
 # SQLite ve Depolama için tam yazma izinleri
 RUN touch /var/www/html/database/database.sqlite \
