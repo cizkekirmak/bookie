@@ -86,7 +86,13 @@ class BookController extends Controller
                     foreach ($docs as $doc) {
                         $title = $doc['title'] ?? '';
                         
-                        if (empty($title) || empty($doc['cover_i']) || preg_match('/[\x{0400}-\x{04FF}]/u', $title) || str_contains(strtolower($title), 'gutenberg')) {
+                        // Başlık boşsa, kapak yoksa, 'gutenberg' içeriyorsa VEYA Türkçe/Latin harf ve temel noktalama işaretleri DIŞINDA bir alfabe (Hintçe, Çince, Rusça, Arapça vb.) barındırıyorsa atla:
+                        if (
+                            empty($title) || 
+                            empty($doc['cover_i']) || 
+                            str_contains(strtolower($title), 'gutenberg') || 
+                            preg_match('/[^\p{Latin}\p{N}\s\p{P}]/u', $title)
+                        ) {
                             continue;
                         }
 
