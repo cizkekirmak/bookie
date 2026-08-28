@@ -29,11 +29,13 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Bağımlılıkları yükle
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
-# Depolama izinleri ve sembolik link
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
-    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
+# SQLite ve Depolama için tam yazma izinleri
+RUN touch /var/www/html/database/database.sqlite \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
+    && chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
+    && chmod 666 /var/www/html/database/database.sqlite \
     && php artisan storage:link
 
 EXPOSE 80
