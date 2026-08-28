@@ -11,7 +11,8 @@ RUN apt-get update && apt-get install -y \
     curl \
     sqlite3 \
     libsqlite3-dev \
-    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd
+    && docker-php-ext-install pdo_mysql pdo_sqlite mbstring exif pcntl bcmath gd \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Apache mod_rewrite aktif et
 RUN a2enmod rewrite
@@ -24,20 +25,21 @@ RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf
 # Composer kurulumu
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Proje dosyalarını kopyala
+# Proje dizini ve dosyaları
 WORKDIR /var/www/html
 COPY . /var/www/html
 
 # Bağımlılıkları yükle
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# SQLite ve Depolama için tam yazma izinleri
-RUN touch /var/www/html/database/database.sqlite \
+# Dizin izinleri ve SQLite dosyası
+RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
+    && touch /var/www/html/database/database.sqlite \
     && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
-    && chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
-    && chmod 666 /var/www/html/database/database.sqlite \
-    && php artisan storage:link
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
+    && chmod 664 /var/www/html/database/database.sqlite \
+    && php artisan storage:link || true
 
 EXPOSE 80
 
