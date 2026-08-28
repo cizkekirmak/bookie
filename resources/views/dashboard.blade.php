@@ -28,7 +28,7 @@
             background-repeat: no-repeat;
         }
 
-        /* HEADER: Arka plan ortada og header, kenarlar bosluk.png */
+        /* HEADER: Masaüstü (Birebir Orijinal Hali) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -52,7 +52,6 @@
             z-index: 1000;
         }
 
-        /* Header İçeriği: max-width kalktı, logo ve butonlar ekranın en sağına ve soluna gider */
         .site-header-inner {
             width: 100%;
             height: 100%;
@@ -73,16 +72,44 @@
             user-select: none;
         }
 
-        /* Arama barı ekranın tam merkezinde sabit */
         .header-search-wrap {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            width: 480px;
+            width: 500px;
             z-index: 99999;
         }
 
-        /* ANA GÖVDE */
+        .header-search-bar-box {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            height: 50px;
+            background-color: #fafcf7;
+            background-image: url('{{ asset('images/arama.jpg') }}');
+            background-repeat: repeat;
+            border: 2px solid #6b9c56;
+            border-radius: 28px;
+            padding: 0 18px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+            width: 100%;
+        }
+
+        .header-desktop-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-shrink: 0;
+        }
+
+        .mobile-menu-trigger,
+        .mobile-dropdown-menu,
+        .mobile-friends-tab,
+        .mobile-drawer-overlay {
+            display: none !important;
+        }
+
+        /* ANA GÖVDE: Masaüstü (Yukarıdan Başlayan Orijinal Yapı) */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -130,12 +157,265 @@
             top: 100px;
         }
 
-        /* Scrollbar stilleri */
         .friend-reviews-scroll::-webkit-scrollbar { width: 8px; }
         .friend-reviews-scroll::-webkit-scrollbar-track { background: transparent; }
         .friend-reviews-scroll::-webkit-scrollbar-thumb { background-color: #82b564; border-radius: 10px; border: 2px solid #77995f; }
         .friend-reviews-scroll::-webkit-scrollbar-thumb:hover { background-color: #5d8e40; }
         .friend-reviews-scroll { scrollbar-width: thin; scrollbar-color: #82b564 transparent; }
+
+        /* ==========================================================================
+           TELEFON / MOBİL STİLLERİ (DİKEYDE ORTALANMIŞ MOBİL DÜZEN)
+           ========================================================================== */
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden !important;
+            }
+
+            .site-header-outer {
+                height: 68px !important;
+                background-image: 
+                    url('{{ asset('images/profil-header.png') }}'),
+                    url('{{ asset('images/bosluk.png') }}') !important;
+            }
+
+            .site-header-inner {
+                padding: 0 12px !important;
+                gap: 10px !important;
+                display: flex !important;
+                align-items: center !important;
+                justify-content: space-between !important;
+            }
+
+            .header-logo {
+                font-size: 30px !important;
+                margin-top: 0 !important;
+                flex-shrink: 0 !important;
+            }
+
+            .header-desktop-actions {
+                display: none !important;
+            }
+
+            .header-search-wrap {
+                position: static !important;
+                transform: none !important;
+                flex: 1 !important;
+                max-width: 220px !important;
+                margin: 0 6px !important;
+                display: block !important;
+            }
+
+            .header-search-bar-box {
+                height: 44px !important;
+                padding: 0 12px !important;
+                gap: 8px !important;
+                border-radius: 24px !important;
+            }
+
+            .header-search-bar-box img {
+                width: 24px !important;
+                height: 24px !important;
+            }
+
+            .header-search-bar-box input {
+                font-size: 15px !important;
+                display: block !important;
+                width: 100% !important;
+            }
+
+            .mobile-menu-trigger {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                width: 44px !important;
+                height: 44px !important;
+                background: #f4fbf0;
+                border: 2px solid #4b813b;
+                border-radius: 10px !important;
+                cursor: pointer;
+                flex-shrink: 0;
+            }
+
+            .mobile-menu-trigger img {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 6px !important;
+            }
+
+            .mobile-dropdown-menu {
+                display: flex !important;
+                position: absolute;
+                top: 72px !important;
+                right: 10px !important;
+                width: 64px !important;
+                background: #c6e085;
+                border: 2px solid #4b813b;
+                border-radius: 14px !important;
+                padding: 8px !important;
+                flex-direction: column;
+                gap: 8px !important;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+                z-index: 100000;
+            }
+
+            .mobile-dropdown-menu.hidden {
+                display: none !important;
+            }
+
+            .mobile-icon-box {
+                width: 48px !important;
+                height: 48px !important;
+                background: #f4fbf0;
+                border: 1.5px solid #6b9c56;
+                border-radius: 10px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+                text-decoration: none;
+                flex-shrink: 0;
+            }
+
+            .mobile-icon-box img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .mobile-icon-box .notification-wrapper,
+            .mobile-icon-box .notification-container,
+            .mobile-icon-box > div {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .equal-spacer {
+                display: none !important;
+            }
+
+            /* MOBİLDE KARTLARI DİKEYDE ORTALA */
+            .app-container {
+                padding: 12px 10px 95px 10px !important;
+                min-height: calc(100vh - 68px) !important;
+                min-height: calc(100dvh - 68px) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: stretch !important;
+            }
+
+            .left-content-area {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                grid-template-rows: auto auto auto !important;
+                grid-template-areas:
+                    "continue admin"
+                    "popular  popular"
+                    "cat      cat" !important;
+                gap: 14px !important;
+                width: 100% !important;
+                padding: 0 !important;
+                margin: auto 0 !important;
+            }
+
+            .dashboard-row-equal {
+                display: contents !important;
+            }
+
+            .mob-grid-item-continue {
+                grid-area: continue !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .mob-grid-item-admin {
+                grid-area: admin !important;
+                width: 100% !important;
+                min-width: 0 !important;
+                margin: 0 !important;
+            }
+
+            .mob-grid-item-popular {
+                grid-area: popular !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            .mob-grid-item-cat {
+                grid-area: cat !important;
+                width: 100% !important;
+                min-width: 0 !important;
+            }
+
+            /* Çekmece */
+            .right-sidebar-panel {
+                position: fixed !important;
+                top: 0 !important;
+                right: 0 !important;
+                width: 86vw !important;
+                max-width: 340px !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 16px 0 0 16px !important;
+                z-index: 100001 !important;
+                transform: translateX(100%);
+                transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -6px 0 24px rgba(0,0,0,0.3) !important;
+            }
+
+            .right-sidebar-panel.drawer-open {
+                transform: translateX(0) !important;
+            }
+
+            .mobile-drawer-overlay {
+                display: block !important;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.45);
+                z-index: 100000;
+                backdrop-filter: blur(2px);
+            }
+
+            .mobile-drawer-overlay.hidden {
+                display: none !important;
+            }
+
+            .mobile-friends-tab {
+                display: flex !important;
+                align-items: center;
+                gap: 6px;
+                position: fixed !important;
+                bottom: 18px !important;
+                right: 0 !important;
+                background: #fdf5a6;
+                color: #2c441b;
+                border: 2px solid #5a7d3b;
+                border-right: none;
+                border-radius: 14px 0 0 14px;
+                padding: 7px 14px;
+                font-family: 'Unkempt', cursive;
+                font-weight: bold;
+                font-size: 14px;
+                box-shadow: -3px 4px 10px rgba(0,0,0,0.18);
+                cursor: pointer;
+                z-index: 9999;
+                transform: rotate(-1.5deg);
+            }
+
+            #chat-draggable-btn,
+            .chat-bubble-btn,
+            .chat-toggle-btn {
+                position: fixed !important;
+                left: 14px !important;
+                bottom: 18px !important;
+                top: auto !important;
+                right: auto !important;
+                z-index: 9999 !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -144,24 +424,21 @@
     <header class="site-header-outer">
         <div class="site-header-inner">
             
-            {{-- EN SOL: Logo --}}
             <div class="header-logo">
                 Bookie
             </div>
 
-            {{-- TAM ORTA: Arama Çubuğu --}}
             <div class="header-search-wrap">
-                <div style="display: flex; align-items: center; gap: 12px; height: 48px; background-color: #fafcf7; background-image: url('{{ asset('images/arama.jpg') }}'); background-repeat: repeat; border: 2px solid #6b9c56; border-radius: 28px; padding: 0 16px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);">
-                    <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0;">
-                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="on" style="flex: 1; border: none; outline: none; background: transparent; font-size: 21px; font-family: 'Unkempt', cursive; color: #1b3711;">
-                    <span id="searchLoader" style="display: none; font-size: 14px;">^^</span>
+                <div class="header-search-bar-box">
+                    <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
+                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="on" style="flex: 1; border: none; outline: none; background: transparent; font-size: 22px; font-family: 'Unkempt', cursive; color: #1b3711;">
+                    <span id="searchLoader" style="display: none; font-size: 15px;">^^</span>
                 </div>
 
-                <div id="searchResultsDropdown" style="display: none; position: absolute; top: 52px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 999999;"></div>
+                <div id="searchResultsDropdown" style="display: none; position: absolute; top: 50px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 999999;"></div>
             </div>
             
-            {{-- EN SAĞ: Butonlar --}}
-            <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
+            <div class="header-desktop-actions">
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
                     @include('partials.notifications')
                 </div>
@@ -172,6 +449,22 @@
                 
                 <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
                     <img src="{{ asset('images/profile.jpg') }}" alt="profile" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                </a>
+            </div>
+
+            <div class="mobile-menu-trigger" id="mobileMenuBtn">
+                <img src="{{ asset('images/profile.jpg') }}" alt="Menu">
+            </div>
+
+            <div class="mobile-dropdown-menu hidden" id="mobileDropdownMenu">
+                <div class="mobile-icon-box">
+                    @include('partials.notifications')
+                </div>
+                <a href="{{ route('ayarlar') }}" class="mobile-icon-box">
+                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="Settings">
+                </a>
+                <a href="{{ route('profile') }}" class="mobile-icon-box">
+                    <img src="{{ asset('images/profile.jpg') }}" alt="Profile">
                 </a>
             </div>
 
@@ -196,33 +489,30 @@
     {{-- KAPSAYICI --}}
     <div class="app-container">
         
-        {{-- SOL PANEL --}}
         <div class="left-content-area">
             
-            {{-- 1. ÜST SATIR --}}
             <div class="dashboard-row-equal">
-                <div style="flex-shrink: 0;">
+                <div class="mob-grid-item-continue" style="flex-shrink: 0;">
                     @include('partials.continue-reading')
                 </div>
                 
                 <div class="equal-spacer"></div>
 
-                <div style="flex-shrink: 0;">
+                <div class="mob-grid-item-popular" style="flex-shrink: 0;">
                     @include('partials.popular-books')
                 </div>
 
                 <div class="equal-spacer"></div>
             </div>
 
-            {{-- 2. ALT SATIR --}}
             <div class="dashboard-row-equal">
-                <div style="flex-shrink: 0;">
+                <div class="mob-grid-item-admin" style="flex-shrink: 0;">
                     @include('partials.adminRecommendation')
                 </div>
                 
                 <div class="equal-spacer"></div>
 
-                <div style="flex-shrink: 0;">
+                <div class="mob-grid-item-cat" style="flex-shrink: 0;">
                     @include('partials.cat-recommendation')
                 </div>
 
@@ -232,7 +522,7 @@
         </div>
 
         {{-- SAĞ PANEL --}}
-        <div class="right-sidebar-panel">
+        <div class="right-sidebar-panel" id="mobileDrawer">
             
             <div style="position: relative; width: 100%;">
                 <div style="background: #f4fbf0; border: 1.5px solid #515f30; border-radius: 22px; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
@@ -242,9 +532,12 @@
                 <div id="userSearchResults" style="display: none; position: absolute; top: 45px; left: 0; width: 100%; background: #ffffff; border: 1.5px solid #4c7237; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); max-height: 220px; overflow-y: auto; z-index: 999999;"></div>
             </div>
 
-            <span style="font-family: 'Henny Penny', cursive; font-size: 18px; color: #1a3c11;">
-                Friend reviews
-            </span>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-family: 'Henny Penny', cursive; font-size: 18px; color: #1a3c11;">
+                    Friend reviews
+                </span>
+                <button type="button" id="closeDrawerBtn" style="display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #1a3c11;">✕</button>
+            </div>
 
             <div class="friend-reviews-scroll" style="display: flex; flex-direction: column; padding-right: 4px; gap: 12px; overflow-y: auto; flex: 1;">
                 @php
@@ -314,6 +607,12 @@
         </div>
     </div>
 
+    {{-- MOBİL POST-IT BUTONU & OVERLAY --}}
+    <div class="mobile-friends-tab" id="openFriendsDrawerBtn">
+        <span>📌 Friends</span>
+    </div>
+    <div class="mobile-drawer-overlay hidden" id="drawerOverlay"></div>
+
     {{-- JS Fonksiyonları --}}
     <script>
     function toggleReviewLike(reviewId, buttonElement) {
@@ -345,6 +644,45 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileDropdown = document.getElementById('mobileDropdownMenu');
+        const openFriendsBtn = document.getElementById('openFriendsDrawerBtn');
+        const drawer = document.getElementById('mobileDrawer');
+        const drawerOverlay = document.getElementById('drawerOverlay');
+        const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+        if (mobileMenuBtn && mobileDropdown) {
+            mobileMenuBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                mobileDropdown.classList.toggle('hidden');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!mobileDropdown.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                    mobileDropdown.classList.add('hidden');
+                }
+            });
+        }
+
+        if (openFriendsBtn && drawer && drawerOverlay) {
+            function openDrawer() {
+                drawer.classList.add('drawer-open');
+                drawerOverlay.classList.remove('hidden');
+                if (closeDrawerBtn) closeDrawerBtn.style.display = 'block';
+            }
+
+            function closeDrawer() {
+                drawer.classList.remove('drawer-open');
+                drawerOverlay.classList.add('hidden');
+                if (closeDrawerBtn) closeDrawerBtn.style.display = 'none';
+            }
+
+            openFriendsBtn.addEventListener('click', openDrawer);
+            drawerOverlay.addEventListener('click', closeDrawer);
+            if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+        }
+
+        // Kitap Arama
         const input = document.getElementById('bookSearchInput');
         const dropdown = document.getElementById('searchResultsDropdown');
 
@@ -420,6 +758,7 @@
             });
         }
 
+        // Kullanıcı Arama
         const userSearchInput = document.getElementById('userSearchInput');
         const userSearchResults = document.getElementById('userSearchResults');
 
@@ -500,7 +839,6 @@
             });
         }
     });
-    
     </script>
     @include('partials.chat')
 </body>

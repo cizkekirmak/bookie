@@ -1,37 +1,3 @@
-<?php
-session_start();
-
-
-$mesaj = '';
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username_or_email = trim($_POST["username_or_email"] ?? "");
-    $password = $_POST["password"] ?? "";
-
-    if (!empty($username_or_email) && !empty($password)) {
-        try {
-            $sql = "SELECT * FROM users WHERE username = :input OP email =  :input LIMIT 1";
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([":input" => $username_or_email]);
-            $user = $stmt->fetch();
-
-            if ($user && password_verify($password, $user["password"])) {
-                $_SESSION["user_id"] = $user["id"];
-                $_SESSION["username"] = $user["username"];
-
-                header("Location: home.php");
-                exit();
-            } else {
-                $mesaj = "<p style='color: red;'>username/email or password is wrong :(</p>";   
-            }                
-        } catch (PDOException $e) {
-            $mesaj = "<p style'color: red,'>oops error: " . htmlspecianchars($e->getmessage()) . "</p>";
-        }
-    } else {
-        $mesaj = "<p style='color: red;'>please fill in everything !!</p>";
-    }
-}
-?>
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -44,17 +10,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     
     <style>
        body { 
-        font-family: "Mystery Quest" , system-ui;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #D1FFBD;
-        margin: 0; 
-        background-image: url("{{ asset('images/arkaplan.png') }}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+            font-family: "Mystery Quest", system-ui;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #D1FFBD;
+            margin: 0; 
+            background-image: url("{{ asset('images/arkaplan.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .dis-kapsayici {
@@ -63,12 +29,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             align-items: center;
             gap: 0px;
         }
+        
         .site-basligi {
             font-family: "Henny Penny", cursive;
             font-size: 100px;
             color: #1a562b;
             margin: 0 0 -20px 0;
             letter-spacing: 2px;
+            user-select: none;
         }
 
         .kutucuk { 
@@ -82,10 +50,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         .kutucuk label {
             display: block;
-            margin-bottom: -2px;
+            margin-bottom: 2px;
             color: #333;
             font-size: 17px;
-
+            cursor: pointer;
         }
 
         .kutucuk input {
@@ -96,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             border-radius: 5px;
             box-sizing: border-box;
             font-family: Arial, sans-serif;
+            outline: none;
         }
 
         .kutucuk button {
@@ -110,6 +79,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             cursor: pointer;
             font-weight: bold;
             font-family: "Henny Penny", cursive;
+            transition: background-color 0.2s ease;
         }
 
         .kutucuk button:hover {
@@ -146,11 +116,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <form method="POST" action="/login">
                 @csrf
+                
                 @if (session('status'))
                     <p style="color: #2e6f40; font-size: 15px; font-family: 'Unkempt', cursive; text-align: center; margin-bottom: 15px;">
                         {{ session('status') }}
                     </p>
                 @endif
+                
                 @if ($errors->any())
                     <div style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; text-align: center; margin-bottom: 15px;">
                         <ul style="list-style-type: none; padding: 0; margin: 0;">
@@ -160,18 +132,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </ul>
                     </div>
                 @endif
-                <label for="username or email">username or email:</label>
-                <input type="text" id="loginname" name="loginname">
-                @error('username_or_email')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px;">
+
+                {{-- label 'for' ile input 'id' birebir eşleştirildi --}}
+                <label for="loginname">username or email:</label>
+                <input type="text" id="loginname" name="loginname" value="{{ old('loginname') }}" required autocomplete="username">
+                @error('loginname')
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 12px;">
                         {{ $message }}
                     </small>
                 @enderror
 
                 <label for="password">password:</label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required autocomplete="current-password">
                 @error('password')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px;">
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 12px;">
                         {{ $message }}
                     </small>
                 @enderror
@@ -185,6 +159,5 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </form>
         </div>
     </div>
-
 </body>
 </html>

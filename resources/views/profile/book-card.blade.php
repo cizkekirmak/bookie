@@ -22,21 +22,21 @@
 
 <div class="book-card-item" 
      data-status="{{ $item->status }}"
-     style="background: #ffffff; border: 1.5px solid #d4e5cb; border-radius: 12px; padding: 14px; display: flex; gap: 16px; align-items: flex-start; box-shadow: 0 2px 5px rgba(0,0,0,0.03); position: relative;">
+     style="background: #ffffff; border: 1.5px solid #d4e5cb; border-radius: 12px; padding: 12px; display: flex; gap: 12px; align-items: flex-start; box-shadow: 0 2px 5px rgba(0,0,0,0.03); position: relative; width: 100%;">
      
     @if($isOwnProfile ?? false)
-        <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding-top: 4px;">
+        <div style="display: flex; align-items: center; justify-content: center; flex-shrink: 0; padding-top: 2px;">
             <input type="checkbox" 
                    name="selected_books[]" 
                    value="{{ $item->id }}" 
                    class="book-select-checkbox" 
                    onchange="updateDeleteButtonState()"
-                   style="width: 18px; height: 18px; cursor: pointer; accent-color: #2d5a27;">
+                   style="width: 16px; height: 16px; cursor: pointer; accent-color: #2d5a27;">
         </div>
     @endif
 
     {{-- Kapak Görseli --}}
-    <a href="{{ route('show', $bookKey) }}" style="flex-shrink: 0; width: 70px; height: 100px; display: block; overflow: hidden; border-radius: 6px; border: 1px solid #c2d8b7;">
+    <a href="{{ route('show', $bookKey) }}" class="book-cover-link" style="flex-shrink: 0; width: 55px; height: 80px; display: block; overflow: hidden; border-radius: 6px; border: 1px solid #c2d8b7;">
         <img src="{{ $coverSrc ?: asset('images/default-book.png') }}" 
              alt="{{ $book->title ?? 'Kitap' }}"
              style="width: 100%; height: 100%; object-fit: cover;"
@@ -44,64 +44,65 @@
     </a>
 
     {{-- Bilgiler & Badge --}}
-    <div style="flex: 1; min-width: 0;">
-        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; gap: 8px;">
-            <div>
-                <h4 style="margin: 0 0 2px 0; font-size: 16px; color: #1a3c11;">
+    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
+        
+        {{-- Başlık + Durum Rozeti --}}
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; width: 100%;">
+            <div style="min-width: 0; flex: 1;">
+                <h4 style="margin: 0 0 2px 0; font-size: 15px; color: #1a3c11; line-height: 1.2; word-break: break-word;">
                     <a href="{{ route('show', $bookKey) }}" style="text-decoration: none; color: inherit;">
                         {{ $book->title ?? 'Bilinmeyen Kitap' }}
                     </a>
                 </h4>
-                <span style="font-size: 13px; color: #527943;">
+                <span style="font-size: 12px; color: #527943; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                     {{ $book->author ?? 'Bilinmeyen Yazar' }}
                 </span>
             </div>
 
-            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0;">
-                <span style="font-size: 11px; padding: 3px 8px; border-radius: 6px; font-weight: bold; background: #eaf3e4; color: #2d5a27; border: 1px solid #c2d8b7;">
-                    @if($item->status === 'reading') currently reading
-                    @elseif($item->status === 'read') read
-                    @elseif($item->status === 'toRead') to read
-                    @else {{ $item->status }}
-                    @endif
-                </span>
+            {{-- Durum Rozeti (read, to read, currently reading) --}}
+            <span style="font-size: 10px; padding: 2px 6px; border-radius: 5px; font-weight: bold; background: #eaf3e4; color: #2d5a27; border: 1px solid #c2d8b7; white-space: nowrap; flex-shrink: 0;">
+                @if($item->status === 'reading') reading
+                @elseif($item->status === 'read') read
+                @elseif($item->status === 'toRead') to read
+                @else {{ $item->status }}
+                @endif
+            </span>
+        </div>
 
-                {{-- İlerleme Çubuğu ve Sayfa Bilgisi --}}
-                @if($hasProgress)
-                    <div style="width: 105px; text-align: right;">
-                        <div style="font-size: 11px; color: #3b612d; font-weight: bold; margin-bottom: 2px;">
-                            @if($pct !== null)
-                                <span>%{{ $pct }}</span>
-                                <span style="font-weight: normal; color: #666; font-size: 10px;">({{ $currentPage }}/{{ $totalPages }})</span>
-                            @else
-                                <span>p. {{ $currentPage }}</span>
-                            @endif
-                        </div>
-                        @if($pct !== null)
-                            <div style="width: 100%; height: 5px; background: #eaf3e4; border: 1px solid #c2d8b7; border-radius: 4px; overflow: hidden;">
-                                <div style="width: {{ $pct }}%; height: 100%; background: #2d5a27; border-radius: 4px;"></div>
-                            </div>
-                        @endif
+        {{-- İlerleme Çubuğu ve Sayfa Bilgisi (Başlığın hemen altı) --}}
+        @if($hasProgress)
+            <div style="width: 100%; margin-top: 2px; margin-bottom: 2px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #3b612d; font-weight: bold; margin-bottom: 2px;">
+                    @if($pct !== null)
+                        <span>%{{ $pct }}</span>
+                        <span style="font-weight: normal; color: #666; font-size: 10px;">{{ $currentPage }} / {{ $totalPages }} p.</span>
+                    @else
+                        <span>p. {{ $currentPage }}</span>
+                    @endif
+                </div>
+                @if($pct !== null)
+                    <div style="width: 100%; height: 5px; background: #eaf3e4; border: 1px solid #c2d8b7; border-radius: 4px; overflow: hidden;">
+                        <div style="width: {{ $pct }}%; height: 100%; background: #2d5a27; border-radius: 4px;"></div>
                     </div>
                 @endif
             </div>
-        </div>
+        @endif
 
         {{-- Renkli Yıldızlar --}}
         @if($item->rating)
             @php
                 $starColor = match((int)$item->rating) {
-                    5 => '#e5a00d', // 5 Yıldız: Altın Sarısı
-                    4 => '#7fa638', // 4 Yıldız: Fıstık Yeşili
-                    3 => '#e07b22', // 3 Yıldız: Sıcak Turuncu
-                    2 => '#d45d43', // 2 Yıldız: Mercan
-                    1 => '#c23b3b', // 1 Yıldız: Kırmızı
+                    5 => '#e5a00d',
+                    4 => '#7fa638',
+                    3 => '#e07b22',
+                    2 => '#d45d43',
+                    1 => '#c23b3b',
                     default => '#e5a00d',
                 };
             @endphp
-            <div style="margin-bottom: 6px; font-size: 15px; display: flex; align-items: center; gap: 2px;">
+            <div style="font-size: 14px; display: flex; align-items: center; gap: 2px; line-height: 1; margin-top: 2px;">
                 @for($i = 1; $i <= 5; $i++)
-                    <span style="color: {{ $i <= $item->rating ? $starColor : '#dcdfd5' }}; line-height: 1;">
+                    <span style="color: {{ $i <= $item->rating ? $starColor : '#dcdfd5' }};">
                         ★
                     </span>
                 @endfor
@@ -110,7 +111,7 @@
 
         {{-- Yorum --}}
         @if(!empty($item->review))
-            <p style="margin: 0; font-size: 13px; color: #333; line-height: 1.4; background: #fbfdf9; padding: 8px 10px; border-radius: 6px; border-left: 3px solid #8ec46f;">
+            <p style="margin: 4px 0 0 0; font-size: 12px; color: #333; line-height: 1.35; background: #fbfdf9; padding: 6px 8px; border-radius: 6px; border-left: 3px solid #8ec46f; word-break: break-word;">
                 "{{ $item->review }}"
             </p>
         @endif

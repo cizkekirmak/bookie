@@ -103,7 +103,8 @@
     border: 2px solid #fff;
     pointer-events: none;
 }
-/* POP-UP: KÜÇÜK VE KOMPAKT (360px x 430px) */
+
+/* POP-UP: MASAÜSTÜ (360px x 430px) */
 .chat-popup {
     position: fixed;
     bottom: 135px;
@@ -117,6 +118,21 @@
     overflow: hidden;
     z-index: 99998;
     border: 1px solid rgba(0,0,0,0.08);
+}
+
+/* POP-UP: MOBİLDE EKRANA TAM ORTALAMA */
+@media (max-width: 768px) {
+    .chat-popup {
+        width: 92vw !important;
+        max-width: 350px !important;
+        height: 430px !important;
+        left: 50% !important;
+        right: auto !important;
+        top: auto !important;
+        bottom: 88px !important;
+        transform: translateX(-50%) !important;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.25) !important;
+    }
 }
 
 /* SOL PANEL */
@@ -154,6 +170,7 @@
     flex-direction: column;
     position: relative;
     background: #fff;
+    min-width: 0;
 }
 .chat-header {
     height: 46px;
@@ -193,7 +210,7 @@
     border: none;
     font-size: 20px;
     cursor: pointer;
-    color: #ffeaf9;
+    color: #333;
 }
 
 .chat-messages-body {
@@ -203,10 +220,10 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background-image: url('{{ asset("images/chat-bg.jpg") }}');/* veya dosyanın public'teki gerçek adı */
-    background-size: 340px auto;           /* Genişliği kutuya uygun sabitler, boyu orantılı uzatır */
-    background-position: center;       /* Üstten ortalayarak hizalar */
-    background-repeat: repeat-y;        /* veya görsel sabit kalsın istersen scroll yapabilirsin */
+    background-image: url('{{ asset("images/chat-bg.jpg") }}');
+    background-size: 340px auto;
+    background-position: center;
+    background-repeat: repeat-y;
     background-color: #fff1f9;
 }
 .chat-empty-state {
@@ -406,16 +423,24 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = isOpen ? 'none' : 'flex';
         if (!isOpen) {
             loadFriends();
-            const rect = btn.getBoundingClientRect();
-            if (rect.left < window.innerWidth / 2) {
-                popup.style.left = `${Math.min(rect.left, window.innerWidth - 380)}px`;
-                popup.style.right = 'auto';
+            // Mobilde CSS ile ortalama yapılabilmesi için inline koordinatları sadece masaüstünde uyguluyoruz
+            if (window.innerWidth > 768) {
+                const rect = btn.getBoundingClientRect();
+                if (rect.left < window.innerWidth / 2) {
+                    popup.style.left = `${Math.min(rect.left, window.innerWidth - 380)}px`;
+                    popup.style.right = 'auto';
+                } else {
+                    popup.style.right = `${Math.max(20, window.innerWidth - rect.right)}px`;
+                    popup.style.left = 'auto';
+                }
+                popup.style.top = `${Math.max(20, rect.top - 440)}px`;
+                popup.style.bottom = 'auto';
             } else {
-                popup.style.right = `${Math.max(20, window.innerWidth - rect.right)}px`;
-                popup.style.left = 'auto';
+                popup.style.left = '';
+                popup.style.right = '';
+                popup.style.top = '';
+                popup.style.bottom = '';
             }
-            popup.style.top = `${Math.max(20, rect.top - 440)}px`;
-            popup.style.bottom = 'auto';
         }
     });
 
@@ -476,7 +501,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/messages/${activeFriendId}`);
             const messages = await res.json();
             
-            // Eğer yeni bir mesaj gelmemişse ve zorunlu kaydırma istenmiyorsa DOM'u baştan çizme (böylece scroll bozulmaz)
+            // Eğer yeni bir mesaj gelmemişse ve zorunlu kaydırma istenmiyorsa DOM'u baştan çizme
             const stringified = JSON.stringify(messages);
             if (stringified === lastLoadedMessagesJson && !forceScroll) {
                 return;
@@ -484,7 +509,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lastLoadedMessagesJson = stringified;
 
             // Kullanıcı zaten en altta mı yoksa yukarıda eski mesajları mı okuyor kontrol et
-            const threshold = 60; // piksel toleransı
+            const threshold = 60;
             const isNearBottom = (messagesBody.scrollHeight - messagesBody.scrollTop - messagesBody.clientHeight) <= threshold;
             const previousScrollTop = messagesBody.scrollTop;
 
@@ -517,11 +542,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 messagesBody.appendChild(bubble);
             });
 
-            // Sadece zorunluysa (mesaj atınca / ilk açılışta) veya kullanıcı zaten en alttaysa aşağı kaydır
+            // Sadece zorunluysa veya kullanıcı zaten en alttaysa aşağı kaydır
             if (forceScroll || isNearBottom) {
                 messagesBody.scrollTop = messagesBody.scrollHeight;
             } else {
-                messagesBody.scrollTop = previousScrollTop; // Kullanıcının kaldığı yeri koru
+                messagesBody.scrollTop = previousScrollTop;
             }
         } catch (e) {
             console.error(e);
@@ -547,7 +572,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (res.ok) {
                 messageInput.value = '';
                 stickerPicker.style.display = 'none';
-                await loadMessages(true); // Gönderdiğinde en alta insin
+                await loadMessages(true);
             }
         } catch (e) {
             console.error('Mesaj iletilemedi:', e);
@@ -582,7 +607,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (popup.style.display === 'flex') {
                 loadFriends();
                 if (activeFriendId) {
-                    loadMessages(false); // Otomatik yenilemede scroll'u zorlama
+                    loadMessages(false);
                 }
             }
         } catch (e) {}
@@ -595,6 +620,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     checkUnread();
-    setInterval(checkUnread, 4000);
+    setInterval(checkUnread, 10000);
 });
 </script>

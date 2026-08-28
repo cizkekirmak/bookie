@@ -9,6 +9,63 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
 
+    {{-- MODAL FONKSİYONLARI (GLOBAL SCOPE) --}}
+    <script>
+        window.openFriendsModal = function() {
+            const modal = document.getElementById('friendsModal');
+            if (modal) {
+                modal.style.display = 'flex';
+            }
+        };
+
+        window.closeFriendsModal = function() {
+            const modal = document.getElementById('friendsModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        window.switchProfileView = function(mode) {
+            const listView = document.getElementById('profile-list-view');
+            const shelfView = document.getElementById('profile-shelf-view');
+            const btnList = document.getElementById('btn-list-view');
+            const btnShelf = document.getElementById('btn-shelf-view');
+
+            if (mode === 'list') {
+                if (listView) listView.style.display = 'flex';
+                if (shelfView) shelfView.style.display = 'none';
+                if (btnList) { btnList.style.background = '#255719'; btnList.style.color = '#ffffff'; }
+                if (btnShelf) { btnShelf.style.background = 'transparent'; btnShelf.style.color = '#1a3c11'; }
+            } else {
+                if (listView) listView.style.display = 'none';
+                if (shelfView) shelfView.style.display = 'flex';
+                if (btnShelf) { btnShelf.style.background = '#255719'; btnShelf.style.color = '#ffffff'; }
+                if (btnList) { btnList.style.background = 'transparent'; btnList.style.color = '#1a3c11'; }
+            }
+        };
+
+        window.filterStatus = function(status, clickedBtn) {
+            document.querySelectorAll('.status-tab').forEach(btn => {
+                btn.style.background = '#eaf3e4';
+                btn.style.color = '#1a3c11';
+                btn.style.border = '1px solid #737e3d';
+            });
+            clickedBtn.style.background = '#255719';
+            clickedBtn.style.color = '#ffffff';
+            clickedBtn.style.border = 'none';
+
+            const cards = document.querySelectorAll('.book-card-item');
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                if (status === 'all' || cardStatus === status) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        };
+    </script>
+
     <style>
         * {
             box-sizing: border-box;
@@ -25,9 +82,10 @@
             margin: 0;
             padding: 0;
             overflow-x: hidden;
+            font-family: 'Unkempt', cursive;
         }
 
-        /* HEADER: Ortada OG profil-header.png, kenar boşluklarında repeat eden bosluk.png */
+        /* HEADER: Masaüstü (76px) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -51,7 +109,6 @@
             z-index: 1000;
         }
 
-        /* Header İçeriği: Dashboard ile birebir aynı (kenarlara tam yaslanır) */
         .site-header-inner {
             width: 100%;
             height: 100%;
@@ -72,7 +129,30 @@
             user-select: none;
         }
 
-        /* ANA GÖVDE KAPSAYICISI */
+        .header-actions-wrap {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-shrink: 0;
+        }
+
+        .header-icon-box {
+            width: 52px;
+            height: 52px;
+            max-width: 52px;
+            max-height: 52px;
+            object-fit: contain;
+            border: 1.5px solid #4b813b;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .header-icon-box:hover {
+            transform: scale(1.1);
+        }
+
+        /* ANA GÖVDE: Masaüstü */
         .profile-container {
             width: 100%;
             max-width: 1520px;
@@ -85,6 +165,29 @@
             border-left: 2px solid #4c7237;
             border-right: 2px solid #4c7237;
             border-bottom: 2px solid #4c7237;
+        }
+
+        .profile-sidebar-panel {
+            width: 320px;
+            background: #8ec46f;
+            border-right: 2px solid #4c7237;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-sizing: border-box;
+            flex-shrink: 0;
+            height: 100%;
+        }
+
+        .profile-main-content {
+            flex: 1;
+            padding: 25px 30px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+            background-color: #f7faf5;
         }
 
         .custom-scroll::-webkit-scrollbar {
@@ -104,23 +207,13 @@
         }
 
         @keyframes popInModal {
-            0% { 
-                transform: scale(0.9); 
-                opacity: 0; 
-            }
-            100% { 
-                transform: scale(1); 
-                opacity: 1; 
-            }
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         @keyframes rainbowWave {
-            0% { 
-                filter: hue-rotate(0deg); 
-            }
-            100% { 
-                filter: hue-rotate(360deg); 
-            }
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
         }
 
         .admin-rainbow-badge {
@@ -130,6 +223,165 @@
             color: #1a3c11 !important;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
         }
+
+        .mobile-profile-tab,
+        .mobile-profile-overlay,
+        .profile-close-btn {
+            display: none !important;
+        }
+
+        /* ==========================================================================
+           TELEFON / MOBİL UYARLAMA
+           ========================================================================== */
+        @media (max-width: 768px) {
+            .site-header-outer {
+                height: 68px !important;
+            }
+
+            .site-header-inner {
+                padding: 0 14px !important;
+            }
+
+            .header-logo {
+                font-size: 30px !important;
+                margin-top: 0 !important;
+            }
+
+            .header-actions-wrap {
+                gap: 8px !important;
+            }
+
+            .header-icon-box,
+            .notification-icon-img,
+            .header-actions-wrap img {
+                width: 44px !important;
+                height: 44px !important;
+                max-width: 44px !important;
+                max-height: 44px !important;
+                border: 2px solid #4b813b !important;
+                border-radius: 10px !important;
+                display: block !important;
+            }
+
+            .profile-container {
+                height: auto !important;
+                min-height: calc(100vh - 68px) !important;
+                min-height: calc(100dvh - 68px) !important;
+                border: none !important;
+                display: flex !important;
+                flex-direction: column !important;
+                align-items: center !important;
+                background-color: transparent !important;
+                padding: 16px 12px 100px 12px !important;
+                overflow-x: hidden !important;
+            }
+
+            /* SAĞDAN AÇILAN ÇEKMECE */
+            .profile-sidebar-panel {
+                position: fixed !important;
+                top: 0 !important;
+                right: 0 !important;
+                left: auto !important;
+                width: 82vw !important;
+                max-width: 320px !important;
+                height: 100vh !important;
+                max-height: 100vh !important;
+                border-radius: 16px 0 0 16px !important;
+                border-left: 2px solid #2d5a27 !important;
+                border-right: none !important;
+                z-index: 100001 !important;
+                transform: translateX(100%);
+                transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+                box-shadow: -6px 0 24px rgba(0,0,0,0.3) !important;
+                padding: 20px 16px !important;
+                overflow-y: auto !important;
+            }
+
+            .profile-sidebar-panel.drawer-open {
+                transform: translateX(0) !important;
+            }
+
+            .profile-close-btn {
+                display: block !important;
+                align-self: flex-start;
+                background: none;
+                border: none;
+                font-size: 22px;
+                color: #1a3c11;
+                cursor: pointer;
+                padding: 0;
+                margin-bottom: 6px;
+                line-height: 1;
+            }
+
+            .mobile-profile-overlay {
+                display: block !important;
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.45);
+                z-index: 100000;
+                backdrop-filter: blur(2px);
+            }
+
+            .mobile-profile-overlay.hidden {
+                display: none !important;
+            }
+
+            /* SAĞDAKİ POST-IT BUTONU */
+            .mobile-profile-tab {
+                display: flex !important;
+                align-items: center;
+                gap: 6px;
+                position: fixed !important;
+                bottom: 18px !important;
+                right: 0 !important;
+                left: auto !important;
+                background: #fdf5a6;
+                color: #2c441b;
+                border: 2px solid #5a7d3b;
+                border-right: none;
+                border-radius: 14px 0 0 14px;
+                padding: 7px 14px;
+                font-family: 'Unkempt', cursive;
+                font-weight: bold;
+                font-size: 14px;
+                box-shadow: -3px 4px 10px rgba(0,0,0,0.18);
+                cursor: pointer;
+                z-index: 9999;
+                transform: rotate(-1.5deg);
+            }
+
+            /* BEYAZ ALAN */
+            .profile-main-content {
+                width: 100% !important;
+                max-width: 440px !important;
+                height: calc(100vh - 165px) !important;
+                height: calc(100dvh - 165px) !important;
+                min-height: 480px !important;
+                padding: 16px 14px !important;
+                border: 2px solid #4c7237 !important;
+                border-radius: 16px !important;
+                background-color: #f7faf5 !important;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
+                display: flex !important;
+                flex-direction: column !important;
+                overflow: hidden !important;
+                flex: none !important;
+            }
+
+            .profile-main-content > div:first-child {
+                display: flex !important;
+                flex-direction: row !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                margin-bottom: 12px !important;
+                flex-shrink: 0 !important;
+            }
+
+            .profile-main-content h3 {
+                font-size: 19px !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -137,28 +389,24 @@
     {{-- HEADER --}}
     <header class="site-header-outer">
         <div class="site-header-inner">     
-            
+
             {{-- LOGO --}}
             <div class="header-logo">
                 Bookie
             </div>
-            
+
             {{-- SAĞ İKONLAR --}}
-            <div style="display: flex; align-items: center; gap: 16px; flex-shrink: 0;">
+            <div class="header-actions-wrap">
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
                     @include('partials.notifications')
                 </div>
 
-                <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="ayarlar" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;"
-                         onmouseenter="this.style.transform='scale(1.1)';"
-                         onmouseleave="this.style.transform='scale(1)';">
+                <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
+                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="ayarlar" class="header-icon-box">
                 </a>
-                
-                <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/dash.jpg') }}" alt="dashboard" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;"
-                         onmouseenter="this.style.transform='scale(1.1)';"
-                         onmouseleave="this.style.transform='scale(1)';">
+
+                <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
+                    <img src="{{ asset('images/dash.jpg') }}" alt="dashboard" class="header-icon-box">
                 </a>
             </div>
 
@@ -168,9 +416,11 @@
     {{-- GÖVDE: Boxed Container --}}
     <div class="profile-container">
 
-        {{-- SOL SABİT PROFİL PANELİ --}}
-        <aside style="width: 320px; background: #8ec46f; border-right: 2px solid #4c7237; padding: 30px 20px; display: flex; flex-direction: column; align-items: center; box-sizing: border-box; flex-shrink: 0; height: 100%;">
+        {{-- SAĞDAN AÇILAN ÇEKMECE PANEL --}}
+        <aside class="profile-sidebar-panel" id="profileSidebarDrawer">
             
+            <button type="button" class="profile-close-btn" id="closeProfileDrawerBtn">&times;</button>
+
             {{-- Profil Fotoğrafı / Fide --}}
             <div style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #2d5a27; background: #eaf3e4; display: flex; justify-content: center; align-items: center; margin-bottom: 0; overflow: hidden; flex-shrink: 0;">
                 @if($user->avatar)
@@ -223,7 +473,7 @@
             @endif
 
             @if(!$isOwnProfile)
-                <div style="margin-bottom: 20px; width: 100%; display: flex; justify-content: center;">
+                <div style="margin-bottom: 20px; width: 100%; display: flex; justify-content: center; margin-top: 10px;">
                     @if(!$friendship)
                         <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                             @csrf
@@ -265,7 +515,7 @@
             @endif
 
             {{-- Friends Butonu --}}
-            <div style="width: 100%; border-top: 1.5px solid #deeaa5; padding-top: 20px; display: flex; justify-content: center;">
+            <div style="width: 100%; border-top: 1.5px solid #deeaa5; padding-top: 20px; margin-top: 14px; display: flex; justify-content: center;">
                 <button 
                     type="button" 
                     onclick="openFriendsModal()" 
@@ -280,7 +530,7 @@
                         padding: 8px 14px; 
                         cursor: pointer; 
                         font-family: 'Unkempt', cursive; 
-                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+                        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); 
                         transition: all 0.2s ease;
                     "
                     onmouseenter="this.style.background='#c5f58b'; this.style.transform='translateY(-1px)';"
@@ -306,8 +556,8 @@
         </aside>
 
         {{-- SAĞ İÇERİK ALANI --}}
-        <main style="flex: 1; padding: 25px 30px; display: flex; flex-direction: column; overflow: hidden; min-width: 0;">
-            
+        <main class="profile-main-content">
+
             {{-- ÜST PANEL: BAŞLIK & SWITCH --}}
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
                 <h3 style="font-family: 'Henny Penny', cursive; font-size: 24px; color: #1a3c11; margin: 0;">
@@ -332,51 +582,36 @@
 
     </div>
 
-{{-- JAVASCRIPT YÖNETİMİ --}}
+    {{-- SAĞDAKİ MOBİL PROFİL POST-IT BUTONU & OVERLAY --}}
+    <div class="mobile-profile-tab" id="openProfileDrawerBtn">
+        <span>📌 Profile</span>
+    </div>
+    <div class="mobile-profile-overlay hidden" id="profileDrawerOverlay"></div>
+
+{{-- JAVASCRIPT ÇEKMECE YÖNETİMİ --}}
 <script>
-function switchProfileView(mode) {
-    const listView = document.getElementById('profile-list-view');
-    const shelfView = document.getElementById('profile-shelf-view');
-    const btnList = document.getElementById('btn-list-view');
-    const btnShelf = document.getElementById('btn-shelf-view');
+document.addEventListener('DOMContentLoaded', function() {
+    const openDrawerBtn = document.getElementById('openProfileDrawerBtn');
+    const closeDrawerBtn = document.getElementById('closeProfileDrawerBtn');
+    const drawer = document.getElementById('profileSidebarDrawer');
+    const overlay = document.getElementById('profileDrawerOverlay');
 
-    if (mode === 'list') {
-        listView.style.display = 'flex';
-        shelfView.style.display = 'none';
-        btnList.style.background = '#255719';
-        btnList.style.color = '#ffffff';
-        btnShelf.style.background = 'transparent';
-        btnShelf.style.color = '#1a3c11';
-    } else {
-        listView.style.display = 'none';
-        shelfView.style.display = 'flex';
-        btnShelf.style.background = '#255719';
-        btnShelf.style.color = '#ffffff';
-        btnList.style.background = 'transparent';
-        btnList.style.color = '#1a3c11';
-    }
-}
-
-function filterStatus(status, clickedBtn) {
-    document.querySelectorAll('.status-tab').forEach(btn => {
-        btn.style.background = '#eaf3e4';
-        btn.style.color = '#1a3c11';
-        btn.style.border = '1px solid #737e3d';
-    });
-    clickedBtn.style.background = '#255719';
-    clickedBtn.style.color = '#ffffff';
-    clickedBtn.style.border = 'none';
-
-    const cards = document.querySelectorAll('.book-card-item');
-    cards.forEach(card => {
-        const cardStatus = card.getAttribute('data-status');
-        if (status === 'all' || cardStatus === status) {
-            card.style.display = 'flex';
-        } else {
-            card.style.display = 'none';
+    if (openDrawerBtn && drawer && overlay) {
+        function openProfile() {
+            drawer.classList.add('drawer-open');
+            overlay.classList.remove('hidden');
         }
-    });
-}
+
+        function closeProfile() {
+            drawer.classList.remove('drawer-open');
+            overlay.classList.add('hidden');
+        }
+
+        openDrawerBtn.addEventListener('click', openProfile);
+        overlay.addEventListener('click', closeProfile);
+        if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeProfile);
+    }
+});
 </script>
 
 {{-- FRIENDS MODAL --}}
@@ -579,20 +814,6 @@ function filterStatus(status, clickedBtn) {
 </div>
 
 <script>
-function openFriendsModal() {
-    const modal = document.getElementById('friendsModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
-}
-
-function closeFriendsModal() {
-    const modal = document.getElementById('friendsModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
 window.addEventListener('click', function(e) {
     const modal = document.getElementById('friendsModal');
     if (e.target === modal) {
@@ -600,6 +821,7 @@ window.addEventListener('click', function(e) {
     }
 });
 </script>
+
 @include('partials.chat')
 </body>
 </html>
