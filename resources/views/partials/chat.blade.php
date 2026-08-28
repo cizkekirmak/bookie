@@ -203,11 +203,10 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
-    background-image: url('{{ asset("images/chat-bg.jpg") }}');
-    background-size: 100% 100%;          /* Kutunun genişlik ve yüksekliğine tam oturtur */
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: local;        /* veya görsel sabit kalsın istersen scroll yapabilirsin */
+    background-image: url('{{ asset("images/chat-bg.jpg") }}');/* veya dosyanın public'teki gerçek adı */
+    background-size: 340px auto;           /* Genişliği kutuya uygun sabitler, boyu orantılı uzatır */
+    background-position: center;       /* Üstten ortalayarak hizalar */
+    background-repeat: repeat-y;        /* veya görsel sabit kalsın istersen scroll yapabilirsin */
     background-color: #fff1f9;
 }
 .chat-empty-state {
