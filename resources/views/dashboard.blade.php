@@ -26,6 +26,7 @@
             background-position: center top;
             background-attachment: fixed;
             background-repeat: no-repeat;
+            font-family: 'Unkempt', cursive;
         }
 
         /* HEADER: Masaüstü (Birebir Orijinal Hali) */
@@ -77,7 +78,7 @@
             left: 50%;
             transform: translateX(-50%);
             width: 500px;
-            z-index: 99999;
+            z-index: 100;
         }
 
         .header-search-bar-box {
@@ -109,7 +110,7 @@
             display: none !important;
         }
 
-        /* ANA GÖVDE: Masaüstü (Yukarıdan Başlayan Orijinal Yapı) */
+        /* ANA GÖVDE: Masaüstü (Birebir Orijinal Hali) */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -164,7 +165,7 @@
         .friend-reviews-scroll { scrollbar-width: thin; scrollbar-color: #82b564 transparent; }
 
         /* ==========================================================================
-           TELEFON / MOBİL STİLLERİ (DİKEYDE ORTALANMIŞ MOBİL DÜZEN)
+           TELEFON / MOBİL UYARLAMA
            ========================================================================== */
         @media (max-width: 768px) {
             body {
@@ -282,21 +283,10 @@
                 object-fit: cover;
             }
 
-            .mobile-icon-box .notification-wrapper,
-            .mobile-icon-box .notification-container,
-            .mobile-icon-box > div {
-                width: 100%;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-
             .equal-spacer {
                 display: none !important;
             }
 
-            /* MOBİLDE KARTLARI DİKEYDE ORTALA */
             .app-container {
                 padding: 12px 10px 95px 10px !important;
                 min-height: calc(100vh - 68px) !important;
@@ -308,13 +298,8 @@
             }
 
             .left-content-area {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                grid-template-rows: auto auto auto !important;
-                grid-template-areas:
-                    "continue admin"
-                    "popular  popular"
-                    "cat      cat" !important;
+                display: flex !important;
+                flex-direction: column !important;
                 gap: 14px !important;
                 width: 100% !important;
                 padding: 0 !important;
@@ -322,32 +307,9 @@
             }
 
             .dashboard-row-equal {
-                display: contents !important;
-            }
-
-            .mob-grid-item-continue {
-                grid-area: continue !important;
-                width: 100% !important;
-                min-width: 0 !important;
-            }
-
-            .mob-grid-item-admin {
-                grid-area: admin !important;
-                width: 100% !important;
-                min-width: 0 !important;
-                margin: 0 !important;
-            }
-
-            .mob-grid-item-popular {
-                grid-area: popular !important;
-                width: 100% !important;
-                min-width: 0 !important;
-            }
-
-            .mob-grid-item-cat {
-                grid-area: cat !important;
-                width: 100% !important;
-                min-width: 0 !important;
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 14px !important;
             }
 
             /* Çekmece */
@@ -432,10 +394,7 @@
                 <div class="header-search-bar-box">
                     <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
                     <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="on" style="flex: 1; border: none; outline: none; background: transparent; font-size: 22px; font-family: 'Unkempt', cursive; color: #1b3711;">
-                    <span id="searchLoader" style="display: none; font-size: 15px;">^^</span>
                 </div>
-
-                <div id="searchResultsDropdown" style="display: none; position: absolute; top: 50px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 999999;"></div>
             </div>
             
             <div class="header-desktop-actions">
@@ -492,30 +451,16 @@
         <div class="left-content-area">
             
             <div class="dashboard-row-equal">
-                <div class="mob-grid-item-continue" style="flex-shrink: 0;">
-                    @include('partials.continue-reading')
-                </div>
-                
+                @include('partials.continue-reading')
                 <div class="equal-spacer"></div>
-
-                <div class="mob-grid-item-popular" style="flex-shrink: 0;">
-                    @include('partials.popular-books')
-                </div>
-
+                @include('partials.popular-books')
                 <div class="equal-spacer"></div>
             </div>
 
             <div class="dashboard-row-equal">
-                <div class="mob-grid-item-admin" style="flex-shrink: 0;">
-                    @include('partials.adminRecommendation')
-                </div>
-                
+                @include('partials.adminRecommendation')
                 <div class="equal-spacer"></div>
-
-                <div class="mob-grid-item-cat" style="flex-shrink: 0;">
-                    @include('partials.cat-recommendation')
-                </div>
-
+                @include('partials.cat-recommendation')
                 <div class="equal-spacer"></div>
             </div>
 
@@ -680,82 +625,6 @@
             openFriendsBtn.addEventListener('click', openDrawer);
             drawerOverlay.addEventListener('click', closeDrawer);
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
-        }
-
-        // Kitap Arama
-        const input = document.getElementById('bookSearchInput');
-        const dropdown = document.getElementById('searchResultsDropdown');
-
-        if (input && dropdown) {
-            let allSearchResults = [];
-            let displayedCount = 0;
-            const PAGE_SIZE = 6;
-
-            function renderNextBooks() {
-                const oldBtn = document.getElementById('searchLoadMoreContainer');
-                if (oldBtn) oldBtn.remove();
-
-                const nextBatch = allSearchResults.slice(displayedCount, displayedCount + PAGE_SIZE);
-                const html = nextBatch.map(book => `
-                    <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
-                        <img src="${book.cover}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;">
-                        <div style="overflow: hidden; text-align: left;">
-                            <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
-                            <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors}</div>
-                        </div>
-                    </div>
-                `).join('');
-
-                dropdown.insertAdjacentHTML('beforeend', html);
-                displayedCount += nextBatch.length;
-
-                if (displayedCount < allSearchResults.length) {
-                    const remaining = allSearchResults.length - displayedCount;
-                    const loadMoreHtml = `
-                        <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
-                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">load more (+${Math.min(PAGE_SIZE, remaining)})</button>
-                        </div>
-                    `;
-                    dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);
-                    document.getElementById('searchLoadMoreBtn').addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        renderNextBooks();
-                    });
-                }
-            }
-
-            input.addEventListener('keydown', async function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    const q = input.value.trim();
-                    if (q.length < 2) return;
-
-                    dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666;">Aranıyor...</div>';
-                    dropdown.style.display = 'block';
-                    try {
-                        const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
-                        const data = await res.json();
-                        const books = Array.isArray(data) ? data : (data.items || []);
-
-                        if (!books || books.length === 0) {
-                            dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666;">Sonuç bulunamadı.</div>';
-                            return;
-                        }
-                        dropdown.innerHTML = '';
-                        allSearchResults = books;
-                        displayedCount = 0;
-                        renderNextBooks();
-                    } catch (err) {
-                        dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: red;">Arama sırasında hata oluştu.</div>';
-                    }
-                }
-            });
-
-            document.addEventListener('click', function (e) {
-                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.style.display = 'none';
-                }
-            });
         }
 
         // Kullanıcı Arama
