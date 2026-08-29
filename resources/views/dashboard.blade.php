@@ -30,7 +30,7 @@
             font-family: 'Unkempt', cursive;
         }
 
-        /* HEADER: Masaüstü (76px) */
+        /* HEADER: Masaüstü */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -75,7 +75,7 @@
             z-index: 10001;
         }
 
-        /* ARAMA ÇUBUĞU SARMALAYICISI: Tıklanabilir ve en üst katmanda */
+        /* ARAMA ÇUBUĞU */
         .header-search-wrap {
             position: absolute;
             left: 50%;
@@ -129,7 +129,7 @@
             display: none !important;
         }
 
-        /* ANA GÖVDE: Masaüstü (Birebir Orijinal Hali) */
+        /* ANA GÖVDE: Masaüstü */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -183,7 +183,6 @@
         .friend-reviews-scroll::-webkit-scrollbar-thumb:hover { background-color: #5d8e40; }
         .friend-reviews-scroll { scrollbar-width: thin; scrollbar-color: #82b564 transparent; }
 
-        /* Popüler Kitaplar Taşma Koruması */
         .mob-grid-item-popular img,
         .popular-book-card img {
             max-height: 125px !important;
@@ -320,7 +319,7 @@
                 min-height: calc(100dvh - 68px) !important;
                 display: flex !important;
                 flex-direction: column !important;
-                justify-content: center !important;
+                justify-content: flex-start !important;
                 align-items: stretch !important;
             }
 
@@ -330,16 +329,38 @@
                 gap: 14px !important;
                 width: 100% !important;
                 padding: 0 !important;
-                margin: auto 0 !important;
+            }
+
+            /* MOBİL KART SIRALAMASI: Continue + Admin Yan Yana, Diğerleri Altında */
+            .mob-top-pair {
+                order: 1 !important;
+                display: flex !important;
+                flex-direction: row !important;
+                gap: 10px !important;
+                width: 100% !important;
+            }
+
+            .mob-top-pair > div {
+                flex: 1 1 50% !important;
+                min-width: 0 !important;
+                width: 50% !important;
+            }
+
+            .mob-item-popular {
+                order: 2 !important;
+                width: 100% !important;
+            }
+
+            .mob-item-cat {
+                order: 3 !important;
+                width: 100% !important;
             }
 
             .dashboard-row-equal {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 14px !important;
+                display: contents !important; /* Mobilde CSS grid/flex sıralamasını alt elemanlara devreder */
             }
 
-            /* Çekmece */
+            /* Sağ Çekmece */
             .right-sidebar-panel {
                 position: fixed !important;
                 top: 0 !important;
@@ -419,7 +440,7 @@
 
             <div class="header-search-wrap">
                 <div class="header-search-bar-box" onclick="document.getElementById('bookSearchInput').focus();">
-                    <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
+                    <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
                     <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="off">
                 </div>
                 <div id="searchResultsDropdown" style="display: none; position: absolute; top: 52px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 100010;"></div>
@@ -478,17 +499,29 @@
         
         <div class="left-content-area">
             
+            {{-- Mobilde Yan Yana Duran Üst İkili (Continue Reading + Admin Recommendation) --}}
+            <div class="mob-top-pair">
+                <div style="flex-shrink: 0;">
+                    @include('partials.continue-reading')
+                </div>
+                <div style="flex-shrink: 0;">
+                    @include('partials.adminRecommendation')
+                </div>
+            </div>
+
+            {{-- 1. Satır: Masaüstü İçin Düzen --}}
             <div class="dashboard-row-equal">
-                @include('partials.continue-reading')
-                <div class="equal-spacer"></div>
-                @include('partials.popular-books')
+                <div class="mob-item-popular" style="flex-shrink: 0;">
+                    @include('partials.popular-books')
+                </div>
                 <div class="equal-spacer"></div>
             </div>
 
+            {{-- 2. Satır: Masaüstü İçin Düzen --}}
             <div class="dashboard-row-equal">
-                @include('partials.adminRecommendation')
-                <div class="equal-spacer"></div>
-                @include('partials.cat-recommendation')
+                <div class="mob-item-cat" style="flex-shrink: 0;">
+                    @include('partials.cat-recommendation')
+                </div>
                 <div class="equal-spacer"></div>
             </div>
 
@@ -532,10 +565,6 @@
                         $itemRatingColor = $ratingColors[$item->rating] ?? '#4a5d44';
                         $bookKey = $item->book->open_library_key ?? $item->book->google_book_id ?? $item->book->key ?? $item->book_id;
                         $bookTitle = $item->book->title ?? 'Kitap Detayı';
-                        $userAvatar = asset('images/profile.jpg');
-                        if ($item->user && !empty($item->user->avatar)) {
-                            $userAvatar = str_starts_with($item->user->avatar, 'http') ? $item->user->avatar : asset('storage/' . $item->user->avatar);
-                        }
                     @endphp
 
                     <div id="review-{{ $item->id }}" style="background: #f1f8ed; border: 1.5px solid #4c7237; border-radius: 10px; padding: 12px;">
@@ -590,7 +619,7 @@
     </div>
     <div class="mobile-drawer-overlay hidden" id="drawerOverlay"></div>
 
-    {{-- JS Fonksiyonları (Arama ve Etkileşimler) --}}
+    {{-- JS Fonksiyonları --}}
     <script>
     function toggleReviewLike(reviewId, buttonElement) {
         const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute('content') || '{{ csrf_token() }}';
@@ -621,6 +650,7 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        // Mobil Menü & Çekmece Kontrolleri
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileDropdown = document.getElementById('mobileDropdownMenu');
         const openFriendsBtn = document.getElementById('openFriendsDrawerBtn');
@@ -659,54 +689,83 @@
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
         }
 
-        // KİTAP ARAMA (ENTER & DROPDOWN)
-        const bookInput = document.getElementById('bookSearchInput');
-        const bookDropdown = document.getElementById('searchResultsDropdown');
+        // ESKİ VE SORUNSUZ ÇALIŞAN KİTAP ARAMA MANTIĞI (PAGINATION + LOAD MORE)
+        const input = document.getElementById('bookSearchInput');
+        const dropdown = document.getElementById('searchResultsDropdown');
 
-        if (bookInput && bookDropdown) {
-            bookInput.addEventListener('keydown', async function (e) {
+        if (input && dropdown) {
+            let allSearchResults = [];
+            let displayedCount = 0;
+            const PAGE_SIZE = 6;
+
+            function renderNextBooks() {
+                const oldBtn = document.getElementById('searchLoadMoreContainer');
+                if (oldBtn) oldBtn.remove();
+
+                const nextBatch = allSearchResults.slice(displayedCount, displayedCount + PAGE_SIZE);
+                const html = nextBatch.map(book => `
+                    <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
+                        <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
+                        <div style="overflow: hidden; text-align: left;">
+                            <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
+                            <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || 'Unknown Author'}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                dropdown.insertAdjacentHTML('beforeend', html);
+                displayedCount += nextBatch.length;
+
+                if (displayedCount < allSearchResults.length) {
+                    const remaining = allSearchResults.length - displayedCount;
+                    const loadMoreHtml = `
+                        <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
+                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">✨ load more (+${Math.min(PAGE_SIZE, remaining)})</button>
+                        </div>
+                    `;
+                    dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);
+                    document.getElementById('searchLoadMoreBtn').addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        renderNextBooks();
+                    });
+                }
+            }
+
+            input.addEventListener('keydown', async function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    const q = this.value.trim();
+                    const q = input.value.trim();
                     if (q.length < 2) return;
 
-                    bookDropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align:center;">Searching books... 🌱</div>';
-                    bookDropdown.style.display = 'block';
-
+                    dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Aranıyor... 🌱</div>';
+                    dropdown.style.display = 'block';
                     try {
                         const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
                         const data = await res.json();
                         const books = Array.isArray(data) ? data : (data.items || []);
 
                         if (!books || books.length === 0) {
-                            bookDropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align:center;">No books found :(</div>';
+                            dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Sonuç bulunamadı.</div>';
                             return;
                         }
-
-                        bookDropdown.innerHTML = books.slice(0, 8).map(book => `
-                            <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
-                                <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
-                                <div style="overflow: hidden; text-align: left;">
-                                    <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
-                                    <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || 'Unknown Author'}</div>
-                                </div>
-                            </div>
-                        `).join('');
-
+                        dropdown.innerHTML = '';
+                        allSearchResults = books;
+                        displayedCount = 0;
+                        renderNextBooks();
                     } catch (err) {
-                        bookDropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #c62828; text-align:center;">Search error occurred!</div>';
+                        dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: red; text-align: center;">Arama sırasında hata oluştu.</div>';
                     }
                 }
             });
 
             document.addEventListener('click', function (e) {
-                if (!bookInput.contains(e.target) && !bookDropdown.contains(e.target)) {
-                    bookDropdown.style.display = 'none';
+                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
                 }
             });
         }
 
-        // KULLANICI ARAMA
+        // KULLANICI ARAMA (SORUNSUZ ORİJİNAL ÇALIŞMA)
         const userSearchInput = document.getElementById('userSearchInput');
         const userSearchResults = document.getElementById('userSearchResults');
 
@@ -755,14 +814,16 @@
 
                             let userAvatarSrc = defaultAvatar;
                             if (user.avatar) {
-                                userAvatarSrc = user.avatar.startsWith('http') ? user.avatar : `/storage/${user.avatar.replace(/^(\/)?(storage\/)?/, '')}`;
+                                userAvatarSrc = user.avatar.startsWith('http') || user.avatar.startsWith('data:') 
+                                    ? user.avatar 
+                                    : `/storage/${user.avatar.replace(/^(\/)?(storage\/)?/, '')}`;
                             }
 
                             return `
                                 <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
-                                            <img src="${userAvatarSrc}" alt="${user.username}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
+                                            <img src="${userAvatarSrc}" alt="${user.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
                                         </div>
                                         <div style="font-size: 14px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
                                             @${user.username}
