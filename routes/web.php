@@ -298,3 +298,12 @@ Route::get("/notifications/unread-count", function() {
 })->middleware("auth")->name("notifications.unreadCount");
 
 Route::get('/api/random-book-recommendation', [BookController::class, 'getRandomRecommendation']);
+Route::get('/fix-render', function () {
+    // 1. Storage linkini oluşturur
+    \Illuminate\Support\Facades\Artisan::call('storage:link');
+    
+    // 2. Cache'i temizler ki backend eksik kapakları diske tekrar indirsin
+    \Illuminate\Support\Facades\Cache::flush();
+    
+    return 'Bağlantılar ve önbellek yenilendi! Sayfayı yenileyebilirsin.';
+});
