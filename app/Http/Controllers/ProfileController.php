@@ -50,16 +50,17 @@ class ProfileController extends Controller
     public function updateProfile(Request $request) {
         $request->validate([
             'bio' => 'nullable|string|max:160',
-            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:10240',
+            'avatar' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:5120', // 5MB limit
         ]);
 
         $user = auth()->user();
+
         if ($request->hasFile('avatar')) {
-            if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                Storage::disk('public')->delete($user->avatar);
-            }
-            $path = $request->file('avatar')->store('avatars', 'public');
-            $user->avatar = $path;
+            $file = $request->file('avatar');
+            
+            // Resmi doğrudan Base64 formatına çevirip veritabanına kaydeder
+            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
+            $user->avatar = $base64;
         }
 
         $user->bio = $request->input('bio');

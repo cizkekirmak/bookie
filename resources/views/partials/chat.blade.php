@@ -1,20 +1,15 @@
-<!-- SÜRÜKLENEBİLİR ANA BUTON (SOL ALTA ALINDI VE BÜYÜTÜLDÜ) -->
 <div id="chat-draggable-btn" class="chat-bubble-btn">
     <img src="{{ asset('images/chat-icon.png') }}" alt="Mesajlar" class="chat-main-icon" draggable="false">
     <span id="chat-unread-dot" class="chat-unread-badge" style="display: none;"></span>
 </div>
 
-<!-- MESAJLAŞMA POP-UP PENCERESİ (KOMPAKT & KÜÇÜLTÜLMÜŞ) -->
 <div id="chat-popup-container" class="chat-popup" style="display: none;">
-    <!-- SOL PANEL: PROFİL FOTOĞRAFLARI -->
     <div class="chat-friends-sidebar" id="chat-friends-list"></div>
 
-    <!-- SAĞ PANEL: SOHBET ALANI -->
     <div class="chat-main-area">
-        <!-- ÜST BAŞLIK (PROFİLE GİDEN LİNK) -->
         <div class="chat-header">
             <a href="#" id="chat-header-user" class="chat-header-user" style="display: none; text-decoration: none; cursor: pointer;">
-                <img id="chat-active-avatar" src="" alt="Avatar" class="chat-header-avatar">
+                <img id="chat-active-avatar" src="{{ asset('images/default-avatar.png') }}" alt="Avatar" class="chat-header-avatar">
                 <span id="chat-active-name" class="chat-header-name"></span>
             </a>
             <div id="chat-header-placeholder" class="chat-header-placeholder">
@@ -23,14 +18,12 @@
             <button type="button" class="chat-close-btn" id="chat-close-btn">&times;</button>
         </div>
 
-        <!-- MESAJ AKIŞI -->
         <div class="chat-messages-body" id="chat-messages-body">
             <div class="chat-empty-state" id="chat-empty-state">
-                You didn't pick anyone yet :<
+                You didn't pick anyone yet :&lt;
             </div>
         </div>
 
-        <!-- 6 ADET STICKER PANELİ -->
         <div class="chat-sticker-picker" id="chat-sticker-picker" style="display: none;">
             <img src="{{ asset('images/sticker1.png') }}" class="sticker-item" data-sticker="sticker1.png" alt="Sticker 1" draggable="false">
             <img src="{{ asset('images/sticker2.png') }}" class="sticker-item" data-sticker="sticker2.png" alt="Sticker 2" draggable="false">
@@ -40,7 +33,6 @@
             <img src="{{ asset('images/sticker6.png') }}" class="sticker-item" data-sticker="sticker6.png" alt="Sticker 6" draggable="false">
         </div>
 
-        <!-- GİRDİ FORMU (DAHA BÜYÜK BUTONLARLA) -->
         <form id="chat-input-form" class="chat-input-area">
             <button type="button" id="chat-toggle-sticker" class="chat-action-btn" title="Sticker Seç">
                 <img src="{{ asset('images/sticker-icon.png') }}" alt="Sticker" class="chat-btn-icon sticker-btn-icon" draggable="false">
@@ -54,7 +46,7 @@
 </div>
 
 <style>
-/* SÜRÜKLENEBİLİR BUTON: SOL ALTTA & BÜYÜK (95px) */
+/* SÜRÜKLENEBİLİR BUTON */
 .chat-bubble-btn {
     position: fixed;
     bottom: 20px;
@@ -86,12 +78,12 @@
     border-radius: 50%;
     border: 1px solid #27211f;
 }
+
+/* ARKADAŞ LİSTESİ */
 .chat-friend-item {
     position: relative;
     cursor: pointer;
 }
-
-/* Arkadaşın avatarı üstündeki kırmızı nokta */
 .chat-friend-dot {
     position: absolute;
     top: 0;
@@ -103,8 +95,20 @@
     border: 2px solid #fff;
     pointer-events: none;
 }
+.chat-friend-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid transparent;
+    transition: transform 0.2s ease, border-color 0.2s ease;
+}
+.chat-friend-item.active .chat-friend-avatar {
+    border-color: #9fa3c2;
+    transform: scale(1.08);
+}
 
-/* POP-UP: MASAÜSTÜ (360px x 430px) */
+/* POP-UP: MASAÜSTÜ */
 .chat-popup {
     position: fixed;
     bottom: 135px;
@@ -120,7 +124,7 @@
     border: 1px solid rgba(0,0,0,0.08);
 }
 
-/* POP-UP: MOBİLDE EKRANA TAM ORTALAMA */
+/* POP-UP: MOBİL */
 @media (max-width: 768px) {
     .chat-popup {
         width: 92vw !important;
@@ -146,21 +150,6 @@
     padding: 12px 0;
     gap: 10px;
     overflow-y: auto;
-}
-.chat-friend-item {
-    cursor: pointer;
-}
-.chat-friend-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid transparent;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-.chat-friend-item.active .chat-friend-avatar {
-    border-color: #9fa3c2;
-    transform: scale(1.08);
 }
 
 /* SAĞ PANEL */
@@ -264,7 +253,6 @@
     display: block;
 }
 
-/* DAKİKA */
 .chat-bubble-time {
     display: none;
     font-size: 9px;
@@ -302,7 +290,7 @@
     transform: scale(1.2);
 }
 
-/* ALT GİRDİ ÇUBUĞU */
+/* GİRDİ FORMU */
 .chat-input-area {
     height: 48px;
     border-top: 1px solid #eaeaea;
@@ -321,23 +309,12 @@
     font-size: 12px;
     outline: none;
 }
-
 .chat-messages-body::-webkit-scrollbar {
     width: 6px;
-}
-.chat-messages-body::-webkit-scrollbar-track {
-    background: transparent;
 }
 .chat-messages-body::-webkit-scrollbar-thumb {
     background: rgb(255, 198, 106);
     border-radius: 10px;
-}
-.chat-messages-body::-webkit-scrollbar-thumb:hover {
-    background: rgb(221, 153, 94);
-}
-.chat-messages-body {
-    scrollbar-width: normal;
-    scrollbar-color: rgb(221, 243, 205) transparent;
 }
 .chat-input-area input::placeholder {
     color: #bfb279;
@@ -385,10 +362,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const unreadDot = document.getElementById('chat-unread-dot');
 
     const csrfToken = "{{ csrf_token() }}";
+    const defaultAvatarUrl = "{{ asset('images/default-avatar.png') }}";
+
     let activeFriendId = null;
     let isDragging = false;
     let shiftX, shiftY;
     let lastLoadedMessagesJson = '';
+
+    // Base64 veya normal yol avatar fallback fonksiyonu
+    function getAvatarSrc(avatar) {
+        if (!avatar || avatar.trim() === '') {
+            return defaultAvatarUrl;
+        }
+        return avatar;
+    }
 
     // SÜRÜKLE - BIRAK
     btn.addEventListener('mousedown', (e) => {
@@ -423,7 +410,6 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = isOpen ? 'none' : 'flex';
         if (!isOpen) {
             loadFriends();
-            // Mobilde CSS ile ortalama yapılabilmesi için inline koordinatları sadece masaüstünde uyguluyoruz
             if (window.innerWidth > 768) {
                 const rect = btn.getBoundingClientRect();
                 if (rect.left < window.innerWidth / 2) {
@@ -462,21 +448,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     ? '<span class="chat-friend-dot"></span>' 
                     : '';
 
+                const safeAvatar = getAvatarSrc(friend.avatar);
+
                 item.innerHTML = `
-                    <img src="${friend.avatar}" class="chat-friend-avatar" alt="${friend.username}">
+                    <img src="${safeAvatar}" class="chat-friend-avatar" alt="${escapeHtml(friend.username)}">
                     ${badgeHtml}
                 `;
                 item.addEventListener('click', () => selectFriend(friend));
                 friendsList.appendChild(item);
             });
         } catch (e) {
-            console.error(e);
+            console.error('Arkadaş listesi yüklenemedi:', e);
         }
     }
 
     async function selectFriend(friend) {
         activeFriendId = friend.id;
-        lastLoadedMessagesJson = ''; // Yeni arkadaş seçilince sıfırla
+        lastLoadedMessagesJson = '';
+        
         document.querySelectorAll('.chat-friend-item').forEach(el => el.classList.remove('active'));
         loadFriends();
 
@@ -484,14 +473,14 @@ document.addEventListener('DOMContentLoaded', () => {
         headerUser.style.display = 'flex';
         headerUser.href = `/profile/${friend.id}`;
         
-        activeAvatar.src = friend.avatar;
+        activeAvatar.src = getAvatarSrc(friend.avatar);
         activeName.textContent = friend.username;
 
         messageInput.disabled = false;
         sendBtn.disabled = false;
         messageInput.focus();
 
-        await loadMessages(true); // İlk açılışta zorla en alta kaydır
+        await loadMessages(true);
         checkUnread();
     }
 
@@ -501,14 +490,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const res = await fetch(`/messages/${activeFriendId}`);
             const messages = await res.json();
             
-            // Eğer yeni bir mesaj gelmemişse ve zorunlu kaydırma istenmiyorsa DOM'u baştan çizme
             const stringified = JSON.stringify(messages);
             if (stringified === lastLoadedMessagesJson && !forceScroll) {
                 return;
             }
             lastLoadedMessagesJson = stringified;
 
-            // Kullanıcı zaten en altta mı yoksa yukarıda eski mesajları mı okuyor kontrol et
             const threshold = 60;
             const isNearBottom = (messagesBody.scrollHeight - messagesBody.scrollTop - messagesBody.clientHeight) <= threshold;
             const previousScrollTop = messagesBody.scrollTop;
@@ -530,26 +517,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (msg.message.startsWith('[sticker:') && msg.message.endsWith(']')) {
                     const stickerName = msg.message.replace('[sticker:', '').replace(']', '');
                     bubble.innerHTML = `
-                        <img src="/images/${stickerName}" class="chat-bubble-sticker" alt="Sticker">
-                        <div class="chat-bubble-time">${msg.time}</div>
+                        <img src="/images/${escapeHtml(stickerName)}" class="chat-bubble-sticker" alt="Sticker">
+                        <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
                     `;
                 } else {
                     bubble.innerHTML = `
                         <div>${escapeHtml(msg.message)}</div>
-                        <div class="chat-bubble-time">${msg.time}</div>
+                        <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
                     `;
                 }
                 messagesBody.appendChild(bubble);
             });
 
-            // Sadece zorunluysa veya kullanıcı zaten en alttaysa aşağı kaydır
             if (forceScroll || isNearBottom) {
                 messagesBody.scrollTop = messagesBody.scrollHeight;
             } else {
                 messagesBody.scrollTop = previousScrollTop;
             }
         } catch (e) {
-            console.error(e);
+            console.error('Mesajlar yüklenirken hata oluştu:', e);
         }
     }
 
@@ -615,7 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function escapeHtml(text) {
         const div = document.createElement('div');
-        div.textContent = text;
+        div.textContent = text || '';
         return div.innerHTML;
     }
 

@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="referrer" content="no-referrer">
     <title>Bookie - Profile</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -421,10 +423,28 @@
             
             <button type="button" class="profile-close-btn" id="closeProfileDrawerBtn">&times;</button>
 
-            {{-- Profil Fotoğrafı / Fide --}}
+            @php
+                $defaultAvatar = asset('images/profile.jpg');
+                $userAvatar = $defaultAvatar;
+
+                if (!empty($user->avatar)) {
+                    if (str_starts_with($user->avatar, 'data:image') || str_starts_with($user->avatar, 'http')) {
+                        $userAvatar = $user->avatar;
+                    } else {
+                        $clean = ltrim($user->avatar, '/');
+                        $userAvatar = str_starts_with($clean, 'storage/') ? asset($clean) : asset('storage/' . $clean);
+                    }
+                }
+            @endphp
+
+            {{-- Profil Fotoğrafı / Fide (Base64 + Storage + Fallback Destekli) --}}
             <div style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #2d5a27; background: #eaf3e4; display: flex; justify-content: center; align-items: center; margin-bottom: 0; overflow: hidden; flex-shrink: 0;">
-                @if($user->avatar)
-                    <img src="{{ asset('storage/' . $user->avatar) }}" alt="{{ $user->username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                @if(!empty($user->avatar))
+                    <img src="{{ $userAvatar }}" 
+                         alt="{{ $user->username ?? $user->name }}" 
+                         referrerpolicy="no-referrer"
+                         style="width: 100%; height: 100%; object-fit: cover; display: block;" 
+                         onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                 @else
                     <span style="font-size: 45px;">🌱</span>
                 @endif
@@ -702,6 +722,17 @@ document.addEventListener('DOMContentLoaded', function() {
             @endphp
 
             @forelse($friendsList as $friend)
+                @php
+                    $friendAvatarUrl = asset('images/profile.jpg');
+                    if (!empty($friend->avatar)) {
+                        if (str_starts_with($friend->avatar, 'data:image') || str_starts_with($friend->avatar, 'http')) {
+                            $friendAvatarUrl = $friend->avatar;
+                        } else {
+                            $cleanFriendAvatar = ltrim($friend->avatar, '/');
+                            $friendAvatarUrl = str_starts_with($cleanFriendAvatar, 'storage/') ? asset($cleanFriendAvatar) : asset('storage/' . $cleanFriendAvatar);
+                        }
+                    }
+                @endphp
                 <div 
                     onclick="window.location.href='/profile/{{ $friend->id }}'" 
                     style="
@@ -739,26 +770,14 @@ document.addEventListener('DOMContentLoaded', function() {
                                 color: #1a3c11; 
                                 font-weight: bold; 
                                 font-family: 'Unkempt', cursive;
+                                overflow: hidden;
                             "
                         >
-                            @if(!empty($friend->avatar))
-                                <img src="{{ asset('storage/' . $friend->avatar) }}" 
-                                alt="{{ $friend->username ?? 'Profile' }}" 
-                                style="width: 100%; 
-                                height: 100%; 
-                                border-radius: 50%; 
-                                display: block; 
-                                object-fit: cover;"
-                                onerror="this.onerror=null; this.src='{{ asset('images/profile.jpg') }}';">
-                            @else
-                                <img src="{{ asset('images/profile.jpg') }}" 
-                                alt="Profile" 
-                                style="width: 100%; 
-                                height: 100%; 
-                                border-radius: 50%; 
-                                display: block; 
-                                object-fit: cover;">
-                            @endif
+                            <img src="{{ $friendAvatarUrl }}" 
+                                 alt="{{ $friend->username ?? 'Profile' }}" 
+                                 referrerpolicy="no-referrer"
+                                 style="width: 100%; height: 100%; border-radius: 50%; display: block; object-fit: cover;"
+                                 onerror="this.onerror=null; this.src='{{ asset('images/profile.jpg') }}';">
                         </div>
 
                         <div>
