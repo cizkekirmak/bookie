@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="referrer" content="no-referrer">
     <title>Bookie - Dashboard</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,7 +30,7 @@
             font-family: 'Unkempt', cursive;
         }
 
-        /* HEADER: Masaüstü (Birebir Orijinal Hali) */
+        /* HEADER: Masaüstü (76px) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -50,7 +51,7 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             position: sticky;
             top: 0;
-            z-index: 1000;
+            z-index: 10000;
         }
 
         .site-header-inner {
@@ -71,14 +72,17 @@
             margin-top: 10px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
             user-select: none;
+            z-index: 10001;
         }
 
+        /* ARAMA ÇUBUĞU SARMALAYICISI: Tıklanabilir ve en üst katmanda */
         .header-search-wrap {
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
             width: 500px;
-            z-index: 100;
+            z-index: 10005;
+            pointer-events: auto !important;
         }
 
         .header-search-bar-box {
@@ -94,6 +98,20 @@
             padding: 0 18px;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
             width: 100%;
+            cursor: text;
+        }
+
+        #bookSearchInput {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 22px;
+            font-family: 'Unkempt', cursive;
+            color: #1b3711;
+            width: 100%;
+            cursor: text;
+            pointer-events: auto !important;
         }
 
         .header-desktop-actions {
@@ -101,6 +119,7 @@
             align-items: center;
             gap: 16px;
             flex-shrink: 0;
+            z-index: 10001;
         }
 
         .mobile-menu-trigger,
@@ -164,6 +183,13 @@
         .friend-reviews-scroll::-webkit-scrollbar-thumb:hover { background-color: #5d8e40; }
         .friend-reviews-scroll { scrollbar-width: thin; scrollbar-color: #82b564 transparent; }
 
+        /* Popüler Kitaplar Taşma Koruması */
+        .mob-grid-item-popular img,
+        .popular-book-card img {
+            max-height: 125px !important;
+            object-fit: cover !important;
+        }
+
         /* ==========================================================================
            TELEFON / MOBİL UYARLAMA
            ========================================================================== */
@@ -204,6 +230,7 @@
                 max-width: 220px !important;
                 margin: 0 6px !important;
                 display: block !important;
+                z-index: 10005 !important;
             }
 
             .header-search-bar-box {
@@ -218,7 +245,7 @@
                 height: 24px !important;
             }
 
-            .header-search-bar-box input {
+            #bookSearchInput {
                 font-size: 15px !important;
                 display: block !important;
                 width: 100% !important;
@@ -391,10 +418,11 @@
             </div>
 
             <div class="header-search-wrap">
-                <div class="header-search-bar-box">
+                <div class="header-search-bar-box" onclick="document.getElementById('bookSearchInput').focus();">
                     <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 32px; height: 32px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
-                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="on" style="flex: 1; border: none; outline: none; background: transparent; font-size: 22px; font-family: 'Unkempt', cursive; color: #1b3711;">
+                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="off">
                 </div>
+                <div id="searchResultsDropdown" style="display: none; position: absolute; top: 52px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 100010;"></div>
             </div>
             
             <div class="header-desktop-actions">
@@ -504,6 +532,10 @@
                         $itemRatingColor = $ratingColors[$item->rating] ?? '#4a5d44';
                         $bookKey = $item->book->open_library_key ?? $item->book->google_book_id ?? $item->book->key ?? $item->book_id;
                         $bookTitle = $item->book->title ?? 'Kitap Detayı';
+                        $userAvatar = asset('images/profile.jpg');
+                        if ($item->user && !empty($item->user->avatar)) {
+                            $userAvatar = str_starts_with($item->user->avatar, 'http') ? $item->user->avatar : asset('storage/' . $item->user->avatar);
+                        }
                     @endphp
 
                     <div id="review-{{ $item->id }}" style="background: #f1f8ed; border: 1.5px solid #4c7237; border-radius: 10px; padding: 12px;">
@@ -558,7 +590,7 @@
     </div>
     <div class="mobile-drawer-overlay hidden" id="drawerOverlay"></div>
 
-    {{-- JS Fonksiyonları --}}
+    {{-- JS Fonksiyonları (Arama ve Etkileşimler) --}}
     <script>
     function toggleReviewLike(reviewId, buttonElement) {
         const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute('content') || '{{ csrf_token() }}';
@@ -627,7 +659,54 @@
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
         }
 
-        // Kullanıcı Arama
+        // KİTAP ARAMA (ENTER & DROPDOWN)
+        const bookInput = document.getElementById('bookSearchInput');
+        const bookDropdown = document.getElementById('searchResultsDropdown');
+
+        if (bookInput && bookDropdown) {
+            bookInput.addEventListener('keydown', async function (e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const q = this.value.trim();
+                    if (q.length < 2) return;
+
+                    bookDropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align:center;">Searching books... 🌱</div>';
+                    bookDropdown.style.display = 'block';
+
+                    try {
+                        const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
+                        const data = await res.json();
+                        const books = Array.isArray(data) ? data : (data.items || []);
+
+                        if (!books || books.length === 0) {
+                            bookDropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align:center;">No books found :(</div>';
+                            return;
+                        }
+
+                        bookDropdown.innerHTML = books.slice(0, 8).map(book => `
+                            <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
+                                <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
+                                <div style="overflow: hidden; text-align: left;">
+                                    <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
+                                    <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || 'Unknown Author'}</div>
+                                </div>
+                            </div>
+                        `).join('');
+
+                    } catch (err) {
+                        bookDropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #c62828; text-align:center;">Search error occurred!</div>';
+                    }
+                }
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!bookInput.contains(e.target) && !bookDropdown.contains(e.target)) {
+                    bookDropdown.style.display = 'none';
+                }
+            });
+        }
+
+        // KULLANICI ARAMA
         const userSearchInput = document.getElementById('userSearchInput');
         const userSearchResults = document.getElementById('userSearchResults');
 
@@ -683,7 +762,7 @@
                                 <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
-                                            <img src="${userAvatarSrc}" alt="${user.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
+                                            <img src="${userAvatarSrc}" alt="${user.username}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
                                         </div>
                                         <div style="font-size: 14px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
                                             @${user.username}
