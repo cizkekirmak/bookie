@@ -113,8 +113,8 @@
     position: fixed;
     bottom: 135px;
     left: 30px;
-    width: 375px;
-    height: 445px;
+    width: 360px;
+    height: 430px;
     background: #ffffff;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.16);
@@ -129,7 +129,7 @@
     .chat-popup {
         width: 92vw !important;
         max-width: 350px !important;
-        height: 445px !important;
+        height: 430px !important;
         left: 50% !important;
         right: auto !important;
         top: auto !important;
@@ -273,7 +273,7 @@
 /* STICKER MENÜSÜ */
 .chat-sticker-picker {
     position: absolute;
-    bottom: 58px;
+    bottom: 56px;
     left: 8px;
     right: 8px;
     background: #ffffff;
@@ -296,27 +296,31 @@
     transform: scale(1.2);
 }
 
-/* GİRDİ FORMU (BÜYÜTÜLDÜ VE HİZALANDI) */
+/* GİRDİ FORMU (TAŞMAYI ÖNLEYEN VE SABİTLEYEN YAPI) */
 .chat-input-area {
-    height: 56px;
+    height: 52px;
     border-top: 1px solid #eaeaea;
     display: flex;
     align-items: center;
-    padding: 0 10px;
-    gap: 8px;
+    padding: 0 8px;
+    gap: 6px;
     background: #f6ffec;
+    box-sizing: border-box;
+    width: 100%;
 }
 .chat-input-area input {
     flex: 1;
-    height: 40px;
+    min-width: 0; /* Butonların dışarı fırlamasını önler */
+    height: 38px;
     border: 1.5px solid #6b9c56;
-    border-radius: 20px;
+    border-radius: 19px;
     padding: 0 14px;
-    font-size: 15px;
+    font-size: 15px; /* Büyük ve okunaklı */
     outline: none;
     font-family: 'Unkempt', cursive !important;
     background-color: #ffffff;
     color: #1b3711;
+    box-sizing: border-box;
 }
 .chat-input-area input::placeholder {
     color: #8c9f7a;
@@ -341,23 +345,25 @@
     border: none;
     cursor: pointer;
     padding: 0;
-    width: 36px;
-    height: 36px;
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
+    flex-shrink: 0; /* Asla ezilmez ve kaybolmaz */
 }
 .chat-btn-icon {
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     object-fit: contain;
     pointer-events: none;
+    display: block;
 }
 .sticker-btn-icon {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     object-fit: contain;
+    display: block;
 }
 </style>
 
@@ -472,7 +478,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     popup.style.right = `${Math.max(20, window.innerWidth - rect.right)}px`;
                     popup.style.left = 'auto';
                 }
-                popup.style.top = `${Math.max(20, rect.top - 455)}px`;
+                popup.style.top = `${Math.max(20, rect.top - 440)}px`;
                 popup.style.bottom = 'auto';
             }
 
