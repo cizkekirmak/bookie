@@ -240,6 +240,7 @@ class BookController extends Controller
             return response()->json([]);
         }
 
+        // 1. Cache Kontrolü (Varsa anında milisaniyede döner)
         $cacheKey = 'search_safe_' . md5(mb_strtolower($query, 'UTF-8'));
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
@@ -248,7 +249,7 @@ class BookController extends Controller
             }
         }
 
-        // 1. Yerel Veritabanı
+        // 2. Yerel DB Eşleşmeleri
         $localBooks = Book::where(function ($q) use ($query) {
                 $q->where('title', 'LIKE', "%{$query}%")
                   ->orWhere('author', 'LIKE', "%{$query}%");
@@ -265,10 +266,75 @@ class BookController extends Controller
                 ];
             })->toArray();
 
-        // 2. Dış API'ler
-        $googleResults = $this->searchGoogleBooks($query);
-        $openLibResults = $this->searchOpenLibrary($query);
+        // 3. Google Books ve Open Library'ye AYNI ANDA (Paralel) İstek
+        $googleParams = [
+            'q'          => 'intitle:' . $query,
+            'maxResults' => 15,
+            'printType'  => 'books',
+        ];
+        if (!empty($this->googleApiKey)) {
+            $googleParams['key'] = $this->googleApiKey;
+        }
 
+        $responses = Http::pool(fn (\Illuminate\Http\Client\Pool $pool) => [
+            $pool->as('google')
+                ->withoutVerifying()
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->timeout(3)
+                ->get('https://www.googleapis.com/books/v1/volumes', $googleParams),
+
+            $pool->as('openlib')
+                ->withoutVerifying()
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BookieApp/1.0'])
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->timeout(3)
+                ->get('https://openlibrary.org/search.json', [
+                    'title' => $query,
+                    'limit' => 20,
+                ]),
+        ]);
+
+        // Google Sonuçlarını Ayrıştır
+        $googleResults = [];
+        try {
+            if ($responses['google']->successful()) {
+                $items = $responses['google']->json('items') ?? [];
+                foreach ($items as $item) {
+                    $info = $item['volumeInfo'] ?? [];
+                    $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
+                    if (empty($rawCover) || empty($info['title'])) continue;
+
+                    $googleResults[] = [
+                        'id'      => $item['id'],
+                        'title'   => $info['title'],
+                        'authors' => isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : 'Bilinmeyen Yazar',
+                        'cover'   => str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover),
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        // Open Library Sonuçlarını Ayrıştır
+        $openLibResults = [];
+        try {
+            if ($responses['openlib']->successful()) {
+                $docs = $responses['openlib']->json('docs') ?? [];
+                foreach ($docs as $doc) {
+                    $coverId = $doc['cover_i'] ?? null;
+                    if (empty($coverId) || empty($doc['title'])) continue;
+
+                    $cleanId = str_replace(['/works/', '/books/'], '', $doc['key'] ?? '');
+                    $openLibResults[] = [
+                        'id'      => 'OL_' . $cleanId,
+                        'title'   => $doc['title'],
+                        'authors' => isset($doc['author_name']) ? implode(', ', array_slice($doc['author_name'], 0, 2)) : 'Bilinmeyen Yazar',
+                        'cover'   => "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg",
+                    ];
+                }
+            }
+        } catch (\Throwable $e) {}
+
+        // 4. Birebir Aynı Orijinal Sıralama ve Filtreleme
         $merged = array_merge($localBooks, $googleResults, $openLibResults);
         
         $cleanQuery = mb_strtolower($query, 'UTF-8');
@@ -292,9 +358,7 @@ class BookController extends Controller
                 }
             }
 
-            if (!$isRelevant) {
-                continue;
-            }
+            if (!$isRelevant) continue;
 
             $uniqueKey = $titleLower . '_' . mb_substr($authorLower, 0, 8);
             if (!isset($seenKeys[$uniqueKey])) {
@@ -303,7 +367,6 @@ class BookController extends Controller
             }
         }
 
-        // Orijinal Sıralama Mantığı
         usort($filteredResults, function ($a, $b) use ($cleanQuery, $queryWords) {
             $tA = mb_strtolower($a['title'], 'UTF-8');
             $tB = mb_strtolower($b['title'], 'UTF-8');
