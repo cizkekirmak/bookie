@@ -261,7 +261,7 @@
         }
 
         /* TELEFON / MOBİL UYARLAMA */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .site-header-outer {
                 height: 68px !important;
             }

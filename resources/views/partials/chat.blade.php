@@ -125,7 +125,7 @@
 }
 
 /* POP-UP: MOBİL */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .chat-popup {
         width: 92vw !important;
         max-width: 350px !important;

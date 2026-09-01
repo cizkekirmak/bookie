@@ -41,7 +41,7 @@
         background: #e8f0dc;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 1024px) {
         .popular-books-card {
             width: 100% !important;
             height: auto !important;

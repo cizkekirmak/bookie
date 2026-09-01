@@ -73,7 +73,7 @@
 }
 
 /* MOBİL UYARLAMA */
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .cat-rec-main-card {
         width: 100% !important;
         height: auto !important;

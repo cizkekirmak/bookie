@@ -183,7 +183,7 @@
         }
 
         /* MOBİL UYARLAMA */
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             body {
                 padding: 16px 10px;
                 min-height: 100dvh;

@@ -222,7 +222,7 @@
     font-size: 13px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
     .notification-icon-img {
         width: 100% !important;
         height: 100% !important;
