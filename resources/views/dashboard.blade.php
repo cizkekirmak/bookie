@@ -30,7 +30,7 @@
             font-family: 'Unkempt', cursive;
         }
 
-        /* HEADER: Masaüstü */
+        /* HEADER: Masaüstü (76px) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -129,7 +129,7 @@
             display: none !important;
         }
 
-        /* ANA GÖVDE: Masaüstü */
+        /* ANA GÖVDE: Masaüstü (Birebir Eski Orijinal Hali) */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -323,44 +323,44 @@
                 align-items: stretch !important;
             }
 
+            /* MOBİLDE SIRALAMA VE DÜZEN */
             .left-content-area {
-                display: flex !important;
-                flex-direction: column !important;
-                gap: 14px !important;
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
                 width: 100% !important;
                 padding: 0 !important;
             }
 
-            /* MOBİL KART SIRALAMASI: Continue + Admin Yan Yana, Diğerleri Altında */
-            .mob-top-pair {
-                order: 1 !important;
-                display: flex !important;
-                flex-direction: row !important;
-                gap: 10px !important;
-                width: 100% !important;
-            }
-
-            .mob-top-pair > div {
-                flex: 1 1 50% !important;
-                min-width: 0 !important;
-                width: 50% !important;
-            }
-
-            .mob-item-popular {
-                order: 2 !important;
-                width: 100% !important;
-            }
-
-            .mob-item-cat {
-                order: 3 !important;
-                width: 100% !important;
-            }
-
             .dashboard-row-equal {
-                display: contents !important; /* Mobilde CSS grid/flex sıralamasını alt elemanlara devreder */
+                display: contents !important;
             }
 
-            /* Sağ Çekmece */
+            .item-continue {
+                grid-column: 1 !important;
+                grid-row: 1 !important;
+                width: 100% !important;
+            }
+
+            .item-admin {
+                grid-column: 2 !important;
+                grid-row: 1 !important;
+                width: 100% !important;
+            }
+
+            .item-popular {
+                grid-column: 1 / span 2 !important;
+                grid-row: 2 !important;
+                width: 100% !important;
+            }
+
+            .item-cat {
+                grid-column: 1 / span 2 !important;
+                grid-row: 3 !important;
+                width: 100% !important;
+            }
+
+            /* Çekmece */
             .right-sidebar-panel {
                 position: fixed !important;
                 top: 0 !important;
@@ -497,31 +497,36 @@
     {{-- KAPSAYICI --}}
     <div class="app-container">
         
+        {{-- SOL PANEL --}}
         <div class="left-content-area">
             
-            {{-- Mobilde Yan Yana Duran Üst İkili (Continue Reading + Admin Recommendation) --}}
-            <div class="mob-top-pair">
-                <div style="flex-shrink: 0;">
+            {{-- 1. ÜST SATIR (Masaüstü: Continue & Popular Books) --}}
+            <div class="dashboard-row-equal">
+                <div class="item-continue" style="flex-shrink: 0;">
                     @include('partials.continue-reading')
                 </div>
-                <div style="flex-shrink: 0;">
-                    @include('partials.adminRecommendation')
-                </div>
-            </div>
+                
+                <div class="equal-spacer"></div>
 
-            {{-- 1. Satır: Masaüstü İçin Düzen --}}
-            <div class="dashboard-row-equal">
-                <div class="mob-item-popular" style="flex-shrink: 0;">
+                <div class="item-popular" style="flex-shrink: 0;">
                     @include('partials.popular-books')
                 </div>
+
                 <div class="equal-spacer"></div>
             </div>
 
-            {{-- 2. Satır: Masaüstü İçin Düzen --}}
+            {{-- 2. ALT SATIR (Masaüstü: Admin & Cat) --}}
             <div class="dashboard-row-equal">
-                <div class="mob-item-cat" style="flex-shrink: 0;">
+                <div class="item-admin" style="flex-shrink: 0;">
+                    @include('partials.adminRecommendation')
+                </div>
+                
+                <div class="equal-spacer"></div>
+
+                <div class="item-cat" style="flex-shrink: 0;">
                     @include('partials.cat-recommendation')
                 </div>
+
                 <div class="equal-spacer"></div>
             </div>
 
@@ -650,7 +655,6 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Mobil Menü & Çekmece Kontrolleri
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
         const mobileDropdown = document.getElementById('mobileDropdownMenu');
         const openFriendsBtn = document.getElementById('openFriendsDrawerBtn');
@@ -689,7 +693,7 @@
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
         }
 
-        // ESKİ VE SORUNSUZ ÇALIŞAN KİTAP ARAMA MANTIĞI (PAGINATION + LOAD MORE)
+        // KİTAP ARAMA (LOAD MORE & ORİJİNAL AKIŞ)
         const input = document.getElementById('bookSearchInput');
         const dropdown = document.getElementById('searchResultsDropdown');
 
@@ -765,7 +769,7 @@
             });
         }
 
-        // KULLANICI ARAMA (SORUNSUZ ORİJİNAL ÇALIŞMA)
+        // KULLANICI ARAMA
         const userSearchInput = document.getElementById('userSearchInput');
         const userSearchResults = document.getElementById('userSearchResults');
 
