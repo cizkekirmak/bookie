@@ -92,11 +92,11 @@
         @if($item->rating)
             @php
                 $starColor = match((int)$item->rating) {
-                        1 => '#d43b82',
+                     1 => '#d43b82',
                         2 => '#e67e22',
                         3 => '#fee16c',
                         4 => '#8dd04e',
-                        5 => '#3a91bc'
+                        5 => '#3a91bc',
                     default => '#e5a00d',
                 };
             @endphp
