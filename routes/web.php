@@ -308,18 +308,25 @@ Route::get('/fix-render', function () {
     
     return 'Bağlantılar ve önbellek yenilendi! Sayfayı yenileyebilirsin.';
 });
-Route::get('/lang/{locale}', function ($locale) {
+Route::get('/lang/{locale}', function (\Illuminate\Http\Request $request, $locale) {
     if (in_array($locale, ['tr', 'en'])) {
         session()->put('locale', $locale);
         app()->setLocale($locale);
     }
 
-    $referer = url()->previous();
+    // Tarayıcının gerçekte bulunduğu sayfanın URL'si
+    $referer = $request->headers->get('referer');
 
-    // Eğer önceki URL bildirim/mesaj API isteğiyse doğrudan dashboard'a veya ana sayfaya at
-    if (str_contains($referer, 'unread') || str_contains($referer, 'api') || str_contains($referer, 'notification')) {
+    // Eğer referer yoksa veya mesaj/api/unread/notification endpoint'i içeriyorsa güvenli sayfaya dön
+    if (
+        !$referer ||
+        str_contains($referer, '/messages/') ||
+        str_contains($referer, 'unread') ||
+        str_contains($referer, '/api/') ||
+        str_contains($referer, 'notification')
+    ) {
         return auth()->check() ? redirect()->route('dashboard') : redirect('/');
     }
 
-    return redirect()->to($referer ?: route('dashboard'));
+    return redirect()->to($referer);
 })->name('lang.switch');
