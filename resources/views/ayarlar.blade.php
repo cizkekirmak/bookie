@@ -12,37 +12,35 @@
 
     <style>
         @font-face {
-    font-family: 'Unkempt';
-    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Henny Penny';
-    src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-        * {
-            box-sizing: border-box;
+            font-family: 'Unkempt';
+            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
         }
 
-          * {
-                -webkit-tap-highlight-color: transparent !important;
-            }
+        @font-face {
+            font-family: 'Henny Penny';
+            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-            button,
-            a,
-            label,
-            span,
-            img {
-                user-select: none !important;
-                -webkit-user-select: none !important;
-                -webkit-touch-callout: none !important;
-            }
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        button,
+        a,
+        label,
+        span,
+        img {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
 
         html, body {
             margin: 0;
@@ -115,7 +113,20 @@
             transition: transform 0.2s ease;
         }
 
-        .header-icon-box:hover {
+        /* ÇERÇEVESİZ LOGO/İKON (DASHBOARD BUTONU) */
+        .header-icon-raw {
+            width: 52px;
+            height: 52px;
+            object-fit: contain;
+            border: none !important;
+            outline: none !important;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .header-icon-box:hover,
+        .header-icon-raw:hover {
             transform: scale(1.1);
         }
 
@@ -285,6 +296,12 @@
                 border-radius: 10px !important;
             }
 
+            .header-icon-raw {
+                width: 44px !important;
+                height: 44px !important;
+                border: none !important;
+            }
+
             .settings-main-area {
                 padding: 20px 14px 90px 14px !important;
                 min-height: calc(100vh - 68px) !important;
@@ -350,7 +367,7 @@
                 </a>
                 
                 <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/dash.jpg') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
+                    <img src="{{ asset('images/dash.png') }}" alt="{{ __('Dashboard') }}" class="header-icon-raw">
                 </a>
             </div>
 
