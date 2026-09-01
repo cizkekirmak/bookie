@@ -608,96 +608,50 @@ class BookController extends Controller
     {
         return $this->store($request);
     }
-
-    public function getRandomRecommendation(Request $request)
+public function getRandomRecommendation(Request $request)
 {
     $genre = $request->query('genre', 'random');
 
-    if ($genre === 'random' || empty($genre)) {
-        $genres = ['fantasy', 'mystery', 'romance', 'science_fiction', 'historical', 'thriller', 'horror', 'biography', 'self-help', 'philosophy'];
-        $genre = $genres[array_rand($genres)];
-    }
+    $genreMap = [
+        'fantasy'         => 'subject:fantasy',
+        'classic'         => 'subject:classic+literature',
+        'romance'         => 'subject:romance',
+        'science_fiction' => 'subject:science+fiction',
+        'historical'      => 'subject:history',
+        'horror'          => 'subject:horror',
+        'philosophy'      => 'subject:philosophy',
+        'random'          => 'subject:fiction',
+    ];
+
+    $query = $genreMap[$genre] ?? 'subject:fiction';
+    $randomOffset = rand(0, 20); // Her aramada farklı bir kitap kümesi
 
     // ----------------------------------------------------
-    // 1. ADIM: Open Library API Denemesi (Hızlı Timeout)
-    // ----------------------------------------------------
-    try {
-        $randomOffset = rand(0, 8) * 25;
-        $response = Http::withHeaders(['User-Agent' => 'BookieApp/1.0'])
-            ->timeout(3)
-            ->get("https://openlibrary.org/subjects/" . urlencode($genre) . ".json", [
-                'limit'  => 25,
-                'offset' => $randomOffset
-            ]);
-
-        if ($response->successful()) {
-            $works = $response->json('works', []);
-            $filtered = array_filter($works, fn($item) => !empty($item['cover_id']) && !empty($item['title']));
-
-            if (!empty($filtered)) {
-                $randomWork = $filtered[array_rand($filtered)];
-                $openLibraryKey = str_replace('/works/', '', $randomWork['key'] ?? '');
-                $title = $randomWork['title'] ?? 'Unknown Title';
-
-                $author = 'Unknown Author';
-                if (!empty($randomWork['authors'])) {
-                    $author = is_array($randomWork['authors'][0]) 
-                        ? ($randomWork['authors'][0]['name'] ?? 'Unknown Author') 
-                        : $randomWork['authors'][0];
-                }
-
-                $coverUrl = "https://covers.openlibrary.org/b/id/{$randomWork['cover_id']}-M.jpg";
-                $pageCount = $randomWork['number_of_pages_median'] ?? ($randomWork['number_of_pages'] ?? null);
-
-                $book = Book::firstOrCreate(
-                    ['open_library_key' => $openLibraryKey],
-                    [
-                        'title'       => $title,
-                        'author'      => $author,
-                        'cover_image' => $coverUrl,
-                        'page_count'  => $pageCount ? (int)$pageCount : null,
-                    ]
-                );
-
-                return response()->json([
-                    'success' => true,
-                    'book'    => [
-                        'id'         => $book->open_library_key,
-                        'title'      => $book->title,
-                        'author'     => $book->author,
-                        'cover'      => $book->cover_image,
-                        'page_count' => $book->page_count,
-                        'url'        => route('show', $book->open_library_key ?? $book->id),
-                    ]
-                ]);
-            }
-        }
-    } catch (\Throwable $e) {
-        // Open Library çöktü veya zaman aşımına uğradı, sessizce Google Books'a geç
-    }
-
-    // ----------------------------------------------------
-    // 2. ADIM: Google Books API Fallback (Yedek Sistem)
+    // 1. ÖNCELİK: Google Books API (Işık hızında & Geniş Arşiv)
     // ----------------------------------------------------
     try {
-        $googleQuery = 'subject:' . str_replace('_', '+', $genre);
-        $randomOffset = rand(0, 30);
-
-        $googleRes = Http::timeout(2)->get('https://www.googleapis.com/books/v1/volumes', [
-            'q'          => $googleQuery,
-            'startIndex' => $randomOffset,
-            'maxResults' => 10,
+        $googleRes = Http::timeout(3)->get('https://www.googleapis.com/books/v1/volumes', [
+            'q'            => $query,
+            'startIndex'   => $randomOffset,
+            'maxResults'   => 10,
             'langRestrict' => 'en',
-            'printType'  => 'books',
+            'printType'    => 'books',
         ]);
 
         if ($googleRes->successful()) {
             $items = $googleRes->json('items') ?? [];
-            if (!empty($items)) {
-                $item = $items[array_rand($items)];
+            
+            // Sadece kapağı ve başlığı olanları filtrele
+            $validItems = array_filter($items, function($item) {
+                return !empty($item['volumeInfo']['imageLinks']['thumbnail']) 
+                    || !empty($item['volumeInfo']['imageLinks']['smallThumbnail']);
+            });
+
+            if (!empty($validItems)) {
+                $item = $validItems[array_rand($validItems)];
                 $info = $item['volumeInfo'] ?? [];
 
-                $cover = $info['imageLinks']['thumbnail'] ?? $info['imageLinks']['smallThumbnail'] ?? asset('images/default-book.png');
+                $cover = $info['imageLinks']['thumbnail'] ?? $info['imageLinks']['smallThumbnail'];
                 $cover = str_replace('http://', 'https://', $cover);
 
                 return response()->json([
@@ -714,13 +668,47 @@ class BookController extends Controller
             }
         }
     } catch (\Throwable $e) {
-        // Google Books da yanıt vermezse veritabanına geç
+        // Google Books başarısız olursa Open Library'e geç
     }
 
     // ----------------------------------------------------
-    // 3. ADIM: Yerel Veritabanı (Son Çare)
+    // 2. YEDEK: Open Library API
     // ----------------------------------------------------
-    $randomDbBook = Book::whereNotNull('cover_image')->first();
+    try {
+        $cleanGenre = ($genre === 'random' || empty($genre)) ? 'fiction' : $genre;
+        $openLibRes = Http::withHeaders(['User-Agent' => 'BookieApp/1.0'])
+            ->timeout(3)
+            ->get("https://openlibrary.org/subjects/{$cleanGenre}.json?limit=20");
+
+        if ($openLibRes->successful()) {
+            $works = $openLibRes->json('works', []);
+            $filtered = array_filter($works, fn($item) => !empty($item['cover_id']) && !empty($item['title']));
+
+            if (!empty($filtered)) {
+                $randomWork = $filtered[array_rand($filtered)];
+                $key = str_replace('/works/', '', $randomWork['key'] ?? '');
+                
+                return response()->json([
+                    'success' => true,
+                    'book'    => [
+                        'id'         => $key,
+                        'title'      => $randomWork['title'] ?? 'Unknown Title',
+                        'author'     => $randomWork['authors'][0]['name'] ?? __('Unknown Author'),
+                        'cover'      => "https://covers.openlibrary.org/b/id/{$randomWork['cover_id']}-M.jpg",
+                        'page_count' => $randomWork['number_of_pages_median'] ?? null,
+                        'url'        => route('show', $key),
+                    ]
+                ]);
+            }
+        }
+    } catch (\Throwable $e) {
+        // Open Library de yanıt vermezse DB fallback
+    }
+
+    // ----------------------------------------------------
+    // 3. SON ÇARE: Veritabanından Rastgele Seçim (Sabit ilk kayıt DEĞİL)
+    // ----------------------------------------------------
+    $randomDbBook = Book::whereNotNull('cover_image')->inRandomOrder()->first();
     if ($randomDbBook) {
         return response()->json([
             'success' => true,
