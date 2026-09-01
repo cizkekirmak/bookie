@@ -113,8 +113,8 @@
     position: fixed;
     bottom: 135px;
     left: 30px;
-    width: 360px;
-    height: 430px;
+    width: 375px;
+    height: 445px;
     background: #ffffff;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.16);
@@ -129,7 +129,7 @@
     .chat-popup {
         width: 92vw !important;
         max-width: 350px !important;
-        height: 430px !important;
+        height: 445px !important;
         left: 50% !important;
         right: auto !important;
         top: auto !important;
@@ -187,12 +187,14 @@
 }
 .chat-header-name {
     font-weight: 600;
-    font-size: 13px;
+    font-size: 14px;
     color: #333;
+    font-family: 'Unkempt', cursive;
 }
 .chat-header-placeholder {
-    font-size: 12px;
+    font-size: 13px;
     color: #888;
+    font-family: 'Unkempt', cursive;
 }
 .chat-close-btn {
     background: none;
@@ -218,10 +220,11 @@
 .chat-empty-state {
     margin: auto;
     color: #777;
-    font-size: 12px;
+    font-size: 13px;
     background: rgba(255,255,255,0.9);
-    padding: 5px 12px;
-    border-radius: 10px;
+    padding: 6px 14px;
+    border-radius: 12px;
+    font-family: 'Unkempt', cursive;
 }
 
 /* BALONCUKLAR */
@@ -229,7 +232,7 @@
     max-width: 80%;
     padding: 6px 10px;
     border-radius: 12px;
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.35;
     word-break: break-word;
     cursor: pointer;
@@ -270,7 +273,7 @@
 /* STICKER MENÜSÜ */
 .chat-sticker-picker {
     position: absolute;
-    bottom: 50px;
+    bottom: 58px;
     left: 8px;
     right: 8px;
     background: #ffffff;
@@ -285,6 +288,7 @@
 .sticker-item {
     width: 38px;
     height: 38px;
+    object-fit: contain;
     cursor: pointer;
     transition: transform 0.15s ease;
 }
@@ -292,26 +296,38 @@
     transform: scale(1.2);
 }
 
-/* GİRDİ FORMU */
+/* GİRDİ FORMU (BÜYÜTÜLDÜ VE HİZALANDI) */
 .chat-input-area {
-    height: 48px;
+    height: 56px;
     border-top: 1px solid #eaeaea;
     display: flex;
     align-items: center;
-    padding: 0 8px;
-    gap: 6px;
+    padding: 0 10px;
+    gap: 8px;
     background: #f6ffec;
 }
 .chat-input-area input {
     flex: 1;
-    height: 34px;
-    border: 1px solid #ddd;
-    border-radius: 18px;
-    padding: 0 12px;
-    font-size: 13px;
+    height: 40px;
+    border: 1.5px solid #6b9c56;
+    border-radius: 20px;
+    padding: 0 14px;
+    font-size: 15px;
     outline: none;
     font-family: 'Unkempt', cursive !important;
+    background-color: #ffffff;
+    color: #1b3711;
 }
+.chat-input-area input::placeholder {
+    color: #8c9f7a;
+    font-family: 'Unkempt', cursive !important;
+    font-size: 15px;
+}
+.chat-input-area input:disabled {
+    background-color: #ffffff;
+    opacity: 0.8;
+}
+
 .chat-messages-body::-webkit-scrollbar {
     width: 6px;
 }
@@ -319,31 +335,29 @@
     background: rgb(255, 198, 106);
     border-radius: 10px;
 }
-.chat-input-area input::placeholder {
-    color: #bfb279;
-    font-family: 'Unkempt', cursive !important;
-}
-.chat-input-area input:disabled {
-    background-color: #ffffff;
-    opacity: 1;
-}
+
 .chat-action-btn {
     background: none;
     border: none;
     cursor: pointer;
-    padding: 2px;
+    padding: 0;
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 .chat-btn-icon {
     width: 26px;
     height: 26px;
+    object-fit: contain;
     pointer-events: none;
 }
 .sticker-btn-icon {
     width: 32px;
     height: 32px;
+    object-fit: contain;
 }
 </style>
 
@@ -458,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     popup.style.right = `${Math.max(20, window.innerWidth - rect.right)}px`;
                     popup.style.left = 'auto';
                 }
-                popup.style.top = `${Math.max(20, rect.top - 440)}px`;
+                popup.style.top = `${Math.max(20, rect.top - 455)}px`;
                 popup.style.bottom = 'auto';
             }
 

@@ -25,7 +25,7 @@
             </div>
 
             @if(auth()->check() && auth()->user()->notifications && auth()->user()->notifications->count() > 0)
-                <button type="button" onclick="clearAllNotifications(this)" style="background: none; border: none; font-size: 11px; color: #888; cursor: pointer; text-decoration: underline; padding: 0;">
+                <button type="button" onclick="clearAllNotifications(this)" style="background: none; border: none; font-size: 13px; color: #888; cursor: pointer; text-decoration: underline; padding: 0; font-family: 'Unkempt', cursive;">
                     {{ __('Clear all') }}
                 </button>
             @endif
