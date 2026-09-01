@@ -9,7 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-       body { 
+        body { 
             font-family: "Mystery Quest", system-ui;
             display: flex;
             justify-content: center;
@@ -130,21 +130,11 @@
                         {{ session('status') }}
                     </p>
                 @endif
-                
-                @if ($errors->any())
-                    <div style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; text-align: center; margin-bottom: 15px;">
-                        <ul style="list-style-type: none; padding: 0; margin: 0;">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
                 <label for="loginname">{{ __('username or email:') }}</label>
                 <input type="text" id="loginname" name="loginname" value="{{ old('loginname') }}" required autocomplete="username">
                 @error('loginname')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 12px;">
+                    <small style="color: #2e6433; font-size: 14px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 14px; text-align: center;">
                         {{ $message }}
                     </small>
                 @enderror
@@ -152,7 +142,7 @@
                 <label for="password">{{ __('password:') }}</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password">
                 @error('password')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 12px;">
+                    <small style="color: #2e6433; font-size: 14px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 14px; text-align: center;">
                         {{ $message }}
                     </small>
                 @enderror
