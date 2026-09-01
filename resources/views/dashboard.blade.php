@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Are+You+Serious&family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -634,7 +634,7 @@
 
                         <div style="margin-bottom: 6px;">
                             <span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">{{ __('book:') }} </span>
-                            <a href="{{ route('show', $bookKey) }}#review-{{ $item->id }}" style="font-size: 13px; font-weight: bold; color: #1a3c11; text-decoration: underline; font-family: 'Unkempt', cursive;">
+                            <a href="{{ route('show', $bookKey) }}#review-{{ $item->id }}" style="font-size: 19px; color: #1a3c11; text-decoration: underline; font-family: 'Are You Serious', cursive; letter-spacing: 0.5px;">
                                 {{ $bookTitle }}
                             </a>
                         </div>
@@ -763,7 +763,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
                     <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
                     <div style="overflow: hidden; text-align: left;">
-                        <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
+                        <div style="font-family: 'Are You Serious', cursive; font-size: 20px; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: 0.5px;">${book.title}</div>
                         <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || textUnknownAuthor}</div>
                     </div>
                 </div>
@@ -788,33 +788,33 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         async function performBookSearch() {
-    const q = input.value.trim();
-    if (q.length < 2) {
-        dropdown.style.display = 'none';
-        dropdown.innerHTML = '';
-        return;
-    }
+            const q = input.value.trim();
+            if (q.length < 2) {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+                return;
+            }
 
-    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
-    dropdown.style.display = 'block';
+            dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
+            dropdown.style.display = 'block';
 
-    try {
-        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-        const data = await res.json();
-        const books = Array.isArray(data) ? data : (data.items || []);
+            try {
+                const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                const books = Array.isArray(data) ? data : (data.items || []);
 
-        if (!books || books.length === 0) {
-            dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
-            return;
+                if (!books || books.length === 0) {
+                    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
+                    return;
+                }
+                dropdown.innerHTML = '';
+                allSearchResults = books;
+                displayedCount = 0;
+                renderNextBooks();
+            } catch (err) {
+                dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
+            }
         }
-        dropdown.innerHTML = '';
-        allSearchResults = books;
-        displayedCount = 0;
-        renderNextBooks();
-    } catch (err) {
-        dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
-    }
-}
 
         // SADECE ENTER TUŞUNA BASILDIĞINDA TETİKLENİR
         input.addEventListener('keydown', function (e) {

@@ -229,11 +229,12 @@
     max-width: 80%;
     padding: 6px 10px;
     border-radius: 12px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.35;
     word-break: break-word;
     cursor: pointer;
     position: relative;
+    font-family: 'Unkempt', cursive;
 }
 .chat-bubble.mine {
     align-self: flex-end;
@@ -259,6 +260,7 @@
     color: #666;
     margin-top: 3px;
     text-align: right;
+    font-family: Arial, sans-serif;
 }
 .chat-bubble.show-time .chat-bubble-time,
 .chat-bubble:hover .chat-bubble-time {
@@ -306,8 +308,9 @@
     border: 1px solid #ddd;
     border-radius: 18px;
     padding: 0 12px;
-    font-size: 12px;
+    font-size: 13px;
     outline: none;
+    font-family: 'Unkempt', cursive !important;
 }
 .chat-messages-body::-webkit-scrollbar {
     width: 6px;
@@ -318,6 +321,7 @@
 }
 .chat-input-area input::placeholder {
     color: #bfb279;
+    font-family: 'Unkempt', cursive !important;
 }
 .chat-input-area input:disabled {
     background-color: #ffffff;
@@ -401,12 +405,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
     let shiftX, shiftY;
     let lastLoadedMessagesCount = 0;
-    let blockInChatSound = false; // Popup yeni açılırken sesi bloke eden kilit
+    let blockInChatSound = false;
     let lastUnreadTotal = 0;
     let pollInterval = null;
 
     function getAvatarSrc(avatar) {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
+    }
+
+    function fixFontChars(text) {
+        if (!text) return '';
+        return text
+            .replace(/İ/g, 'I')
+            .replace(/ğ/g, 'g')
+            .replace(/Ğ/g, 'G')
+            .replace(/ş/g, 's')
+            .replace(/Ş/g, 'S');
     }
 
     // SÜRÜKLE - BIRAK
@@ -443,7 +457,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (!isOpen) {
             unreadDot.style.display = 'none';
-            blockInChatSound = true; // Chat açılırken sahte mesaj sesi çalmasın!
+            blockInChatSound = true;
 
             if (window.innerWidth > 768) {
                 const rect = btn.getBoundingClientRect();
@@ -458,13 +472,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 popup.style.bottom = 'auto';
             }
 
-            // Arkadaş listesini çek ve mesajı olan arkadaşı gecikmesiz aç
             await loadFriends();
             if (activeFriendId) {
                 await loadMessages(true);
             }
 
-            // Açılış bittikten sonra ses kilidini aç
             setTimeout(() => {
                 blockInChatSound = false;
             }, 1000);
@@ -513,11 +525,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            // Eğer bir arkadaş seçili değilse ve mesajı olan biri varsa anında seç
             if (!activeFriendId && targetFriend) {
                 await selectFriend(targetFriend);
             } else if (!activeFriendId && friends.length > 0) {
-                // Mesaj yoksa ilk arkadaşı varsayılan seç
                 await selectFriend(friends[0]);
             }
         } catch (e) {}
@@ -526,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
-        blockInChatSound = true; // Odaya girerken ses çalmasın
+        blockInChatSound = true;
         
         headerPlaceholder.style.display = 'none';
         headerUser.style.display = 'flex';
@@ -541,7 +551,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         lastUnreadTotal = 0;
 
-        // UI seçili durumunu güncelle
         document.querySelectorAll('.chat-friend-item').forEach(el => el.classList.remove('active'));
 
         await loadMessages(true);
@@ -561,7 +570,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const messages = await res.json();
 
-            // YALNIZCA kilit kapalıyken ve canlı yeni mesaj düştüğünde çal!
             if (!blockInChatSound && lastLoadedMessagesCount > 0 && messages.length > lastLoadedMessagesCount) {
                 const newestMessage = messages[messages.length - 1];
                 if (!newestMessage.is_mine) {
@@ -600,7 +608,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 } else {
                     bubble.innerHTML = `
-                        <div>${escapeHtml(msg.message)}</div>
+                        <div>${escapeHtml(fixFontChars(msg.message))}</div>
                         <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
                     `;
                 }
@@ -674,13 +682,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 unreadDot.style.display = (currentCount > 0) ? 'block' : 'none';
             }
 
-            // Chat kapalıyken mesaj geldiyse Dış Bildirim Sesi
             if (!isPopupOpen && currentCount > lastUnreadTotal) {
                 playSound('closed');
             }
             lastUnreadTotal = currentCount;
 
-            // Chat açıkken sadece aktif odanın mesajlarını hızlıca kontrol et
             if (isPopupOpen && activeFriendId) {
                 loadMessages(false);
             }
