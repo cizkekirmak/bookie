@@ -14,11 +14,8 @@ return [
     |
     */
 
-    'default' => env('MAIL_MAILER', 'log'),
-    'brevo' => [
-    'transport' => 'brevo',
-    'key' => env('BREVO_KEY'),
-],
+    'default' => env('MAIL_MAILER', 'brevo'),
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
@@ -34,15 +31,18 @@ return [
     |
     | Supported: "smtp", "sendmail", "mailgun", "ses", "ses-v2",
     |            "postmark", "resend", "log", "array",
-    |            "failover", "roundrobin"
+    |            "failover", "roundrobin", "brevo"
     |
     */
 
     'mailers' => [
 
+        'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('BREVO_KEY'),
+        ],
+
         'smtp' => [
-        
-            ],
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),
@@ -53,19 +53,13 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
-        'brevo' => [
-            'transport' => 'brevo',
-            'key' => env('BREVO_KEY'),
+
         'ses' => [
             'transport' => 'ses',
         ],
 
         'postmark' => [
             'transport' => 'postmark',
-            // 'message_stream_id' => env('POSTMARK_MESSAGE_STREAM_ID'),
-            // 'client' => [
-            //     'timeout' => 5,
-            // ],
         ],
 
         'resend' => [
@@ -89,17 +83,8 @@ return [
         'failover' => [
             'transport' => 'failover',
             'mailers' => [
-                'smtp',
+                'brevo',
                 'log',
-            ],
-            'retry_after' => 60,
-        ],
-
-        'roundrobin' => [
-            'transport' => 'roundrobin',
-            'mailers' => [
-                'ses',
-                'postmark',
             ],
             'retry_after' => 60,
         ],
@@ -118,8 +103,8 @@ return [
     */
 
     'from' => [
-        'address' => env('MAIL_FROM_ADDRESS', 'hello@example.com'),
-        'name' => env('MAIL_FROM_NAME', env('APP_NAME', 'Laravel')),
+        'address' => env('MAIL_FROM_ADDRESS', 'bookieapp.info@gmail.com'),
+        'name' => env('MAIL_FROM_NAME', 'Bookie'),
     ],
 
 ];
