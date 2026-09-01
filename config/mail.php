@@ -41,9 +41,7 @@ return [
     'mailers' => [
 
         'smtp' => [
-            'brevo' => [
-            'transport' => 'brevo',
-            'key' => env('BREVO_KEY'),
+        
             ],
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
@@ -55,7 +53,9 @@ return [
             'timeout' => null,
             'local_domain' => env('MAIL_EHLO_DOMAIN', parse_url((string) env('APP_URL', 'http://localhost'), PHP_URL_HOST)),
         ],
-
+        'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('BREVO_KEY'),
         'ses' => [
             'transport' => 'ses',
         ],
