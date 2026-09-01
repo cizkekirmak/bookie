@@ -15,7 +15,10 @@ return [
     */
 
     'default' => env('MAIL_MAILER', 'log'),
-
+    'brevo' => [
+    'transport' => 'brevo',
+    'key' => env('BREVO_KEY'),
+],
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
