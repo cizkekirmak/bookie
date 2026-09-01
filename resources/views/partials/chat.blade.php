@@ -365,17 +365,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
-    // --- SES TANIMLARI & AYARLARI ---
-    const SOUNDS = {
-        closed: new Audio("{{ asset('sounds/yeni-mesaj.mp3') }}"),
-        inChat: new Audio("{{ asset('sounds/mesaj-atma.mp3') }}")
+    // --- SES MOTORU (GARANTİLİ TAZE ÇALMA) ---
+    const SOUND_URLS = {
+        closed: "{{ asset('sounds/yeni-mesaj.mp3') }}",
+        inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
     };
 
     let audioUnlocked = false;
     function unlockAudio() {
         if (!audioUnlocked) {
-            SOUNDS.closed.play().then(() => { SOUNDS.closed.pause(); SOUNDS.closed.currentTime = 0; }).catch(() => {});
-            SOUNDS.inChat.play().then(() => { SOUNDS.inChat.pause(); SOUNDS.inChat.currentTime = 0; }).catch(() => {});
+            const silent1 = new Audio(SOUND_URLS.closed);
+            const silent2 = new Audio(SOUND_URLS.inChat);
+            silent1.play().then(() => { silent1.pause(); }).catch(() => {});
+            silent2.play().then(() => { silent2.pause(); }).catch(() => {});
             audioUnlocked = true;
             document.removeEventListener('click', unlockAudio);
         }
@@ -384,16 +386,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function playSound(type) {
         const soundEnabled = localStorage.getItem('chat_sound_enabled') !== 'false';
-        const volume = parseFloat(localStorage.getItem('chat_sound_volume') ?? '0.6');
+        const volume = parseFloat(localStorage.getItem('chat_sound_volume') ?? '0.8');
         if (!soundEnabled || volume <= 0) return;
 
         try {
-            const audio = (type === 'closed') ? SOUNDS.closed : SOUNDS.inChat;
+            const url = (type === 'closed') ? SOUND_URLS.closed : SOUND_URLS.inChat;
+            const audio = new Audio(url);
             audio.volume = volume;
-            audio.currentTime = 0;
-            audio.play().catch(e => {
-                console.warn('Ses oynatılamadı:', e);
-            });
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.warn('[Chat Audio Hatası]:', err.message);
+                });
+            }
         } catch (e) {}
     }
 
@@ -401,8 +406,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
     let shiftX, shiftY;
     let lastLoadedMessagesCount = 0;
-    let previousUnreadCount = null;
     let isFirstLoadForActiveFriend = false;
+    let lastUnreadTotal = 0;
     let pollInterval = null;
 
     function getAvatarSrc(avatar) {
@@ -501,7 +506,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
-        isFirstLoadForActiveFriend = true; // İlk açılışta eski mesajları yeni sanıp ses çalmaması için
+        isFirstLoadForActiveFriend = true;
         
         headerPlaceholder.style.display = 'none';
         headerUser.style.display = 'flex';
@@ -513,6 +518,8 @@ document.addEventListener('DOMContentLoaded', () => {
         messageInput.disabled = false;
         sendBtn.disabled = false;
         messageInput.focus();
+
+        lastUnreadTotal = 0;
 
         loadFriends();
         await loadMessages(true);
@@ -528,7 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const messages = await res.json();
 
-            // İlk yükleme DEĞİLSE ve yeni bir mesaj geldiyse ses çal
+            // İlk açılış değilse ve yeni mesaj geldiyse sohbet içi ses çal
             if (!isFirstLoadForActiveFriend && lastLoadedMessagesCount > 0 && messages.length > lastLoadedMessagesCount) {
                 const newestMessage = messages[messages.length - 1];
                 if (!newestMessage.is_mine) {
@@ -603,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.ok) {
-                playSound('inChat'); // Mesaj gönderilince çalan ses
+                playSound('inChat'); // Gönderilince ses anında tetiklenir
                 messageInput.value = '';
                 stickerPicker.style.display = 'none';
                 await loadMessages(true);
@@ -640,22 +647,20 @@ document.addEventListener('DOMContentLoaded', () => {
             const currentCount = parseInt(data.unread_count || 0);
             const isPopupOpen = (popup.style.display === 'flex');
 
-            // Chat kutusu açıksa ana butondaki nokta söndürülür
+            // 1. Kırmızı Nokta (Badge)
             if (isPopupOpen) {
                 unreadDot.style.display = 'none';
             } else {
                 unreadDot.style.display = (currentCount > 0) ? 'block' : 'none';
             }
 
-            // Chat kapalıyken yeni mesaj geldiyse dış ses çal
-            if (previousUnreadCount !== null && currentCount > previousUnreadCount) {
-                if (!isPopupOpen) {
-                    playSound('closed');
-                }
+            // 2. BİLDİRİM SESİ: Chat kapalıyken mesaj arttıysa doğrudan çal
+            if (!isPopupOpen && currentCount > lastUnreadTotal) {
+                playSound('closed');
             }
-            previousUnreadCount = currentCount;
+            lastUnreadTotal = currentCount;
 
-            // Popup açıksa arkadaş listesini ve konuşmayı yenile
+            // 3. Popup açıksa listeyi ve aktif odayı tazele
             if (isPopupOpen) {
                 loadFriends();
                 if (activeFriendId) {
@@ -667,8 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startPolling() {
         if (pollInterval) clearInterval(pollInterval);
-        // Chat açıksa mesajlar akıcı gelsin diye 2.5 saniyede bir, kapalıysa 6 saniyede bir kontrol et
-        const intervalTime = (popup.style.display === 'flex') ? 2500 : 6000;
+        const intervalTime = (popup.style.display === 'flex') ? 2500 : 5000;
         pollInterval = setInterval(checkUnread, intervalTime);
     }
 
