@@ -412,7 +412,7 @@
                 @endif
 
                 {{-- Okuma Durumu --}}
-                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 14px;">{{ __('reading progress') }}</label>
+                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 16px;">{{ __('reading progress') }}</label>
                 <div class="radio-group-wrap" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
                     <label class="radio-label">
                         <input type="radio" name="status" value="reading" class="status-radio" {{ ($userBook && $userBook->status == 'reading') ? 'checked' : '' }} required>
@@ -470,7 +470,7 @@
                 </div>
 
                 {{-- Değerlendirme / Yorum --}}
-                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 14px;">{{ __('your thoughts:') }}</label>
+                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 16px;">{{ __('your thoughts:') }}</label>
                 <textarea name="review" rows="3" placeholder="{{ __('what did u think about this book?') }}" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #2d5a27; font-family: 'Unkempt', cursive; font-size: 14px; color: #1b3711; resize: vertical; box-sizing: border-box; margin-bottom: 14px; outline: none; background: #fff;">{{ $userBook->review ?? '' }}</textarea>
 
                 <button type="submit" class="review-submit-btn" style="background: #2d5a27; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 15px; cursor: pointer; transition: background 0.15s ease;">
