@@ -9,7 +9,7 @@
     <div class="chat-main-area">
         <div class="chat-header">
             <a href="#" id="chat-header-user" class="chat-header-user" style="display: none; text-decoration: none; cursor: pointer;">
-                <img id="chat-active-avatar" src="{{ asset('images/default-avatar.png') }}" alt="Avatar" class="chat-header-avatar">
+                <img id="chat-active-avatar" src="{{ asset('images/default-avatar.jpg') }}" alt="Avatar" class="chat-header-avatar">
                 <span id="chat-active-name" class="chat-header-name"></span>
             </a>
             <div id="chat-header-placeholder" class="chat-header-placeholder">
@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const unreadDot = document.getElementById('chat-unread-dot');
 
     const csrfToken = "{{ csrf_token() }}";
-    const defaultAvatarUrl = "{{ asset('images/default-avatar.png') }}";
+    const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
     let activeFriendId = null;
     let isDragging = false;
