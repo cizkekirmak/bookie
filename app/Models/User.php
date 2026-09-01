@@ -26,12 +26,18 @@ class User extends Authenticatable
         ];
     }
 
-   public function sendPasswordResetNotification($token)
+  public function sendPasswordResetNotification($token)
     {
         $url = url(route('password.reset', [
             'token' => $token,
             'email' => $this->getEmailForPasswordReset(),
         ], false));
+
+        // public/images/logo.png
+        $logoUrl = url('images/logo.png');
+
+        $salutationText = __('with love,\nBookie Team');
+        $formattedSalutation = str_replace('\n', '<br>', nl2br(e($salutationText)));
 
         $htmlContent = '
         <!DOCTYPE html>
@@ -44,12 +50,12 @@ class User extends Authenticatable
             <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #c2e2a3; padding: 40px 15px;">
                 <tr>
                     <td align="center">
-                        <!-- Logo -->
+                        <!-- Bookie PNG Logo -->
                         <div style="margin-bottom: 25px; text-align: center;">
-                            <span style="font-family: Georgia, serif; font-size: 42px; font-weight: bold; color: #2d5a27; letter-spacing: -1px;">B<span style="font-style: italic;">oo</span>kie</span>
+                            <img src="' . $logoUrl . '" alt="Bookie" style="height: 55px; max-width: 200px; display: inline-block;" />
                         </div>
 
-                        <!-- Card -->
+                        <!-- Kart -->
                         <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 570px; background-color: #ffffff; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 40px 35px; text-align: left;">
                             <tr>
                                 <td>
@@ -65,11 +71,11 @@ class User extends Authenticatable
                                     <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 12px;">' . e(__('this link will die in 60 minutes, be quick !')) . '</p>
                                     <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 25px;">' . e(__('if u didnt request this link, just ignore it :p')) . '</p>
 
-                                    <p style="font-size: 15px; color: #4b5563; line-height: 1.5; margin-bottom: 30px;">' . nl2br(e(__('with love,\nBookie Team'))) . '</p>
+                                    <p style="font-size: 15px; color: #4b5563; line-height: 1.5; margin-bottom: 30px;">' . $formattedSalutation . '</p>
 
                                     <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0 20px 0;">
 
-                                    <!-- Alt Bilgi -->
+                                    <!-- Alt Link Uyarısı -->
                                     <p style="font-size: 12px; color: #6b7280; line-height: 1.5; margin: 0; word-break: break-all;">
                                         ' . e(__('If you\'re having trouble clicking the "reset password" button, copy and paste the URL below into your web browser:')) . '<br>
                                         <a href="' . $url . '" style="color: #2563eb; text-decoration: underline;">' . $url . '</a>
@@ -103,7 +109,7 @@ class User extends Authenticatable
             Log::error('Brevo API Hatası: ' . $response->body());
         }
     }
-
+    
     public function books()
     {
         return $this->hasMany(\App\Models\Book::class);
