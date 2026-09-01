@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Bookie - Settings</title>
+    <title>Bookie - {{ __('Settings') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -73,6 +73,7 @@
             margin-top: 10px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
             user-select: none;
+            text-decoration: none;
         }
 
         .header-icon-box {
@@ -307,12 +308,24 @@
     <header class="site-header-outer">
         <div class="site-header-inner">
             
-            <div class="header-logo">
+            <a href="{{ route('dashboard') }}" class="header-logo">
                 Bookie
-            </div>
+            </a>
 
-            {{-- SAĞ İKONLAR --}}
+            {{-- SAĞ İKONLAR & DİL SEÇİCİ --}}
             <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
+                <div style="font-family: 'Unkempt', cursive; font-size: 15px; display: flex; gap: 6px; align-items: center; margin-right: 4px;">
+                    <a href="{{ route('lang.switch', 'tr') }}" 
+                       style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'tr' ? 'bold' : 'normal' }};">
+                       TR
+                    </a>
+                    <span style="color: #badfa0;">|</span>
+                    <a href="{{ route('lang.switch', 'en') }}" 
+                       style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'en' ? 'bold' : 'normal' }};">
+                       EN
+                    </a>
+                </div>
+
                 <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
                     <img src="{{ asset('images/profile.jpg') }}" alt="profile" class="header-icon-box">
                 </a>
@@ -329,7 +342,7 @@
     <div class="settings-main-area">
         <div class="settings-card">
             
-            <h2 class="settings-title">profile settings</h2>
+            <h2 class="settings-title">{{ __('profile settings') }}</h2>
 
             @if(session('success'))
                 <div class="alert-box alert-success">
@@ -369,20 +382,20 @@
                 {{-- Avatar Yükleme Butonu --}}
                 <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display: none;" onchange="previewImage(event)">
                 <button type="button" class="choose-pic-btn" onclick="document.getElementById('avatar-input').click()">
-                    choose your best pic !
+                    {{ __('choose your best pic !') }}
                 </button>
 
                 {{-- Bio Alanı --}}
                 <div class="form-label-row">
-                    <span>About you (bio)</span>
+                    <span>{{ __('About you (bio)') }}</span>
                     <span id="char-count" class="bio-char-counter">{{ strlen(auth()->user()->bio ?? '') }}/160</span>
                 </div>
 
-                <textarea name="bio" id="bio-textarea" rows="3" maxlength="160" placeholder="tell us about yourself..." class="bio-textarea" oninput="updateCharCount(this)">{{ auth()->user()->bio ?? '' }}</textarea>
+                <textarea name="bio" id="bio-textarea" rows="3" maxlength="160" placeholder="{{ __('tell us about yourself...') }}" class="bio-textarea" oninput="updateCharCount(this)">{{ auth()->user()->bio ?? '' }}</textarea>
 
                 {{-- Kaydet Butonu --}}
                 <button type="submit" class="save-btn">
-                    save
+                    {{ __('save') }}
                 </button>
             </form>
 

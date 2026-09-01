@@ -307,3 +307,9 @@ Route::get('/fix-render', function () {
     
     return 'Bağlantılar ve önbellek yenilendi! Sayfayı yenileyebilirsin.';
 });
+Route::get('/lang/{locale}', function ($locale) {
+    if (in_array($locale, ['tr', 'en'])) {
+        session(['locale' => $locale]);
+    }
+    return redirect()->back();
+})->name('lang.switch');

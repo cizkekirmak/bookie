@@ -111,7 +111,7 @@
         margin-bottom: 6px;
         display: block;
         font-weight: normal;">
-        continue?
+        {{ __('continue?') }}
     </span>
 
     <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
@@ -146,7 +146,7 @@
                         <div style="margin-bottom: 4px;">
                             <div style="display: flex; justify-content: space-between; font-size: 10px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
                                 <span>%{{ $pct }}</span>
-                                <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} p.</span>
+                                <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} {{ __('p.') }}</span>
                             </div>
                             <div style="width: 95%; height: 5px; background-color: #eaf3e4; border: 1px solid #737e3d; border-radius: 6px; overflow: hidden;">
                                 <div style="width: {{ $pct }}%; height: 95%; background: #2d5a27; border-radius: 6px; transition: width 0.4s ease;"></div>
@@ -156,12 +156,12 @@
                 </div>
 
                 <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" class="continue-btn">
-                    Oku →
+                    {{ __('Read →') }}
                 </a>
             </div>
         @else
             <div style="text-align: center; width: 100%; color: #3b612d; font-size: 12px; font-family: 'Unkempt', cursive;">
-                <p style="margin: 0 0 4px 0;">Okunan kitap yok.</p>
+                <p style="margin: 0 0 4px 0;">{{ __('No books currently being read.') }}</p>
                 <span style="font-size: 18px;">📚</span>
             </div>
         @endif

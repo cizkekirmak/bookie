@@ -7,7 +7,7 @@
 <div class="notification-container" onmouseenter="openNotificationPanel()" onmouseleave="closeNotificationPanel()">
     
     <button type="button" class="notification-trigger-btn" onclick="toggleNotificationPanel(event)">
-        <img src="{{ asset('images/bildirim.jpg') }}" alt="bildirimler" class="notification-icon-img"
+        <img src="{{ asset('images/bildirim.jpg') }}" alt="{{ __('Notifications') }}" class="notification-icon-img"
              onmouseenter="this.style.transform='scale(1.1)'; this.style.filter='drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.4))';"
              onmouseleave="this.style.transform='scale(1)'; this.style.filter='none';">
         @if($totalCount > 0)
@@ -18,15 +18,15 @@
     <div class="notification-dropdown-panel" style="display: none;">
         <div class="notification-header">
             <div>
-                <span>Notifications</span>
+                <span>{{ __('Notifications') }}</span>
                 @if($totalCount > 0)
-                    <span class="notification-subtext">{{ $totalCount }} new</span>
+                    <span class="notification-subtext">{{ $totalCount }} {{ __('new') }}</span>
                 @endif
             </div>
 
             @if(auth()->check() && auth()->user()->notifications && auth()->user()->notifications->count() > 0)
                 <button type="button" onclick="clearAllNotifications(this)" style="background: none; border: none; font-size: 11px; color: #888; cursor: pointer; text-decoration: underline; padding: 0;">
-                    Clear all
+                    {{ __('Clear all') }}
                 </button>
             @endif
         </div>
@@ -249,7 +249,7 @@ if (!window.notifInitialized) {
     window.notifInitialized = true;
 
     window.openNotificationPanel = function() {
-        if (window.innerWidth <= 768) return; // Mobilde hover yerine click kullanılır
+        if (window.innerWidth <= 768) return;
         clearTimeout(window.notifTimeout);
         const container = event ? event.currentTarget : document.querySelector('.notification-container');
         const panel = container ? container.querySelector('.notification-dropdown-panel') : null;
@@ -268,7 +268,6 @@ if (!window.notifInitialized) {
 
         if (panel) {
             const isHidden = panel.style.display === 'none' || panel.style.display === '';
-            // Sayfadaki diğer tüm bildirim panellerini kapat
             document.querySelectorAll('.notification-dropdown-panel').forEach(p => p.style.display = 'none');
 
             if (isHidden) {
@@ -281,7 +280,7 @@ if (!window.notifInitialized) {
     };
 
     window.closeNotificationPanel = function() {
-        if (window.innerWidth <= 768) return; // Mobilde mouseleave kapatmasın
+        if (window.innerWidth <= 768) return;
         window.notifTimeout = setTimeout(function() {
             document.querySelectorAll('.notification-dropdown-panel').forEach(panel => {
                 panel.style.display = 'none';
@@ -289,7 +288,6 @@ if (!window.notifInitialized) {
         }, 200);
     };
 
-    // Dışarıya tıklandığında paneli kapat
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.notification-container')) {
             document.querySelectorAll('.notification-dropdown-panel').forEach(panel => {
@@ -331,6 +329,9 @@ if (!window.notifInitialized) {
         const notificationItem = formElement.closest(".notification-item");
         const isReject = actionUrl.includes('reject');
 
+        const textDeclined = @json(__("'s friend request was declined."));
+        const textAccepted = @json(__("'s friend request was accepted !"));
+
         fetch(actionUrl, {
             method: "POST",
             body: formData,
@@ -345,9 +346,7 @@ if (!window.notifInitialized) {
 
                 const descSpan = notificationItem.querySelector(".notification-desc");
                 if (descSpan) {
-                    descSpan.innerText = isReject 
-                        ? "'s friend request was declined." 
-                        : "'s friend request was accepted !";
+                    descSpan.innerText = isReject ? textDeclined : textAccepted;
                 }
 
                 document.querySelectorAll('.notification-badge, #notifCount').forEach(badge => {
@@ -365,6 +364,7 @@ if (!window.notifInitialized) {
 
     window.clearAllNotifications = function(button) {
         const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute('content') || '{{ csrf_token() }}';
+        const emptyText = @json(__('No notifications yet ^^'));
 
         fetch('/notifications/clear-all', {
             method: 'POST',
@@ -378,7 +378,7 @@ if (!window.notifInitialized) {
         .then(data => {
             if (data.success) {
                 document.querySelectorAll('.notification-list').forEach(list => {
-                    list.innerHTML = '<div class="notification-empty">No notifications yet </div>';
+                    list.innerHTML = `<div class="notification-empty">${emptyText}</div>`;
                 });
                 if (button) button.remove();
             }

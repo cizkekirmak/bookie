@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'Book Details' }} - Bookie</title>
+    <title>{{ $title ?? __('Book Details') }} - Bookie</title>
     
     <!-- Fontlar -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -126,7 +126,7 @@
             color: #1f5117;
         }
 
-        /* MOBİL UYARLAMA (Dikey & Yatay Tam Ortalama) */
+        /* MOBİL UYARLAMA */
         @media (max-width: 768px) {
             body {
                 padding: 16px 10px;
@@ -219,7 +219,6 @@
                 font-size: 14px !important;
             }
 
-            /* CHAT BUTONUNU PANELE VE EKRANA GÖRE SABİTLE */
             #chat-draggable-btn,
             .chat-bubble-btn,
             .chat-toggle-btn {
@@ -236,7 +235,7 @@
 <body>
 
 <div class="container">
-    <a href="{{ route('dashboard') }}" class="back-link">← wanna go back?</a>
+    <a href="{{ route('dashboard') }}" class="back-link">← {{ __('wanna go back?') }}</a>
 
     @if(session('success'))
         <div style="background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; font-family: 'Henny Penny', cursive; font-size: 14px;">
@@ -263,7 +262,7 @@
             {{-- Başlık ve Sağdaki İndir/Oku Butonu --}}
             <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; flex-wrap: wrap;">
                 <h1 class="book-title-heading" style="font-family: 'Henny Penny', cursive; color: #1f5117; margin: 0; font-size: 26px;">
-                    {{ $title ?? 'Unknown book' }}
+                    {{ $title ?? __('Unknown book') }}
                 </h1>
 
                 @if(!empty($downloadUrl) || (!empty($book) && !empty($book->download_url)))
@@ -280,18 +279,18 @@
                            border-radius: 6px; 
                            text-decoration: none; 
                            font-family: 'Unkempt', cursive; 
-                           font-size: 12px;
-                           white-space: nowrap;
-                           flex-shrink: 0;
-                           cursor: pointer;
+                           font-size: 12px; 
+                           white-space: nowrap; 
+                           flex-shrink: 0; 
+                           cursor: pointer; 
                        ">
-                        📖 <span>Kitabı Oku / İndir</span>
+                        📖 <span>{{ __('Read / Download Book') }}</span>
                     </a>
                 @endif
             </div>
 
             <h4 class="book-author-text" style="color: #4a5d44; margin: 0 0 8px 0; font-size: 15px; font-weight: normal;">
-                by {{ $authors ?? 'Unknown author' }}
+                {{ __('by') }} {{ $authors ?? __('Unknown author') }}
             </h4>
             @php
                 $averageRating = $averageRating ?? 0;
@@ -319,12 +318,12 @@
                 </div>
 
                 <span style="font-family: 'Unkempt', cursive; font-weight: bold; color: #1a3c11; font-size: 13px;">
-                    {{ $averageRating > 0 ? number_format($averageRating, 1) : 'no ratings yet' }}
+                    {{ $averageRating > 0 ? number_format($averageRating, 1) : __('no ratings yet') }}
                 </span>
 
                 @if($totalReviews > 0)
                     <span style="color: #666; font-size: 11px; font-family: 'Unkempt', cursive;">
-                        ({{ $totalReviews }} inceleme)
+                        ({{ $totalReviews }} {{ __('reviews') }})
                     </span>
                 @endif
             </div>
@@ -341,7 +340,6 @@
                 <input type="hidden" name="author" value="{{ $authors ?? 'Unknown author' }}">
                 <input type="hidden" name="download_url" value="{{ $downloadUrl ?? ($book->download_url ?? '') }}">
 
-                {{-- Kitap Anahtarı (Key) Tanımlaması --}}
                 @php
                     $routeKey = (string) request()->route('key');
                     $isOl = str_starts_with($routeKey, 'OL') || str_contains($routeKey, '/works/');
@@ -350,7 +348,6 @@
                     $currentPage = $userBook->current_page ?? 0;
                 @endphp
 
-                {{-- Toplam Sayfa Sayısı (Hidden) --}}
                 <input type="hidden" name="page_count" value="{{ $pageCount ?? '' }}">
 
                 @if($isOl)
@@ -362,35 +359,35 @@
                 @endif
 
                 {{-- Okuma Durumu --}}
-                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 4px; font-size: 13px;">reading progress</label>
+                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 4px; font-size: 13px;">{{ __('reading progress') }}</label>
                 <div class="radio-group-wrap" style="display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px;">
                     <label class="radio-label">
                         <input type="radio" name="status" value="reading" class="status-radio" {{ ($userBook && $userBook->status == 'reading') ? 'checked' : '' }} required>
-                        currently reading 
+                        {{ __('currently reading') }} 
                     </label>
                     <label class="radio-label">
                         <input type="radio" name="status" value="read" class="status-radio" {{ ($userBook && $userBook->status == 'read') ? 'checked' : '' }}>
-                        read
+                        {{ __('read') }}
                     </label>
                     <label class="radio-label">
                         <input type="radio" name="status" value="want_to_read" class="status-radio" {{ (!$userBook || $userBook->status == 'want_to_read' || $userBook->status == 'toRead') ? 'checked' : '' }}>
-                        want to read
+                        {{ __('want to read') }}
                     </label>
                 </div>
 
                 {{-- Sayfa İlerleme Kutusu --}}
                 <div id="page-box" class="page-box" style="display: {{ ($userBook && $userBook->status == 'reading') ? 'flex' : 'none' }};">
-                    <span style="color: #1f5117; font-size: 12px; font-weight: bold;">on page:</span>
+                    <span style="color: #1f5117; font-size: 12px; font-weight: bold;">{{ __('on page:') }}</span>
                     <input type="number" name="current_page" id="current_page" class="page-input" min="0" max="{{ $pageCount ?? 9999 }}" value="{{ $currentPage }}" placeholder="0">
                     
                     @if(!empty($pageCount) && $pageCount > 0)
-                        <span style="color: #4a5d44; font-size: 12px;">/ {{ $pageCount }} pages</span>
+                        <span style="color: #4a5d44; font-size: 12px;">/ {{ $pageCount }} {{ __('pages') }}</span>
                     @endif
                 </div>
 
                 {{-- 5 Renkli Puan Verme --}}
                 <div style="margin-bottom: 12px;">
-                    <label style="font-family: 'Henny Penny', cursive; color: #1f5117; display: block; margin-bottom: 4px; font-size: 13px;">rate this book:</label>
+                    <label style="font-family: 'Henny Penny', cursive; color: #1f5117; display: block; margin-bottom: 4px; font-size: 13px;">{{ __('rate this book:') }}</label>
                     <input type="hidden" name="rating" id="selected-rating" value="{{ $userBook->rating ?? '' }}">
 
                     <div class="star-rating-multi" style="display: inline-flex; gap: 4px; cursor: pointer; user-select: none;">
@@ -416,16 +413,16 @@
                     </div>
                     
                     <span id="rating-text" style="font-family: 'Henny Penny', cursive; color: #3a7d2c; font-size: 12px; margin-left: 6px; vertical-align: middle;">
-                        {{ isset($userBook->rating) ? "({$userBook->rating}/5)" : '(no rating)' }}
+                        {{ isset($userBook->rating) ? "({$userBook->rating}/5)" : __('(no rating)') }}
                     </span>
                 </div>
 
                 {{-- Değerlendirme / Yorum --}}
-                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 4px; font-size: 13px;">your thoughts:</label>
-                <textarea name="review" rows="3" placeholder="what did u think about this book?" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1.5px solid #2d5a27; font-family: 'Unkempt', cursive; font-size: 13px; color: #1b3711; resize: vertical; box-sizing: border-box; margin-bottom: 12px; outline: none;">{{ $userBook->review ?? '' }}</textarea>
+                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 4px; font-size: 13px;">{{ __('your thoughts:') }}</label>
+                <textarea name="review" rows="3" placeholder="{{ __('what did u think about this book?') }}" style="width: 100%; padding: 8px 10px; border-radius: 6px; border: 1.5px solid #2d5a27; font-family: 'Unkempt', cursive; font-size: 13px; color: #1b3711; resize: vertical; box-sizing: border-box; margin-bottom: 12px; outline: none;">{{ $userBook->review ?? '' }}</textarea>
 
                 <button type="submit" class="review-submit-btn" style="background: #2d5a27; color: white; border: none; padding: 9px 20px; border-radius: 6px; font-family: 'Unkempt', cursive; font-size: 14px; cursor: pointer;">
-                    save it to my library!
+                    {{ __('save it to my library!') }}
                 </button>
             </form>
 
@@ -433,7 +430,7 @@
             @if(auth()->check() && auth()->user()->email === "bookieapp.info@gmail.com")
                 <div style="margin-top: 16px; padding: 10px; background: #eaf3e4; border: 1.5px dashed #2d5a27; border-radius: 8px;">
                     <h4 style="margin: 0 0 6px 0; font-size: 12px; color: #1a3c11; font-weight: bold; font-family: 'Henny Penny', cursive;">
-                        ⭐ Admin Tavsiyesi Olarak Belirle
+                        ⭐ {{ __('Set as Admin Recommendation') }}
                     </h4>
                     <form action="{{ route('adminRecommendation.store') }}" method="POST" style="display: flex; flex-direction: column; gap: 6px;">
                         @csrf
@@ -442,10 +439,10 @@
                         <input type="hidden" name="authors" value="{{ $authors ?? '' }}">
                         <input type="hidden" name="cover_url" value="{{ $coverUrl ?? '' }}">
                         
-                        <textarea name="admin_note" rows="2" placeholder="Admin tavsiye notunu buraya yaz..." style="width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 6px; border: 1px solid #737e3d; font-size: 12px; resize: none; font-family: 'Unkempt', cursive;"></textarea>
+                        <textarea name="admin_note" rows="2" placeholder="{{ __('Write your admin recommendation note here...') }}" style="width: 100%; box-sizing: border-box; padding: 6px 8px; border-radius: 6px; border: 1px solid #737e3d; font-size: 12px; resize: none; font-family: 'Unkempt', cursive;"></textarea>
 
                         <button type="submit" style="align-self: flex-start; background: #2d5a27; color: #fff; border: none; padding: 5px 10px; border-radius: 6px; font-size: 11px; cursor: pointer; font-weight: bold; font-family: 'Unkempt', cursive;">
-                            tavsiyeni kaydet 📌
+                            {{ __('save recommendation 📌') }}
                         </button>
                     </form>
                 </div>
@@ -453,7 +450,7 @@
 
             {{-- 3. KULLANICI YORUMLARI --}}
             <div style="margin-top: 20px;">
-                <h3 style="font-family: 'Henny Penny', cursive; color: #1f5117; margin-bottom: 8px; font-size: 16px;">reviews ({{ $allReviews->count() }})</h3>
+                <h3 style="font-family: 'Henny Penny', cursive; color: #1f5117; margin-bottom: 8px; font-size: 16px;">{{ __('reviews') }} ({{ $allReviews->count() }})</h3>
 
                 @forelse($allReviews as $item)
                     @php
@@ -461,9 +458,9 @@
                     @endphp
                     <div id="review-{{ $item->id }}" style="background: #f1f8ed; border: 1.5px solid #4c7237; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; transition: transform 0.2s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                            <strong style="font-weight: bold; color: #1f5117; font-size: 12px;">{{ $item->user->username ?? ($item->user->name ?? 'Anonim') }}</strong>
+                            <strong style="font-weight: bold; color: #1f5117; font-size: 12px;">{{ $item->user->username ?? ($item->user->name ?? __('Anonymous')) }}</strong>
                             <span style="color: {{ $itemRatingColor }}; font-size: 13px;">
-                                {{ $item->rating > 0 ? str_repeat('★', $item->rating) : 'no rating' }}
+                                {{ $item->rating > 0 ? str_repeat('★', $item->rating) : __('no rating') }}
                             </span> 
                         </div>
                         
@@ -481,7 +478,7 @@
                         </div>
                     </div>
                 @empty
-                    <p style="color: #4a5d44; font-size: 12px;">there are no ratings for this book yet, wanna be the first one :>?</p>
+                    <p style="color: #4a5d44; font-size: 12px;">{{ __('there are no ratings for this book yet, wanna be the first one :>?') }}</p>
                 @endforelse
             </div>
 
@@ -494,6 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const starButtons = document.querySelectorAll('.star-rating-multi .star-btn');
     const ratingInput = document.getElementById('selected-rating');
     const ratingText = document.getElementById('rating-text');
+    const noRatingText = @json(__(' (no rating)'));
 
     const colorMap = {
         1: '#d43b82',
@@ -532,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (parseInt(ratingInput.value) === clickVal) {
                 ratingInput.value = '';
-                ratingText.innerText = '(no rating)';
+                ratingText.innerText = noRatingText;
                 paintStars(0);
             } else {
                 ratingInput.value = clickVal;

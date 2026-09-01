@@ -38,7 +38,7 @@
     {{-- Kapak Görseli --}}
     <a href="{{ route('show', $bookKey) }}" class="book-cover-link" style="flex-shrink: 0; width: 55px; height: 80px; display: block; overflow: hidden; border-radius: 6px; border: 1px solid #c2d8b7;">
         <img src="{{ $coverSrc ?: asset('images/default-book.png') }}" 
-             alt="{{ $book->title ?? 'Kitap' }}"
+             alt="{{ $book->title ?? __('Book') }}"
              style="width: 100%; height: 100%; object-fit: cover;"
              onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
     </a>
@@ -51,33 +51,33 @@
             <div style="min-width: 0; flex: 1;">
                 <h4 style="margin: 0 0 2px 0; font-size: 15px; color: #1a3c11; line-height: 1.2; word-break: break-word;">
                     <a href="{{ route('show', $bookKey) }}" style="text-decoration: none; color: inherit;">
-                        {{ $book->title ?? 'Bilinmeyen Kitap' }}
+                        {{ $book->title ?? __('Unknown Book') }}
                     </a>
                 </h4>
                 <span style="font-size: 12px; color: #527943; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    {{ $book->author ?? 'Bilinmeyen Yazar' }}
+                    {{ $book->author ?? __('Unknown Author') }}
                 </span>
             </div>
 
             {{-- Durum Rozeti (read, to read, currently reading) --}}
             <span style="font-size: 10px; padding: 2px 6px; border-radius: 5px; font-weight: bold; background: #eaf3e4; color: #2d5a27; border: 1px solid #c2d8b7; white-space: nowrap; flex-shrink: 0;">
-                @if($item->status === 'reading') reading
-                @elseif($item->status === 'read') read
-                @elseif($item->status === 'toRead') to read
-                @else {{ $item->status }}
+                @if($item->status === 'reading') {{ __('reading') }}
+                @elseif($item->status === 'read') {{ __('read') }}
+                @elseif($item->status === 'toRead' || $item->status === 'want_to_read') {{ __('to read') }}
+                @else {{ __($item->status) }}
                 @endif
             </span>
         </div>
 
-        {{-- İlerleme Çubuğu ve Sayfa Bilgisi (Başlığın hemen altı) --}}
+        {{-- İlerleme Çubuğu ve Sayfa Bilgisi --}}
         @if($hasProgress)
             <div style="width: 100%; margin-top: 2px; margin-bottom: 2px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #3b612d; font-weight: bold; margin-bottom: 2px;">
                     @if($pct !== null)
                         <span>%{{ $pct }}</span>
-                        <span style="font-weight: normal; color: #666; font-size: 10px;">{{ $currentPage }} / {{ $totalPages }} p.</span>
+                        <span style="font-weight: normal; color: #666; font-size: 10px;">{{ $currentPage }} / {{ $totalPages }} {{ __('p.') }}</span>
                     @else
-                        <span>p. {{ $currentPage }}</span>
+                        <span>{{ __('p.') }} {{ $currentPage }}</span>
                     @endif
                 </div>
                 @if($pct !== null)

@@ -1,8 +1,9 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - Bookie</title>
+    <title>{{ __('Reset Password') }} - Bookie</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,17 +11,17 @@
     <style>
         body { 
             font-family: "Mystery Quest" , system-ui;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #D1FFBD;
-        margin: 0; 
-        
-        background-image: url("{{ asset('images/arkaplan.png') }}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #D1FFBD;
+            margin: 0; 
+            
+            background-image: url("{{ asset('images/arkaplan.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .dis-kapsayici {
@@ -67,7 +68,7 @@
             color: #2e6f40;
             text-decoration: none;
             font-family: "Henny Penny", cursive;
-            font-weight: none;
+            font-weight: normal;
         }
         .alt-linkler a:hover {
             text-decoration: underline;
@@ -80,7 +81,8 @@
             border: 1px solid #5f9852;
             border-radius: 5px;
             box-sizing: border-box;
-            font-family: Arial, sans-serif; }
+            font-family: Arial, sans-serif;
+        }
 
         button { 
             width: 250px; 
@@ -94,7 +96,8 @@
             border-radius: 5px; 
             cursor: pointer;
             font-weight: bold;
-            font-family: "Henny Penny", cursive; }
+            font-family: "Henny Penny", cursive;
+        }
 
         button:hover { background-color: #45a049; }
     </style>
@@ -105,29 +108,28 @@
         <div class="kutucuk">
             @if (session("status"))
                 <p style="color: #2e6f40; font-size: 15px; font-family: 'Unkempt', cursive; text-align: center; margin-bottom: 15px;">
-                    {{ session("status")}}
+                    {{ session("status") }}
                 </p>
             @endif
 
             <form method="POST" action="{{ route('password.email') }}">
                 @csrf
 
-                <label for="email">email:</label>
+                <label for="email">{{ __('email:') }}</label>
                 <input type="email" id="email" name="email" required>
 
                 @error("email")
                 <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -10px; margin-bottom: 15px;">
-                    {{ $message}}
+                    {{ $message }}
                 </small>
                 @enderror
 
-                <button type="submit">Send reset link</button>
+                <button type="submit">{{ __('Send reset link') }}</button>
             </form>
             <div class="alt-linkler">
-                <a href="/login">do u wanna go back?</a>
+                <a href="/login">{{ __('do u wanna go back?') }}</a>
             </div>
         </div>
     </div>
-    
 </body>
 </html>

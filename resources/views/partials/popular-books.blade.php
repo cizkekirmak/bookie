@@ -86,7 +86,7 @@
 
 <div class="popular-books-card">
     <h3 style="font-family: 'Henny Penny', cursive; color: #1a3c11; font-size: 15px; margin: 0 0 14px 0; font-weight: normal;">
-        Popular books this week:
+        {{ __('Popular books this week:') }}
     </h3>
 
     <div class="popular-books-list">
@@ -113,7 +113,7 @@
             </div>
         @empty
             <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #777; width: 100%; text-align: center;">
-                Couldn't load the popular books.
+                {{ __("Couldn't load the popular books.") }}
             </div>
         @endforelse
     </div>

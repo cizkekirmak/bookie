@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Bookie - Profile</title>
+    <title>Bookie - {{ __('Profile') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -128,6 +128,7 @@
             margin-top: 10px;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
             user-select: none;
+            text-decoration: none;
         }
 
         .header-actions-wrap {
@@ -387,12 +388,24 @@
         <div class="site-header-inner">     
 
             {{-- LOGO --}}
-            <div class="header-logo">
+            <a href="{{ route('dashboard') }}" class="header-logo">
                 Bookie
-            </div>
+            </a>
 
-            {{-- SAĞ İKONLAR --}}
+            {{-- SAĞ İKONLAR & DİL SEÇİCİ --}}
             <div class="header-actions-wrap">
+                <div style="font-family: 'Unkempt', cursive; font-size: 15px; display: flex; gap: 6px; align-items: center; margin-right: 4px;">
+                    <a href="{{ route('lang.switch', 'tr') }}" 
+                       style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'tr' ? 'bold' : 'normal' }};">
+                       TR
+                    </a>
+                    <span style="color: #badfa0;">|</span>
+                    <a href="{{ route('lang.switch', 'en') }}" 
+                       style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'en' ? 'bold' : 'normal' }};">
+                       EN
+                    </a>
+                </div>
+
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
                     @include('partials.notifications')
                 </div>
@@ -429,7 +442,7 @@
                 @if(!empty($user->avatar))
                     <img src="{{ $userAvatar }}" 
                          alt="{{ $user->username ?? $user->name }}" 
-                         referrerpolicy="no-referrer"
+                         referrerpolicy="no-referrer" 
                          style="width: 100%; height: 100%; object-fit: cover; display: block;" 
                          onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                 @else
@@ -467,7 +480,7 @@
                     cursor: pointer;
                 ">
                     <span>{{ $title['icon'] }}</span>
-                    <span>{{ $title['name'] }}</span>
+                    <span>{{ __($title['name'] ?? 'certified noob') }}</span>
                     <span style="font-size: 10px; opacity: 0.6;">▼</span>
                 </div>
             </button>
@@ -485,7 +498,7 @@
                         <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                             @csrf
                             <button type="submit" style="width: 100%; background-color: #2d5a27; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 15px;">
-                                Add friend
+                                {{ __('Add friend') }}
                             </button>
                         </form>
                     @elseif($friendship->status === 'pending')
@@ -493,18 +506,18 @@
                             <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                                 @csrf
                                 <button type="submit" style="width: 100%; background-color: #6c757d; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">
-                                    İstek Gönderildi (İptal Et)
+                                    {{ __('Request Sent (Cancel)') }}
                                 </button>
                             </form>
                         @else
                             <div style="display: flex; gap: 5px; width: 100%;">
                                 <form action="{{ route('friends.accept', $user->id) }}" method="POST" style="flex: 1; margin: 0;">
                                     @csrf
-                                    <button type="submit" style="width: 100%; background-color: #25621d; color: rgb(140, 155, 25); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">Kabul Et</button>
+                                    <button type="submit" style="width: 100%; background-color: #25621d; color: rgb(140, 155, 25); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">{{ __('Accept') }}</button>
                                 </form>
                                 <form action="{{ route('friends.reject', $user->id) }}" method="POST" style="flex: 1; margin: 0;">
                                     @csrf
-                                    <button type="submit" style="width: 100%; background-color: #516a28; color: rgb(119, 131, 26); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">Reddet</button>
+                                    <button type="submit" style="width: 100%; background-color: #516a28; color: rgb(119, 131, 26); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">{{ __('Decline') }}</button>
                                 </form>
                             </div>
                         @endif
@@ -513,7 +526,7 @@
                             <form action="{{ route('friends.remove', $user->id) }}" method="POST" style="margin: 0; display: flex; justify-content: center; width: 100%;">
                                 @csrf
                                 <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1px solid #1d491b; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 13px; text-align: center; display: block;">
-                                    Remove Friend
+                                    {{ __('Remove Friend') }}
                                 </button>
                             </form>
                         </div>
@@ -544,7 +557,7 @@
                     onmouseleave="this.style.background='#deeaa5'; this.style.transform='translateY(0)';"
                 >
                     <span style="font-size: 15px; font-weight: bold; color: #1a3c11; display: flex; align-items: center; gap: 6px;">
-                        🌱 friends
+                        🌱 {{ __('friends') }}
                     </span>
 
                     <span style="
@@ -568,15 +581,15 @@
             {{-- ÜST PANEL: BAŞLIK & SWITCH --}}
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
                 <h3 style="font-family: 'Henny Penny', cursive; font-size: 24px; color: #1a3c11; margin: 0;">
-                    Bookshelf & Reviews
+                    {{ __('Bookshelf & Reviews') }}
                 </h3>
 
                 <div style="display: flex; background: #cae28c; border: 2px solid #737e3d; border-radius: 12px; padding: 4px; gap: 6px;">
                     <button type="button" id="btn-list-view" onclick="switchProfileView('list')" style="border: none; background: #255719; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
-                        Book List
+                        {{ __('Book List') }}
                     </button>
                     <button type="button" id="btn-shelf-view" onclick="switchProfileView('shelf')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
-                        Shelf View
+                        {{ __('Shelf View') }}
                     </button>
                 </div>
             </div>
@@ -591,7 +604,7 @@
 
     {{-- SAĞDAKİ MOBİL PROFİL POST-IT BUTONU & OVERLAY --}}
     <div class="mobile-profile-tab" id="openProfileDrawerBtn">
-        <span>📌 Profile</span>
+        <span>📌 {{ __('Profile') }}</span>
     </div>
     <div class="mobile-profile-overlay hidden" id="profileDrawerOverlay"></div>
 
@@ -671,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     color: #1a3c11;
                 "
             >
-                🌱 Friends ({{ $friendsCount ?? ($user->friends ? $user->friends->count() : 0) }})
+                🌱 {{ __('Friends') }} ({{ $friendsCount ?? ($user->friends ? $user->friends->count() : 0) }})
             </span>
 
             <button 
@@ -756,7 +769,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         >
                             <img src="{{ $friendAvatarUrl }}" 
                                  alt="{{ $friend->username ?? 'Profile' }}" 
-                                 referrerpolicy="no-referrer"
+                                 referrerpolicy="no-referrer" 
                                  style="width: 100%; height: 100%; border-radius: 50%; display: block; object-fit: cover;"
                                  onerror="this.onerror=null; this.src='{{ asset('images/profile.jpg') }}';">
                         </div>
@@ -780,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                     color: #666;
                                 "
                             >
-                                {{ \App\Models\UserBook::where('user_id', $friend->id)->whereHas('book')->count() }} kitap
+                                {{ \App\Models\UserBook::where('user_id', $friend->id)->whereHas('book')->count() }} {{ __('books') }}
                             </div>
                         </div>
                     </div>
@@ -793,7 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             font-weight: bold;
                         "
                     >
-                        wanna see their profile? →
+                        {{ __('wanna see their profile? →') }}
                     </span>
                 </div>
             @empty
@@ -806,7 +819,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         font-size: 14px;
                     "
                 >
-                    You dont have any friends yet :((  🌱
+                    {{ __('You dont have any friends yet :((  🌱') }}
                 </div>
             @endforelse
         </div>

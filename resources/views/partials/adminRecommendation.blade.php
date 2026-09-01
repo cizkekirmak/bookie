@@ -114,14 +114,14 @@
         margin-bottom: 6px;
         display: block;
         font-weight: normal;">
-        admin recommends!
+        {{ __('admin recommends!') }}
     </span>
 
     <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
         <a href="{{ route('show', $adminBookKey) }}" class="admin-book-cover-link">
             @if(!empty($coverSrc))
                 <img src="{{ $coverSrc }}" 
-                     alt="{{ $adminRecommendation->title ?? 'Book Cover' }}"
+                     alt="{{ $adminRecommendation->title ?? __('Book Cover') }}"
                      style="width: 100%; height: 100%; object-fit: cover; display: block;"
                      onerror="this.onerror=null; this.src='https://covers.openlibrary.org/b/id/10849922-M.jpg';">
             @else
@@ -149,7 +149,7 @@
             @endif
 
             <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
-                Kitaba Git →
+                {{ __('Go to Book →') }}
             </a>
         </div>
     </div>

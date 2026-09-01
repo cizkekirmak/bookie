@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Bookie</title>
+    <title>{{ __('Login') }} - Bookie</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
@@ -133,8 +133,7 @@
                     </div>
                 @endif
 
-                {{-- label 'for' ile input 'id' birebir eşleştirildi --}}
-                <label for="loginname">username or email:</label>
+                <label for="loginname">{{ __('username or email:') }}</label>
                 <input type="text" id="loginname" name="loginname" value="{{ old('loginname') }}" required autocomplete="username">
                 @error('loginname')
                     <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 12px;">
@@ -142,7 +141,7 @@
                     </small>
                 @enderror
 
-                <label for="password">password:</label>
+                <label for="password">{{ __('password:') }}</label>
                 <input type="password" id="password" name="password" required autocomplete="current-password">
                 @error('password')
                     <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 12px;">
@@ -150,11 +149,11 @@
                     </small>
                 @enderror
 
-                <button type="submit">log in</button>
+                <button type="submit">{{ __('log in') }}</button>
 
                 <div class="alt-linkler">
-                     <a href="/register"><p>don't have an account?</p></a>
-                     <a href="/forgotpassword"><p>forgot your password?</p></a>
+                     <a href="/register"><p>{{ __("don't have an account?") }}</p></a>
+                     <a href="/forgotpassword"><p>{{ __('forgot your password?') }}</p></a>
                 </div>
             </form>
         </div>

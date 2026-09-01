@@ -15,7 +15,7 @@
                class="notification-avatar" 
                style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;">
                 <img src="{{ $avatarSrc }}" 
-                     alt="{{ $sender?->username ?? 'Profil' }}" 
+                     alt="{{ $sender?->username ?? __('Profile') }}" 
                      referrerpolicy="no-referrer"
                      style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                      onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
@@ -23,18 +23,18 @@
 
             <div class="notification-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
                 <a href="{{ route('profile', $sender?->id ?? '#') }}" class="sender-name" style="font-size: 13px; font-weight: bold; color: #1a3c11; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    {{ $sender?->name ?? ($sender?->username ?? 'User') }}
+                    {{ $sender?->name ?? ($sender?->username ?? __('User')) }}
                 </a>
-                <span class="notification-desc" style="font-size: 12px; color: #555;">sent you a friend request.</span>
+                <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __('sent you a friend request.') }}</span>
 
                 <div class="notification-actions" style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
                     <form action="{{ route('friends.accept', $sender?->id) }}" method="POST" onsubmit="handleFriendAction(event, this)" style="margin:0;">
                         @csrf
-                        <button type="submit" class="btn-action-accept" style="background: #1a3c11; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Unkempt', cursive;">Accept ^^</button>
+                        <button type="submit" class="btn-action-accept" style="background: #1a3c11; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Unkempt', cursive;">{{ __('Accept ^^') }}</button>
                     </form>
                     <form action="{{ route('friends.reject', $sender?->id) }}" method="POST" onsubmit="handleFriendAction(event, this)" style="margin:0;">
                         @csrf
-                        <button type="submit" class="btn-action-reject" style="background: #eee; color: #444; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Unkempt', cursive;">Reject :<</button>
+                        <button type="submit" class="btn-action-reject" style="background: #eee; color: #444; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Unkempt', cursive;">{{ __('Reject :<') }}</button>
                     </form>
                 </div>
             </div>
@@ -73,7 +73,7 @@
                        onclick="event.stopPropagation();" 
                        style="display: block; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; background: #badfa0; cursor: pointer; text-decoration: none;">
                         <img src="{{ $notifAvatarSrc }}" 
-                             alt="{{ $notifData['sender_name'] ?? 'Profil' }}" 
+                             alt="{{ $notifData['sender_name'] ?? __('Profile') }}" 
                              referrerpolicy="no-referrer"
                              style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                              onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
@@ -87,9 +87,9 @@
                            onclick="event.stopPropagation();"
                            class="sender-name" 
                            style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 13px;">
-                            {{ $notifData['sender_name'] ?? ($notifUser?->username ?? 'User') }}
+                            {{ $notifData['sender_name'] ?? ($notifUser?->username ?? __('User')) }}
                         </a>
-                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ $notifData['message'] ?? 'liked your review.' }}</span>
+                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __($notifData['message'] ?? 'liked your review.') }}</span>
                     </div>
                     
                     <small style="display:block; font-size:11px; color:#888; margin-top:2px;">
@@ -105,7 +105,7 @@
                 <a href="{{ route('profile', $senderId ?? '#') }}" 
                    style="display: flex; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;">
                     <img src="{{ $notifAvatarSrc }}" 
-                         alt="{{ $notifData['sender_name'] ?? 'Profil' }}" 
+                         alt="{{ $notifData['sender_name'] ?? __('Profile') }}" 
                          referrerpolicy="no-referrer"
                          style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                          onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
@@ -113,12 +113,12 @@
 
                 <div class="notification-info" style="flex: 1; min-width: 0;">
                     <a href="{{ route('profile', $senderId ?? '#') }}" class="sender-name" style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 13px;">
-                        {{ $notifData['sender_name'] ?? ($notifUser?->username ?? 'User') }}
+                        {{ $notifData['sender_name'] ?? ($notifUser?->username ?? __('User')) }}
                     </a>
                     @if(($notifData['type'] ?? '') === 'accepted_self')
-                        <span class="notification-desc" style="font-size: 12px; color: #555;">'s friend request was accepted !</span>
+                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __("'s friend request was accepted !") }}</span>
                     @else
-                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ $notifData['message'] ?? 'accepted your friend request.' }}</span>
+                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __($notifData['message'] ?? 'accepted your friend request.') }}</span>
                     @endif
                     <small style="display:block; font-size:11px; color:#888; margin-top:2px;">
                         {{ $notification->created_at ? $notification->created_at->diffForHumans() : '' }}
@@ -130,7 +130,7 @@
 
     @if(count($pendingList ?? []) === 0 && auth()->user()->notifications->count() === 0)
         <div class="notification-empty" style="text-align: center; padding: 18px 10px; color: #888; font-size: 13px; font-family: 'Unkempt', cursive;">
-            No notifications yet ^^
+            {{ __('No notifications yet ^^') }}
         </div>
     @endif
 </div>

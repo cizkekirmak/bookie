@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Bookie - Dashboard</title>
+    <title>Bookie - {{ __('Dashboard') }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -461,12 +461,25 @@
             <div class="header-search-wrap">
                 <div class="header-search-bar-box" id="searchBarBox">
                     <img src="{{ asset('images/yıldız.png') }}" id="searchStarBtn" alt="Search" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
-                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="off" enterkeyhint="search">
+                    <input type="text" id="bookSearchInput" placeholder="{{ __('what are you looking for?') }}" autocomplete="off" enterkeyhint="search">
                 </div>
                 <div id="searchResultsDropdown" style="display: none; position: absolute; top: 54px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 100010;"></div>
             </div>
             
             <div class="header-desktop-actions">
+                {{-- DİL SEÇİCİ (TR / EN) --}}
+                <div style="font-family: 'Unkempt', cursive; font-size: 15px; display: flex; gap: 6px; align-items: center; margin-right: 4px;">
+                    <a href="{{ route('lang.switch', 'tr') }}" 
+                       style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'tr' ? 'bold' : 'normal' }};">
+                       TR
+                    </a>
+                    <span style="color: #badfa0;">|</span>
+                    <a href="{{ route('lang.switch', 'en') }}" 
+                       style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'en' ? 'bold' : 'normal' }};">
+                       EN
+                    </a>
+                </div>
+
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
                     @include('partials.notifications')
                 </div>
@@ -485,6 +498,12 @@
             </div>
 
             <div class="mobile-dropdown-menu hidden" id="mobileDropdownMenu">
+                {{-- Mobil Dil Seçici --}}
+                <div class="mobile-icon-box" style="font-size: 13px; font-weight: bold; gap: 3px;">
+                    <a href="{{ route('lang.switch', 'tr') }}" style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#1f5117' : '#888' }};">TR</a>
+                    <span>/</span>
+                    <a href="{{ route('lang.switch', 'en') }}" style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#1f5117' : '#888' }};">EN</a>
+                </div>
                 <div class="mobile-icon-box">
                     @include('partials.notifications')
                 </div>
@@ -558,14 +577,14 @@
             <div style="position: relative; width: 100%;">
                 <div style="background: #f4fbf0; border: 1.5px solid #515f30; border-radius: 22px; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
                     <span style="font-size: 16px;">👤</span>
-                    <input type="text" id="userSearchInput" placeholder="find other users" autocomplete="off" style="border: none; background: transparent; outline: none; font-family: 'Unkempt', cursive; font-size: 16px; color: #1b3711; width: 100%;">
+                    <input type="text" id="userSearchInput" placeholder="{{ __('find other users') }}" autocomplete="off" style="border: none; background: transparent; outline: none; font-family: 'Unkempt', cursive; font-size: 16px; color: #1b3711; width: 100%;">
                 </div>
                 <div id="userSearchResults" style="display: none; position: absolute; top: 45px; left: 0; width: 100%; background: #ffffff; border: 1.5px solid #4c7237; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); max-height: 220px; overflow-y: auto; z-index: 999999;"></div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
                 <span style="font-family: 'Henny Penny', cursive; font-size: 18px; color: #1a3c11;">
-                    Friend reviews
+                    {{ __('Friend reviews') }}
                 </span>
                 <button type="button" id="closeDrawerBtn" style="display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #1a3c11;">✕</button>
             </div>
@@ -589,26 +608,26 @@
                     @php 
                         $itemRatingColor = $ratingColors[$item->rating] ?? '#4a5d44';
                         $bookKey = $item->book->open_library_key ?? $item->book->google_book_id ?? $item->book->key ?? $item->book_id;
-                        $bookTitle = $item->book->title ?? 'Kitap Detayı';
+                        $bookTitle = $item->book->title ?? __('Book Details');
                     @endphp
 
                     <div id="review-{{ $item->id }}" style="background: #f1f8ed; border: 1.5px solid #4c7237; border-radius: 10px; padding: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             @if($item->user)
                             <a href="{{ route('profile', $item->user->id) }}" style="color: #1f5117; text-decoration: none; font-weight: bold; font-family: 'Unkempt', cursive;">
-                                {{ $item->user->username ?? ($item->user->name ?? 'Anonim') }}
+                                {{ $item->user->username ?? ($item->user->name ?? __('Anonymous')) }}
                             </a>
                             @else
-                            <strong style="font-weight: bold; color: #1f5117; font-family: 'Unkempt', cursive;">'Anonim'</strong>
+                            <strong style="font-weight: bold; color: #1f5117; font-family: 'Unkempt', cursive;">{{ __('Anonymous') }}</strong>
                             @endif
 
                             <span style="color: {{ $itemRatingColor }}; font-size: 14px;">
-                                {{ $item->rating > 0 ? str_repeat('★', $item->rating) : 'puan yok' }}
+                                {{ $item->rating > 0 ? str_repeat('★', $item->rating) : __('no rating') }}
                             </span> 
                         </div>
 
                         <div style="margin-bottom: 6px;">
-                            <span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">kitap: </span>
+                            <span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">{{ __('book:') }} </span>
                             <a href="{{ route('show', $bookKey) }}#review-{{ $item->id }}" style="font-size: 13px; font-weight: bold; color: #1a3c11; text-decoration: underline; font-family: 'Unkempt', cursive;">
                                 {{ $bookTitle }}
                             </a>
@@ -630,7 +649,7 @@
                     </div>
                 @empty
                     <p style="color: #4a5d44; font-size: 13px; margin: 0; font-family: 'Unkempt', cursive;">
-                        there are no reviews yet, sorry!
+                        {{ __('there are no reviews yet, sorry!') }}
                     </p>
                 @endforelse
             </div>
@@ -640,7 +659,7 @@
 
     {{-- MOBİL POST-IT BUTONU & OVERLAY --}}
     <div class="mobile-friends-tab" id="openFriendsDrawerBtn">
-        <span>📌 Friends</span>
+        <span>📌 {{ __('Friends') }}</span>
     </div>
     <div class="mobile-drawer-overlay hidden" id="drawerOverlay"></div>
 
@@ -713,7 +732,7 @@
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
         }
 
-        // KİTAP ARAMA SİSTEMİ (MOBİL VE MASAÜSTÜ TAM DESTEKLİ)
+        // KİTAP ARAMA SİSTEMİ
         const input = document.getElementById('bookSearchInput');
         const searchStarBtn = document.getElementById('searchStarBtn');
         const dropdown = document.getElementById('searchResultsDropdown');
@@ -723,6 +742,12 @@
             let displayedCount = 0;
             const PAGE_SIZE = 6;
             let searchDebounceTimer;
+
+            const textSearching = @json(__('Searching...^^'));
+            const textNotFound = @json(__('No results found.'));
+            const textSearchError = @json(__('An error occurred during search.'));
+            const textLoadMore = @json(__('load more'));
+            const textUnknownAuthor = @json(__('Unknown Author'));
 
             function renderNextBooks() {
                 const oldBtn = document.getElementById('searchLoadMoreContainer');
@@ -734,7 +759,7 @@
                         <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
                         <div style="overflow: hidden; text-align: left;">
                             <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
-                            <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || 'Unknown Author'}</div>
+                            <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || textUnknownAuthor}</div>
                         </div>
                     </div>
                 `).join('');
@@ -746,7 +771,7 @@
                     const remaining = allSearchResults.length - displayedCount;
                     const loadMoreHtml = `
                         <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
-                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">✨ load more (+${Math.min(PAGE_SIZE, remaining)})</button>
+                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">${textLoadMore} (+${Math.min(PAGE_SIZE, remaining)})</button>
                         </div>
                     `;
                     dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);
@@ -765,7 +790,7 @@
                     return;
                 }
 
-                dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Aranıyor... 🌱</div>';
+                dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
                 dropdown.style.display = 'block';
 
                 try {
@@ -774,7 +799,7 @@
                     const books = Array.isArray(data) ? data : (data.items || []);
 
                     if (!books || books.length === 0) {
-                        dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Sonuç bulunamadı.</div>';
+                        dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
                         return;
                     }
                     dropdown.innerHTML = '';
@@ -782,11 +807,10 @@
                     displayedCount = 0;
                     renderNextBooks();
                 } catch (err) {
-                    dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: red; text-align: center;">Arama sırasında hata oluştu.</div>';
+                    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
                 }
             }
 
-            // Mobilde hem Enter hem yıldız ikonu hem de yazma dinleyicisi
             input.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
@@ -823,6 +847,12 @@
             let debounceTimer;
             const defaultAvatar = "{{ asset('images/profile.jpg') }}";
 
+            const textUserNotFound = @json(__('no user was found, are u sure u spelt that correctly?'));
+            const textUserSearchError = @json(__('An error occurred.'));
+            const textFriendsStatus = @json(__('✓ friends'));
+            const textPendingStatus = @json(__('pending'));
+            const textRequestedStatus = @json(__('requested'));
+
             userSearchInput.addEventListener('input', function () {
                 clearTimeout(debounceTimer);
                 const query = this.value.trim();
@@ -839,7 +869,7 @@
                         const users = await res.json();
 
                         if (users.length === 0) {
-                            userSearchResults.innerHTML = '<div style="padding: 10px; font-size: 13px; color: #777; text-align: center; font-family: \'Unkempt\', cursive;">no user was found, are u sure u spelt that correctly?</div>';
+                            userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: #777; text-align: center; font-family: 'Unkempt', cursive;">${textUserNotFound}</div>`;
                             userSearchResults.style.display = 'block';
                             return;
                         }
@@ -848,16 +878,16 @@
                         userSearchResults.innerHTML = users.map(user => {
                             let actionHtml = '';
                             if (user.status === 'accepted') {
-                                actionHtml = `<span style="font-size: 12px; color: #1a3c11; font-weight: bold; font-family: 'Unkempt', cursive;">✓ friends</span>`;
+                                actionHtml = `<span style="font-size: 12px; color: #1a3c11; font-weight: bold; font-family: 'Unkempt', cursive;">${textFriendsStatus}</span>`;
                             } else if (user.status === 'pending') {
                                 actionHtml = user.is_sender 
-                                    ? `<span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">pending</span>`
-                                    : `<span style="font-size: 12px; color: #c62828; font-family: 'Unkempt', cursive;">requested</span>`;
+                                    ? `<span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">${textPendingStatus}</span>`
+                                    : `<span style="font-size: 12px; color: #c62828; font-family: 'Unkempt', cursive;">${textRequestedStatus}</span>`;
                             } else {
                                 actionHtml = `
                                     <form action="/friends/${user.id}/request" method="POST" style="margin: 0;" onclick="event.stopPropagation();">
                                         <input type="hidden" name="_token" value="${csrfToken}">
-                                        <button type="submit" style="background: #2d5a27; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; font-family: 'Unkempt', cursive;" title="Arkadaş Ekle">+</button>
+                                        <button type="submit" style="background: #2d5a27; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; font-family: 'Unkempt', cursive;" title="{{ __('Add Friend') }}">+</button>
                                     </form>
                                 `;
                             }
@@ -884,7 +914,7 @@
 
                         userSearchResults.style.display = 'block';
                     } catch (err) {
-                        userSearchResults.innerHTML = '<div style="padding: 10px; font-size: 13px; color: red; text-align: center; font-family: \'Unkempt\', cursive;">Hata oluştu.</div>';
+                        userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: red; text-align: center; font-family: 'Unkempt', cursive;">${textUserSearchError}</div>`;
                     }
                 }, 300);
             });

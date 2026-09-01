@@ -13,8 +13,8 @@
     >
         <img class="like-heart-img"
             src="{{ $isLiked ? asset('images/dolukalp.png') : asset('images/boskalp.png') }}"
-            alt="Like"
-            style="width: 23px; height: 23px; pbject-fit: contain; vertical-align: middke;">
+            alt="{{ __('Like') }}"
+            style="width: 23px; height: 23px; object-fit: contain; vertical-align: middle;">
     </button>
     
     <span class="like-count-display" style="font-size: 13px; font-weight: bold; color: #1b3711; min-width: 12px;">

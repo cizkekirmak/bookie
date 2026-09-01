@@ -1,5 +1,5 @@
 <div id="chat-draggable-btn" class="chat-bubble-btn">
-    <img src="{{ asset('images/chat-icon.png') }}" alt="Mesajlar" class="chat-main-icon" draggable="false">
+    <img src="{{ asset('images/chat-icon.png') }}" alt="{{ __('Messages') }}" class="chat-main-icon" draggable="false">
     <span id="chat-unread-dot" class="chat-unread-badge" style="display: none;"></span>
 </div>
 
@@ -13,14 +13,14 @@
                 <span id="chat-active-name" class="chat-header-name"></span>
             </a>
             <div id="chat-header-placeholder" class="chat-header-placeholder">
-                Choose a friend to start chatting.
+                {{ __('Choose a friend to start chatting.') }}
             </div>
             <button type="button" class="chat-close-btn" id="chat-close-btn">&times;</button>
         </div>
 
         <div class="chat-messages-body" id="chat-messages-body">
             <div class="chat-empty-state" id="chat-empty-state">
-                You didn't pick anyone yet :&lt;
+                {{ __("You didn't pick anyone yet :<") }}
             </div>
         </div>
 
@@ -34,12 +34,12 @@
         </div>
 
         <form id="chat-input-form" class="chat-input-area">
-            <button type="button" id="chat-toggle-sticker" class="chat-action-btn" title="Sticker Seç">
-                <img src="{{ asset('images/sticker-icon.png') }}" alt="Sticker" class="chat-btn-icon sticker-btn-icon" draggable="false">
+            <button type="button" id="chat-toggle-sticker" class="chat-action-btn" title="{{ __('Choose Sticker') }}">
+                <img src="{{ asset('images/sticker-icon.png') }}" alt="{{ __('Sticker') }}" class="chat-btn-icon sticker-btn-icon" draggable="false">
             </button>
-            <input type="text" id="chat-message-input" placeholder="Write a message..." autocomplete="off" disabled>
-            <button type="submit" id="chat-send-btn" class="chat-action-btn" title="Gönder" disabled>
-                <img src="{{ asset('images/send-icon.png') }}" alt="Gönder" class="chat-btn-icon" draggable="false">
+            <input type="text" id="chat-message-input" placeholder="{{ __('Write a message...') }}" autocomplete="off" disabled>
+            <button type="submit" id="chat-send-btn" class="chat-action-btn" title="{{ __('Send') }}" disabled>
+                <img src="{{ asset('images/send-icon.png') }}" alt="{{ __('Send') }}" class="chat-btn-icon" draggable="false">
             </button>
         </form>
     </div>
@@ -361,6 +361,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const stickerPicker = document.getElementById('chat-sticker-picker');
     const unreadDot = document.getElementById('chat-unread-dot');
 
+    const emptyChatText = @json(__('No messages yet. Send the first one!'));
+
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
@@ -369,7 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let shiftX, shiftY;
     let lastLoadedMessagesJson = '';
 
-    // Base64 veya normal yol avatar fallback fonksiyonu
     function getAvatarSrc(avatar) {
         if (!avatar || avatar.trim() === '') {
             return defaultAvatarUrl;
@@ -502,7 +503,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             messagesBody.innerHTML = '';
             if (messages.length === 0) {
-                messagesBody.innerHTML = '<div class="chat-empty-state">Henüz mesaj yok. İlk mesajı sen at!</div>';
+                messagesBody.innerHTML = `<div class="chat-empty-state">${emptyChatText}</div>`;
                 return;
             }
 

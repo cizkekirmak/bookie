@@ -1,8 +1,9 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>join us! - Bookie</title>
+    <title>{{ __('join us!') }} - Bookie</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,17 +11,17 @@
     <style>
         body { 
             font-family: "Mystery Quest" , system-ui;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #D1FFBD;
-        margin: 0; 
-        
-        background-image: url("{{ asset('images/arkaplan.png') }}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #D1FFBD;
+            margin: 0; 
+            
+            background-image: url("{{ asset('images/arkaplan.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .dis-kapsayici {
@@ -67,7 +68,7 @@
             color: #2e6f40;
             text-decoration: none;
             font-family: "Henny Penny", cursive;
-            font-weight: none;
+            font-weight: normal;
         }
         .alt-linkler a:hover {
             text-decoration: underline;
@@ -80,7 +81,8 @@
             border: 1px solid #5f9852;
             border-radius: 5px;
             box-sizing: border-box;
-            font-family: Arial, sans-serif; }
+            font-family: Arial, sans-serif;
+        }
 
         button { 
             width: 250px; 
@@ -94,7 +96,8 @@
             border-radius: 5px; 
             cursor: pointer;
             font-weight: bold;
-            font-family: "Henny Penny", cursive; }
+            font-family: "Henny Penny", cursive;
+        }
 
         button:hover { background-color: #45a049; }
 
@@ -106,46 +109,43 @@
         <h1 class="site-basligi">Bookie</h1>
     
         <div class="kutucuk">
-        
 
             <form method="POST" action="/register" novalidate>
                 @csrf
 
-                <label for="username">username:</label>
-                <input type="text" id="username" name="username">
+                <label for="username">{{ __('username:') }}</label>
+                <input type="text" id="username" name="username" value="{{ old('username') }}">
                 @error('username')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px;">
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px; margin-bottom: 10px;">
                         {{ $message }}
                     </small>
                 @enderror
 
-                <label for="e-mail">email:</label>
-                <input type="email" id="email" name="email">
+                <label for="email">{{ __('email:') }}</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}">
                 @error('email')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px;">
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px; margin-bottom: 10px;">
                         {{ $message }}
                     </small>
                 @enderror   
 
-                <label for="password">password:</label>
+                <label for="password">{{ __('password:') }}</label>
                 <input type="password" id="password" name="password">
                 @error('password')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5 px; padding-bottom: 5px;">
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px; margin-bottom: 10px;">
                         {{ $message }}
                     </small>
                 @enderror
 
-                <button type="submit">register</button>
+                <button type="submit">{{ __('register') }}</button>
 
                 <div class="alt-linkler">
-                    <p><a href="/login">already got an account?</p></a>
-                    <p><a href="/forgotpassword">forgot your password?</p></a>
-                    
-                    
+                    <p><a href="/login">{{ __('already got an account?') }}</a></p>
+                    <p><a href="/forgotpassword">{{ __('forgot your password?') }}</a></p>
+                </div>
             </form>
         </div>
     </div>
-
 
 </body>
 </html>

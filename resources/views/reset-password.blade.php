@@ -1,8 +1,9 @@
-<html lang="en">
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - Bookie</title>
+    <title>{{ __('Reset Password') }} - Bookie</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -10,17 +11,17 @@
     <style>
         body { 
             font-family: "Mystery Quest" , system-ui;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #D1FFBD;
-        margin: 0; 
-        
-        background-image: url("{{ asset('images/arkaplan.png') }}");
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #D1FFBD;
+            margin: 0; 
+            
+            background-image: url("{{ asset('images/arkaplan.png') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
 
         .dis-kapsayici {
@@ -53,26 +54,6 @@
             font-family: "Henny Penny", cursive; 
         }
 
-        .alt-linkler {
-            margin-top: 15px;
-            text-align: center;
-            font-size: 15px;
-        }
-
-        .alt-linkler p {
-            margin: 6px 0;
-        }
-
-        .alt-linkler a {
-            color: #2e6f40;
-            text-decoration: none;
-            font-family: "Henny Penny", cursive;
-            font-weight: none;
-        }
-        .alt-linkler a:hover {
-            text-decoration: underline;
-        }
-
         input {     
             width: 100%;
             padding: 10px;
@@ -80,7 +61,8 @@
             border: 1px solid #5f9852;
             border-radius: 5px;
             box-sizing: border-box;
-            font-family: Arial, sans-serif; }
+            font-family: Arial, sans-serif;
+        }
 
         button { 
             width: 250px; 
@@ -94,7 +76,8 @@
             border-radius: 5px; 
             cursor: pointer;
             font-weight: bold;
-            font-family: "Henny Penny", cursive; }
+            font-family: "Henny Penny", cursive;
+        }
 
         button:hover { background-color: #45a049; }
     </style>
@@ -108,31 +91,30 @@
                 
                 <input type="hidden" name="token" value="{{ $token }}">
 
-                <label for="email">email:</label>
+                <label for="email">{{ __('email:') }}</label>
                 <input type="email" id="email" name="email" value="{{ request('email') }}" required>
 
-                <label for="password">new password:</label>
+                <label for="password">{{ __('new password:') }}</label>
                 <input type="password" id="password" name="password" required>
 
-                <label for="password_confirmation">Confirm New Password:</label>
+                <label for="password_confirmation">{{ __('Confirm New Password:') }}</label>
                 <input type="password" id="password_confirmation" name="password_confirmation" required>
                 
                 @error('email')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px;">
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px; margin-bottom: 10px;">
                         {{ $message }}
                     </small>
                 @enderror 
 
                 @error('password')
-                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px;">
+                    <small style="color: #2e6433; font-size: 15px; font-family: 'Unkempt', cursive; display: block; margin-top: -5px; margin-bottom: 10px;">
                         {{ $message }}
                     </small>
                 @enderror
 
-                <button type="submit">Update Password</button>
+                <button type="submit">{{ __('Update Password') }}</button>
             </form>
         </div>
     </div>
-    
 </body>
 </html>

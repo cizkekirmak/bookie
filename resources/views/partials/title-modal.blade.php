@@ -45,9 +45,9 @@
             flex-shrink: 0;
         ">
             <div>
-                <span style="font-size: 18px; font-weight: bold; color: #1a3c11;">Reading Titles</span>
+                <span style="font-size: 18px; font-weight: bold; color: #1a3c11;">{{ __('Reading Titles') }}</span>
                 <div style="font-size: 12px; color: #355e28;">
-                    read: <strong>{{ $userFinishedCount }}</strong>
+                    {{ __('read:') }} <strong>{{ $userFinishedCount }}</strong>
                 </div>
             </div>
             <button type="button" onclick="closeTitlesModal()" style="
@@ -93,15 +93,15 @@
                         @if($unlocked)
                             <span style="font-size: 22px; width: 26px; text-align: center; display: inline-block;">{{ $t['icon'] }}</span>
                         @else
-                            <img src="{{ asset('images/lock.png') }}" alt="Locked" style="width: 30px; height: 30px; object-fit: contain; display: block;" onerror="this.outerHTML='🔒'">
+                            <img src="{{ asset('images/lock.png') }}" alt="{{ __('Locked') }}" style="width: 30px; height: 30px; object-fit: contain; display: block;" onerror="this.outerHTML='🔒'">
                         @endif
 
                         <div style="display: flex; flex-direction: column;">
                             <span style="font-size: 14px; font-weight: bold; color: {{ $unlocked ? '#1a3c11' : '#444' }};">
-                                {{ $t['name'] }}
+                                {{ __($t['name']) }}
                             </span>
                             <span style="font-size: 11px; color: #666;">
-                                {{ $t['desc'] }}
+                                {{ __($t['desc']) }}
                             </span>
                         </div>
                     </div>
@@ -110,11 +110,11 @@
                     <div style="font-size: 11px; font-weight: bold; flex-shrink: 0; margin-left: 10px;">
                         @if($unlocked)
                             <span style="color: #2e7d32; background: #e8f5df; border: 1px solid #7bb35c; padding: 2px 8px; border-radius: 8px;">
-                                ✓ Unlocked
+                                ✓ {{ __('Unlocked') }}
                             </span>
                         @else
                             <span style="color: #666; background: #d7e4d0; padding: 2px 8px; border-radius: 8px;">
-                                {{ $t['req'] }} kitap (kalan: {{ $needed }})
+                                {{ __(':req books (left: :needed)', ['req' => $t['req'], 'needed' => $needed]) }}
                             </span>
                         @endif
                     </div>
