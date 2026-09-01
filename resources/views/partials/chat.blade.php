@@ -362,14 +362,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const unreadDot = document.getElementById('chat-unread-dot');
 
     const emptyChatText = @json(__('No messages yet. Send the first one!'));
-
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
+
+    // --- SES TANIMLARI & AYARLAR (LocalStorage Uyumlu) ---
+    const soundNewMessage = new Audio("{{ asset('sounds/yeni-mesaj.mp3') }}");
+    const soundInChat = new Audio("{{ asset('sounds/mesaj-atma.mp3') }}");
+
+    function getSoundSettings() {
+        const soundEnabled = localStorage.getItem('chat_sound_enabled') !== 'false'; // varsayılan: açık
+        const soundVolume = parseFloat(localStorage.getItem('chat_sound_volume') ?? '0.6'); // varsayılan: 0.6
+        return { soundEnabled, soundVolume };
+    }
+
+    // Tarayıcı otomatik ses engeli (Autoplay Policy) aşma mekanizması
+    let audioUnlocked = false;
+    function unlockAudio() {
+        if (!audioUnlocked) {
+            soundNewMessage.play().then(() => { soundNewMessage.pause(); soundNewMessage.currentTime = 0; }).catch(() => {});
+            soundInChat.play().then(() => { soundInChat.pause(); soundInChat.currentTime = 0; }).catch(() => {});
+            audioUnlocked = true;
+            document.removeEventListener('click', unlockAudio);
+        }
+    }
+    document.addEventListener('click', unlockAudio);
+
+    function playChatSound(type) {
+        if (!audioUnlocked) return;
+
+        const { soundEnabled, soundVolume } = getSoundSettings();
+        if (!soundEnabled || soundVolume <= 0) return;
+
+        try {
+            if (type === 'incoming_popup_closed') {
+                soundNewMessage.volume = soundVolume;
+                soundNewMessage.currentTime = 0;
+                soundNewMessage.play().catch(() => {});
+            } else if (type === 'in_chat') {
+                soundInChat.volume = soundVolume;
+                soundInChat.currentTime = 0;
+                soundInChat.play().catch(() => {});
+            }
+        } catch (e) {}
+    }
 
     let activeFriendId = null;
     let isDragging = false;
     let shiftX, shiftY;
     let lastLoadedMessagesJson = '';
+    let previousUnreadCount = null; // İlk açılışta gereksiz ses çalmaması için null
 
     function getAvatarSrc(avatar) {
         if (!avatar || avatar.trim() === '') {
@@ -409,7 +450,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isDragging) return;
         const isOpen = popup.style.display === 'flex';
         popup.style.display = isOpen ? 'none' : 'flex';
+        
         if (!isOpen) {
+            // Chat açıldığında ana ikondaki kırmızı noktayı hemen temizle
+            unreadDot.style.display = 'none';
+
             loadFriends();
             if (window.innerWidth > 768) {
                 const rect = btn.getBoundingClientRect();
@@ -433,11 +478,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     closeBtn.addEventListener('click', () => {
         popup.style.display = 'none';
+        checkUnread(); // Kapatılınca okunmamış mesaj varsa noktayı günceller
     });
 
     async function loadFriends() {
         try {
-            const res = await fetch('/messages/friends');
+            const res = await fetch('/messages/friends', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
             const friends = await res.json();
             friendsList.innerHTML = '';
 
@@ -445,9 +493,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = document.createElement('div');
                 item.className = `chat-friend-item ${activeFriendId === friend.id ? 'active' : ''}`;
                 
-                const badgeHtml = friend.unread_count > 0 
-                    ? '<span class="chat-friend-dot"></span>' 
-                    : '';
+                // Seçili aktif arkadaşta bildirim noktası çıkmaz
+                const showBadge = (activeFriendId === friend.id) ? false : (friend.unread_count > 0);
+                const badgeHtml = showBadge ? '<span class="chat-friend-dot"></span>' : '';
 
                 const safeAvatar = getAvatarSrc(friend.avatar);
 
@@ -481,20 +529,34 @@ document.addEventListener('DOMContentLoaded', () => {
         sendBtn.disabled = false;
         messageInput.focus();
 
-        await loadMessages(true);
+        await loadMessages(true, false);
         checkUnread();
     }
 
-    async function loadMessages(forceScroll = false) {
+    async function loadMessages(forceScroll = false, isPolling = false) {
         if (!activeFriendId) return;
         try {
-            const res = await fetch(`/messages/${activeFriendId}`);
+            const res = await fetch(`/messages/${activeFriendId}`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
             const messages = await res.json();
             
             const stringified = JSON.stringify(messages);
             if (stringified === lastLoadedMessagesJson && !forceScroll) {
                 return;
             }
+
+            // Sohbet açıkken karşıdan yeni mesaj geldiyse sohbet içi ses çal
+            if (isPolling && lastLoadedMessagesJson !== '') {
+                const oldMessages = JSON.parse(lastLoadedMessagesJson || '[]');
+                if (messages.length > oldMessages.length) {
+                    const lastMsg = messages[messages.length - 1];
+                    if (!lastMsg.is_mine) {
+                        playChatSound('in_chat');
+                    }
+                }
+            }
+
             lastLoadedMessagesJson = stringified;
 
             const threshold = 60;
@@ -548,6 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
@@ -557,9 +620,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.ok) {
+                playChatSound('in_chat'); // Mesaj başarılı gönderilince çalacak ses
                 messageInput.value = '';
                 stickerPicker.style.display = 'none';
-                await loadMessages(true);
+                await loadMessages(true, false);
             }
         } catch (e) {
             console.error('Mesaj iletilemedi:', e);
@@ -587,14 +651,33 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function checkUnread() {
         try {
-            const res = await fetch('/messages/unread-count');
+            const res = await fetch('/messages/unread-count', {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
             const data = await res.json();
-            unreadDot.style.display = data.unread_count > 0 ? 'block' : 'none';
-            
-            if (popup.style.display === 'flex') {
+            const currentCount = data.unread_count || 0;
+            const isPopupOpen = popup.style.display === 'flex';
+
+            // Bildirim noktası yönetimi: Chat açıkken asla kırmızı nokta gösterme
+            if (isPopupOpen) {
+                unreadDot.style.display = 'none';
+            } else {
+                unreadDot.style.display = currentCount > 0 ? 'block' : 'none';
+            }
+
+            // Ses Kararı: Sayfa ilk açıldığında değil, sonradan yeni okunmamış mesaj geldiğinde
+            if (previousUnreadCount !== null && currentCount > previousUnreadCount) {
+                if (!isPopupOpen) {
+                    playChatSound('incoming_popup_closed');
+                }
+            }
+            previousUnreadCount = currentCount;
+
+            // Popup açıksa arkadaş listesini ve konuşmayı tazele
+            if (isPopupOpen) {
                 loadFriends();
                 if (activeFriendId) {
-                    loadMessages(false);
+                    loadMessages(false, true);
                 }
             }
         } catch (e) {}
