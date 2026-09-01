@@ -413,16 +413,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
     }
 
-    function fixFontChars(text) {
-        if (!text) return '';
-        return text
-            .replace(/İ/g, 'I')
-            .replace(/ğ/g, 'g')
-            .replace(/Ğ/g, 'G')
-            .replace(/ş/g, 's')
-            .replace(/Ş/g, 'S');
-    }
-
     // SÜRÜKLE - BIRAK
     btn.addEventListener('mousedown', (e) => {
         isDragging = false;
@@ -608,7 +598,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `;
                 } else {
                     bubble.innerHTML = `
-                        <div>${escapeHtml(fixFontChars(msg.message))}</div>
+                        <div>${escapeHtml(msg.message)}</div>
                         <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
                     `;
                 }

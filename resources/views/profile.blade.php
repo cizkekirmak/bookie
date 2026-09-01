@@ -8,7 +8,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&family=Unkempt:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Henny+Penny&family=Mystery+Quest&display=swap" rel="stylesheet">
 
     {{-- MODAL FONKSİYONLARI (GLOBAL SCOPE) --}}
     <script>
@@ -68,6 +68,13 @@
     </script>
 
     <style>
+        @font-face {
+    font-family: 'Unkempt';
+    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
         * {
             box-sizing: border-box;
         }
