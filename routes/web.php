@@ -312,5 +312,7 @@ Route::get('/lang/{locale}', function ($locale) {
         session()->put('locale', $locale);
         app()->setLocale($locale);
     }
-    return redirect()->back();
+
+    // JSON API rotalarına geri düşmeyi engelleyen güvenli yönlendirme:
+    return redirect()->back(fallback: route('dashboard'));
 })->name('lang.switch');
