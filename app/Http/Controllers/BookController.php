@@ -326,105 +326,89 @@ class BookController extends Controller
             return response()->json([]);
         }
 
-        $cacheKey = 'search_safe_' . md5(mb_strtolower($query, 'UTF-8'));
-        if (Cache::has($cacheKey)) {
-            $cached = Cache::get($cacheKey);
-            if (!empty($cached)) {
-                return response()->json($cached);
+        // 1. Google Books Araması (Doğrudan sorgu)
+        $googleResults = [];
+        try {
+            $params = [
+                'q'          => $query,
+                'maxResults' => 20,
+                'printType'  => 'books',
+            ];
+            if (!empty($this->googleApiKey)) {
+                $params['key'] = $this->googleApiKey;
             }
-        }
 
-        $localBooks = Book::where(function ($q) use ($query) {
-                $q->where('title', 'LIKE', "%{$query}%")
-                  ->orWhere('author', 'LIKE', "%{$query}%");
-            })
-            ->whereNotNull('cover_image')
-            ->limit(5)
-            ->get()
-            ->map(function ($b) {
-                return [
-                    'id'      => $b->google_book_id ?? ($b->open_library_key ?? (string)$b->id),
-                    'title'   => $b->title,
-                    'authors' => $b->author,
-                    'cover'   => $b->cover_image,
-                ];
-            })->toArray();
+            $response = Http::withoutVerifying()
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->timeout(4)
+                ->get('https://www.googleapis.com/books/v1/volumes', $params);
 
-        $googleResults = $this->searchGoogleBooks($query);
-        $openLibResults = $this->searchOpenLibrary($query);
+            if ($response->successful()) {
+                $items = $response->json('items') ?? [];
+                foreach ($items as $item) {
+                    $info = $item['volumeInfo'] ?? [];
+                    $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
+                    if (empty($rawCover) || empty($info['title'])) continue;
 
-        $merged = array_merge($localBooks, $googleResults, $openLibResults);
-        
-        $cleanQuery = mb_strtolower($query, 'UTF-8');
-        $stopwords = ['ve', 'ile', 'de', 'da', 'bir', 'the', 'and', 'of', 'in', 'a', 'an'];
-        $queryWords = array_filter(explode(' ', $cleanQuery), function($w) use ($stopwords) {
-            return mb_strlen($w, 'UTF-8') > 1 && !in_array($w, $stopwords);
-        });
-
-        $filteredResults = [];
-        $seenKeys = [];
-
-        foreach ($merged as $item) {
-            $titleLower = mb_strtolower($item['title'], 'UTF-8');
-            $authorLower = mb_strtolower($item['authors'] ?? '', 'UTF-8');
-
-            $isRelevant = false;
-            foreach ($queryWords as $word) {
-                if (str_contains($titleLower, $word) || str_contains($authorLower, $word)) {
-                    $isRelevant = true;
-                    break;
+                    $googleResults[] = [
+                        'id'      => $item['id'],
+                        'title'   => $info['title'],
+                        'authors' => isset($info['authors']) ? implode(', ', $info['authors']) : 'Bilinmeyen Yazar',
+                        'cover'   => str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover),
+                    ];
                 }
             }
+        } catch (\Throwable $e) {}
 
-            if (!$isRelevant) {
-                continue;
+        // 2. Open Library Araması
+        $openLibResults = [];
+        try {
+            $response = Http::withoutVerifying()
+                ->withHeaders(['User-Agent' => 'BookieApp/1.0'])
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->timeout(4)
+                ->get('https://openlibrary.org/search.json', [
+                    'q'     => $query,
+                    'limit' => 20,
+                ]);
+
+            if ($response->successful()) {
+                $docs = $response->json('docs') ?? [];
+                foreach ($docs as $doc) {
+                    $coverId = $doc['cover_i'] ?? null;
+                    if (empty($coverId) || empty($doc['title'])) continue;
+
+                    $cleanId = str_replace(['/works/', '/books/'], '', $doc['key'] ?? '');
+                    $openLibResults[] = [
+                        'id'      => 'OL_' . $cleanId,
+                        'title'   => $doc['title'],
+                        'authors' => isset($doc['author_name']) ? implode(', ', $doc['author_name']) : 'Bilinmeyen Yazar',
+                        'cover'   => "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg",
+                    ];
+                }
             }
+        } catch (\Throwable $e) {}
 
-            $uniqueKey = $titleLower . '_' . mb_substr($authorLower, 0, 8);
-            if (!isset($seenKeys[$uniqueKey])) {
-                $seenKeys[$uniqueKey] = true;
-                $filteredResults[] = $item;
-            }
-        }
+        // 3. Sonuçları birleştir (Tekrarları temizle)
+        $merged = array_merge($googleResults, $openLibResults);
+        $results = [];
+        $seen = [];
 
-        usort($filteredResults, function ($a, $b) use ($cleanQuery, $queryWords) {
-            $tA = mb_strtolower($a['title'], 'UTF-8');
-            $tB = mb_strtolower($b['title'], 'UTF-8');
-
-            if ($tA === $cleanQuery && $tB !== $cleanQuery) return -1;
-            if ($tA !== $cleanQuery && $tB === $cleanQuery) return 1;
-
-            $startsA = str_starts_with($tA, $cleanQuery);
-            $startsB = str_starts_with($tB, $cleanQuery);
-            if ($startsA && !$startsB) return -1;
-            if (!$startsA && $startsB) return 1;
-
-            $scoreA = 0;
-            $scoreB = 0;
-            foreach ($queryWords as $word) {
-                if (str_contains($tA, $word)) $scoreA++;
-                if (str_contains($tB, $word)) $scoreB++;
-            }
-
-            if ($scoreA !== $scoreB) {
-                return $scoreB <=> $scoreA;
-            }
-
-            return 0;
-        });
-
-        $results = array_slice($filteredResults, 0, 10);
-
-        if (!empty($results)) {
-            foreach ($results as $book) {
-                Cache::put('book_meta_' . $book['id'], [
-                    'title'       => $book['title'],
-                    'authors'     => $book['authors'],
-                    'coverUrl'    => $book['cover'],
+        foreach ($merged as $item) {
+            $uniqueKey = mb_strtolower(trim($item['title']), 'UTF-8');
+            if (!isset($seen[$uniqueKey])) {
+                $seen[$uniqueKey] = true;
+                $results[] = $item;
+                
+                // Show sayfasında hızlı açılması için cache'e koy
+                Cache::put('book_meta_' . $item['id'], [
+                    'title'       => $item['title'],
+                    'authors'     => $item['authors'],
+                    'coverUrl'    => $item['cover'],
                     'description' => 'Açıklama yükleniyor...',
                 ], 604800);
             }
-            Cache::put($cacheKey, $results, now()->addHours(24));
+            if (count($results) >= 12) break;
         }
 
         return response()->json($results);

@@ -132,7 +132,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post("/books/{key}/save", [BookController::class, 'saveOrUpdate'])->name('books.save');
     Route::post("/books/{book}/reviews", [ReviewController::class, "store"])->name("reviews.store");
     Route::post('/reviews/{review}/toggle-like', [ReviewController::class, 'toggleLike'])->name('reviews.toggleLike');
-    Route::get('/api/search-books', [BookController::class, 'searchApi'])->name('api.books.search');
+    Route::get('/api/search', [BookController::class, 'searchApi']);
+    Route::get('/api/search-books', [BookController::class, 'searchApi']);
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/books/bulk-remove', [ProfileController::class, 'bulkRemoveBooks'])->name('profile.books.bulkRemove');
 

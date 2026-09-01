@@ -788,34 +788,33 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         async function performBookSearch() {
-            const q = input.value.trim();
-            if (q.length < 2) {
-                dropdown.style.display = 'none';
-                dropdown.innerHTML = '';
-                return;
-            }
+    const q = input.value.trim();
+    if (q.length < 2) {
+        dropdown.style.display = 'none';
+        dropdown.innerHTML = '';
+        return;
+    }
 
-            dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
-            dropdown.style.display = 'block';
+    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
+    dropdown.style.display = 'block';
 
-            try {
-                // Not: Route tanımlamanda hangi path varsa onu çağırır (/api/search veya /api/search-books)
-                const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
-                const data = await res.json();
-                const books = Array.isArray(data) ? data : (data.items || []);
+    try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+        const books = Array.isArray(data) ? data : (data.items || []);
 
-                if (!books || books.length === 0) {
-                    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
-                    return;
-                }
-                dropdown.innerHTML = '';
-                allSearchResults = books;
-                displayedCount = 0;
-                renderNextBooks();
-            } catch (err) {
-                dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
-            }
+        if (!books || books.length === 0) {
+            dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
+            return;
         }
+        dropdown.innerHTML = '';
+        allSearchResults = books;
+        displayedCount = 0;
+        renderNextBooks();
+    } catch (err) {
+        dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
+    }
+}
 
         // SADECE ENTER TUŞUNA BASILDIĞINDA TETİKLENİR
         input.addEventListener('keydown', function (e) {
