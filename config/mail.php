@@ -41,6 +41,10 @@ return [
     'mailers' => [
 
         'smtp' => [
+            'brevo' => [
+            'transport' => 'brevo',
+            'key' => env('BREVO_KEY'),
+            ],
             'transport' => 'smtp',
             'scheme' => env('MAIL_SCHEME'),
             'url' => env('MAIL_URL'),

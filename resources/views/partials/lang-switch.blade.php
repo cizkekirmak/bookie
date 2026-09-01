@@ -1,39 +1,38 @@
 <div class="lang-switch-wrapper" style="
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    background: #2d5a27;
-    border: 2px solid #1a3c11;
-    padding: 5px 8px;
-    border-radius: 24px;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.22);
+    gap: 3px;
+    background: #255719;
+    border: 1px solid #1a3c11;
+    padding: 3px 4px;
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
     font-family: 'Unkempt', cursive;
-    font-size: 16px;
+    font-size: 13px;
     user-select: none;
+    line-height: 1;
 ">
     <a href="{{ route('lang.switch', 'tr') }}" style="
         text-decoration: none;
-        padding: 5px 14px;
-        border-radius: 16px;
-        color: {{ app()->getLocale() == 'tr' ? '#1f5117' : '#eaf3e4' }};
+        padding: 3px 8px;
+        border-radius: 10px;
+        color: {{ app()->getLocale() == 'tr' ? '#1f5117' : '#badfa0' }};
         background: {{ app()->getLocale() == 'tr' ? '#cae28c' : 'transparent' }};
         font-weight: {{ app()->getLocale() == 'tr' ? 'bold' : 'normal' }};
         transition: all 0.15s ease;
         display: inline-block;
-        line-height: 1.2;
         cursor: pointer;
     ">TR</a>
 
     <a href="{{ route('lang.switch', 'en') }}" style="
         text-decoration: none;
-        padding: 5px 14px;
-        border-radius: 16px;
-        color: {{ app()->getLocale() == 'en' ? '#1f5117' : '#eaf3e4' }};
+        padding: 3px 8px;
+        border-radius: 10px;
+        color: {{ app()->getLocale() == 'en' ? '#1f5117' : '#badfa0' }};
         background: {{ app()->getLocale() == 'en' ? '#cae28c' : 'transparent' }};
         font-weight: {{ app()->getLocale() == 'en' ? 'bold' : 'normal' }};
         transition: all 0.15s ease;
         display: inline-block;
-        line-height: 1.2;
         cursor: pointer;
     ">EN</a>
 </div>
