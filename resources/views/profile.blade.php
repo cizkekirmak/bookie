@@ -69,34 +69,22 @@
 
     <style>
         @font-face {
-            font-family: 'Unkempt';
-            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
+    font-family: 'Unkempt';
+    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
-        @font-face {
-            font-family: 'Henny Penny';
-            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-        }
-
+@font-face {
+    font-family: 'Henny Penny';
+    src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
         * {
             box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent !important;
-        }
-
-        button,
-        a,
-        label,
-        span,
-        img {
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            -webkit-touch-callout: none !important;
         }
 
         body {
@@ -112,6 +100,19 @@
             overflow-x: hidden;
             font-family: 'Unkempt', cursive;
         }
+          * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
 
         /* HEADER: Masaüstü (76px) */
         .site-header-outer {
@@ -177,22 +178,7 @@
             transition: transform 0.2s ease;
         }
 
-        /* ÇERÇEVESİZ DASHBOARD LOGOSU */
-        .header-icon-raw {
-            width: 52px;
-            height: 52px;
-            max-width: 52px;
-            max-height: 52px;
-            object-fit: contain;
-            border: none !important;
-            outline: none !important;
-            display: block;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-
-        .header-icon-box:hover,
-        .header-icon-raw:hover {
+        .header-icon-box:hover {
             transform: scale(1.1);
         }
 
@@ -294,22 +280,14 @@
             }
 
             .header-icon-box,
-            .notification-icon-img {
+            .notification-icon-img,
+            .header-actions-wrap img {
                 width: 44px !important;
                 height: 44px !important;
                 max-width: 44px !important;
                 max-height: 44px !important;
                 border: 2px solid #4b813b !important;
                 border-radius: 10px !important;
-                display: block !important;
-            }
-
-            .header-icon-raw {
-                width: 44px !important;
-                height: 44px !important;
-                max-width: 44px !important;
-                max-height: 44px !important;
-                border: none !important;
                 display: block !important;
             }
 
@@ -455,7 +433,7 @@
                 </a>
 
                 <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/dash.png') }}" alt="{{ __('Dashboard') }}" class="header-icon-raw">
+                    <img src="{{ asset('images/dash.jpg') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
                 </a>
             </div>
 
@@ -876,6 +854,6 @@ window.addEventListener('click', function(e) {
 </script>
 
 @include('partials.chat')
-@include('partials.title-modal')
 </body>
 </html>
+@include('partials.title-modal')
