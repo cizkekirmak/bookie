@@ -309,7 +309,8 @@ Route::get('/fix-render', function () {
 });
 Route::get('/lang/{locale}', function ($locale) {
     if (in_array($locale, ['tr', 'en'])) {
-        session(['locale' => $locale]);
+        session()->put('locale', $locale);
+        app()->setLocale($locale);
     }
     return redirect()->back();
 })->name('lang.switch');

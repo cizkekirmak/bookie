@@ -124,7 +124,8 @@
         .mobile-menu-trigger,
         .mobile-dropdown-menu,
         .mobile-friends-tab,
-        .mobile-drawer-overlay {
+        .mobile-drawer-overlay,
+        .mobile-bottom-lang-bar {
             display: none !important;
         }
 
@@ -331,7 +332,7 @@
             .app-container {
                 width: 100% !important;
                 max-width: 100% !important;
-                padding: 12px 10px 85px 10px !important;
+                padding: 12px 10px 90px 10px !important;
                 margin: 0 !important;
                 min-height: calc(100vh - 68px) !important;
                 min-height: calc(100dvh - 68px) !important;
@@ -436,6 +437,17 @@
                 transform: rotate(-1.5deg);
             }
 
+            /* EKRANIN EN ALTINDA ORTALANMIŞ MOBİL DİL BUTONU */
+            .mobile-bottom-lang-bar {
+                display: flex !important;
+                position: fixed !important;
+                bottom: 18px !important;
+                left: 50% !important;
+                transform: translateX(-50%) !important;
+                z-index: 9998 !important;
+                pointer-events: auto !important;
+            }
+
             #chat-draggable-btn,
             .chat-bubble-btn,
             .chat-toggle-btn {
@@ -472,7 +484,9 @@
                 @include('partials.lang-switch')
 
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
-                    @include('partials.notifications')
+                    @auth
+                        @include('partials.notifications')
+                    @endauth
                 </div>
 
                 <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
@@ -489,13 +503,11 @@
             </div>
 
             <div class="mobile-dropdown-menu hidden" id="mobileDropdownMenu">
-                {{-- Mobil Dil Seçici --}}
-                <div style="width: 100%; display: flex; justify-content: center; padding: 2px 0;">
-                    @include('partials.lang-switch')
-                </div>
-                <div class="mobile-icon-box">
-                    @include('partials.notifications')
-                </div>
+                @auth
+                    <div class="mobile-icon-box">
+                        @include('partials.notifications')
+                    </div>
+                @endauth
                 <a href="{{ route('ayarlar') }}" class="mobile-icon-box">
                     <img src="{{ asset('images/ayarlar.jpg') }}" alt="{{ __('Settings') }}">
                 </a>
@@ -506,6 +518,11 @@
 
         </div>
     </header>
+
+    {{-- MOBİL EKRANDA EN ALTA ORTALANMIŞ DİL SEÇİCİ --}}
+    <div class="mobile-bottom-lang-bar">
+        @include('partials.lang-switch')
+    </div>
 
     @if(session('success'))
         <div id="bildiri-message" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: 'Unkempt', cursive;">
