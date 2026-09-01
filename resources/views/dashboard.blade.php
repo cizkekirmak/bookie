@@ -670,269 +670,265 @@
     <div class="mobile-drawer-overlay hidden" id="drawerOverlay"></div>
 
     {{-- JS Fonksiyonları --}}
-    <script>
-    function toggleReviewLike(reviewId, buttonElement) {
-        const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute('content') || '{{ csrf_token() }}';
-        const emptyHeartSrc = "{{ asset('images/boskalp.png') }}";
-        const fullHeartSrc = "{{ asset('images/dolukalp.png') }}";
+<script>
+function toggleReviewLike(reviewId, buttonElement) {
+    const csrfToken = document.querySelector("meta[name='csrf-token']")?.getAttribute('content') || '{{ csrf_token() }}';
+    const emptyHeartSrc = "{{ asset('images/boskalp.png') }}";
+    const fullHeartSrc = "{{ asset('images/dolukalp.png') }}";
 
-        fetch(`/reviews/${reviewId}/toggle-like`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'X-Requested-With': 'XMLHttpRequest'
+    fetch(`/reviews/${reviewId}/toggle-like`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken,
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const buttons = document.querySelectorAll(`button[data-review-id="${reviewId}"]`);
+            buttons.forEach(btn => {
+                const heartImg = btn.querySelector('.like-heart-img');
+                const count = btn.parentElement.querySelector('.like-count-display');
+                if (heartImg) heartImg.src = data.liked ? fullHeartSrc : emptyHeartSrc;
+                if (count) count.innerText = data.likes_count;
+            });
+        }
+    })
+    .catch(err => console.error('Beğeni hatası:', err));
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileDropdown = document.getElementById('mobileDropdownMenu');
+    const openFriendsBtn = document.getElementById('openFriendsDrawerBtn');
+    const drawer = document.getElementById('mobileDrawer');
+    const drawerOverlay = document.getElementById('drawerOverlay');
+    const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+
+    if (mobileMenuBtn && mobileDropdown) {
+        mobileMenuBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            mobileDropdown.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!mobileDropdown.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+                mobileDropdown.classList.add('hidden');
             }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.success) {
-                const buttons = document.querySelectorAll(`button[data-review-id="${reviewId}"]`);
-                buttons.forEach(btn => {
-                    const heartImg = btn.querySelector('.like-heart-img');
-                    const count = btn.parentElement.querySelector('.like-count-display');
-                    if (heartImg) heartImg.src = data.liked ? fullHeartSrc : emptyHeartSrc;
-                    if (count) count.innerText = data.likes_count;
-                });
-            }
-        })
-        .catch(err => console.error('Beğeni hatası:', err));
+        });
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const mobileDropdown = document.getElementById('mobileDropdownMenu');
-        const openFriendsBtn = document.getElementById('openFriendsDrawerBtn');
-        const drawer = document.getElementById('mobileDrawer');
-        const drawerOverlay = document.getElementById('drawerOverlay');
-        const closeDrawerBtn = document.getElementById('closeDrawerBtn');
-
-        if (mobileMenuBtn && mobileDropdown) {
-            mobileMenuBtn.addEventListener('click', function (e) {
-                e.stopPropagation();
-                mobileDropdown.classList.toggle('hidden');
-            });
-
-            document.addEventListener('click', function (e) {
-                if (!mobileDropdown.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
-                    mobileDropdown.classList.add('hidden');
-                }
-            });
+    if (openFriendsBtn && drawer && drawerOverlay) {
+        function openDrawer() {
+            drawer.classList.add('drawer-open');
+            drawerOverlay.classList.remove('hidden');
+            if (closeDrawerBtn) closeDrawerBtn.style.display = 'block';
         }
 
-        if (openFriendsBtn && drawer && drawerOverlay) {
-            function openDrawer() {
-                drawer.classList.add('drawer-open');
-                drawerOverlay.classList.remove('hidden');
-                if (closeDrawerBtn) closeDrawerBtn.style.display = 'block';
-            }
-
-            function closeDrawer() {
-                drawer.classList.remove('drawer-open');
-                drawerOverlay.classList.add('hidden');
-                if (closeDrawerBtn) closeDrawerBtn.style.display = 'none';
-            }
-
-            openFriendsBtn.addEventListener('click', openDrawer);
-            drawerOverlay.addEventListener('click', closeDrawer);
-            if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+        function closeDrawer() {
+            drawer.classList.remove('drawer-open');
+            drawerOverlay.classList.add('hidden');
+            if (closeDrawerBtn) closeDrawerBtn.style.display = 'none';
         }
 
-        // KİTAP ARAMA SİSTEMİ
-        const input = document.getElementById('bookSearchInput');
-        const searchStarBtn = document.getElementById('searchStarBtn');
-        const dropdown = document.getElementById('searchResultsDropdown');
+        openFriendsBtn.addEventListener('click', openDrawer);
+        drawerOverlay.addEventListener('click', closeDrawer);
+        if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
+    }
 
-        if (input && dropdown) {
-            let allSearchResults = [];
-            let displayedCount = 0;
-            const PAGE_SIZE = 6;
-            let searchDebounceTimer;
+    // KİTAP ARAMA SİSTEMİ (Yalnızca Enter veya Yıldız Butonu İle Çalışır)
+    const input = document.getElementById('bookSearchInput');
+    const searchStarBtn = document.getElementById('searchStarBtn');
+    const dropdown = document.getElementById('searchResultsDropdown');
 
-            const textSearching = @json(__('Searching...^^'));
-            const textNotFound = @json(__('No results found.'));
-            const textSearchError = @json(__('An error occurred during search.'));
-            const textLoadMore = @json(__('load more'));
-            const textUnknownAuthor = @json(__('Unknown Author'));
+    if (input && dropdown) {
+        let allSearchResults = [];
+        let displayedCount = 0;
+        const PAGE_SIZE = 6;
 
-            function renderNextBooks() {
-                const oldBtn = document.getElementById('searchLoadMoreContainer');
-                if (oldBtn) oldBtn.remove();
+        const textSearching = @json(__('Searching...^^'));
+        const textNotFound = @json(__('No results found.'));
+        const textSearchError = @json(__('An error occurred during search.'));
+        const textLoadMore = @json(__('load more'));
+        const textUnknownAuthor = @json(__('Unknown Author'));
 
-                const nextBatch = allSearchResults.slice(displayedCount, displayedCount + PAGE_SIZE);
-                const html = nextBatch.map(book => `
-                    <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
-                        <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
-                        <div style="overflow: hidden; text-align: left;">
-                            <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
-                            <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || textUnknownAuthor}</div>
-                        </div>
+        function renderNextBooks() {
+            const oldBtn = document.getElementById('searchLoadMoreContainer');
+            if (oldBtn) oldBtn.remove();
+
+            const nextBatch = allSearchResults.slice(displayedCount, displayedCount + PAGE_SIZE);
+            const html = nextBatch.map(book => `
+                <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
+                    <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
+                    <div style="overflow: hidden; text-align: left;">
+                        <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
+                        <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || textUnknownAuthor}</div>
                     </div>
-                `).join('');
+                </div>
+            `).join('');
 
-                dropdown.insertAdjacentHTML('beforeend', html);
-                displayedCount += nextBatch.length;
+            dropdown.insertAdjacentHTML('beforeend', html);
+            displayedCount += nextBatch.length;
 
-                if (displayedCount < allSearchResults.length) {
-                    const remaining = allSearchResults.length - displayedCount;
-                    const loadMoreHtml = `
-                        <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
-                            <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">${textLoadMore} (+${Math.min(PAGE_SIZE, remaining)})</button>
-                        </div>
-                    `;
-                    dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);
-                    document.getElementById('searchLoadMoreBtn').addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        renderNextBooks();
-                    });
-                }
-            }
-
-            async function performBookSearch() {
-                const q = input.value.trim();
-                if (q.length < 2) {
-                    dropdown.style.display = 'none';
-                    dropdown.innerHTML = '';
-                    return;
-                }
-
-                dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
-                dropdown.style.display = 'block';
-
-                try {
-                    const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
-                    const data = await res.json();
-                    const books = Array.isArray(data) ? data : (data.items || []);
-
-                    if (!books || books.length === 0) {
-                        dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
-                        return;
-                    }
-                    dropdown.innerHTML = '';
-                    allSearchResults = books;
-                    displayedCount = 0;
-                    renderNextBooks();
-                } catch (err) {
-                    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
-                }
-            }
-
-            input.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter') {
-                    e.preventDefault();
-                    clearTimeout(searchDebounceTimer);
-                    performBookSearch();
-                    input.blur();
-                }
-            });
-
-            input.addEventListener('input', function () {
-                clearTimeout(searchDebounceTimer);
-                searchDebounceTimer = setTimeout(performBookSearch, 450);
-            });
-
-            if (searchStarBtn) {
-                searchStarBtn.addEventListener('click', function (e) {
+            if (displayedCount < allSearchResults.length) {
+                const remaining = allSearchResults.length - displayedCount;
+                const loadMoreHtml = `
+                    <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
+                        <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">${textLoadMore} (+${Math.min(PAGE_SIZE, remaining)})</button>
+                    </div>
+                `;
+                dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);
+                document.getElementById('searchLoadMoreBtn').addEventListener('click', function (e) {
                     e.stopPropagation();
-                    performBookSearch();
+                    renderNextBooks();
                 });
             }
-
-            document.addEventListener('click', function (e) {
-                if (!input.contains(e.target) && !dropdown.contains(e.target)) {
-                    dropdown.style.display = 'none';
-                }
-            });
         }
 
-        // KULLANICI ARAMA
-        const userSearchInput = document.getElementById('userSearchInput');
-        const userSearchResults = document.getElementById('userSearchResults');
+        async function performBookSearch() {
+            const q = input.value.trim();
+            if (q.length < 2) {
+                dropdown.style.display = 'none';
+                dropdown.innerHTML = '';
+                return;
+            }
 
-        if (userSearchInput && userSearchResults) {
-            let debounceTimer;
-            const defaultAvatar = "{{ asset('images/profile.jpg') }}";
+            dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
+            dropdown.style.display = 'block';
 
-            const textUserNotFound = @json(__('no user was found, are u sure u spelt that correctly?'));
-            const textUserSearchError = @json(__('An error occurred.'));
-            const textFriendsStatus = @json(__('✓ friends'));
-            const textPendingStatus = @json(__('pending'));
-            const textRequestedStatus = @json(__('requested'));
+            try {
+                // Not: Route tanımlamanda hangi path varsa onu çağırır (/api/search veya /api/search-books)
+                const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
+                const data = await res.json();
+                const books = Array.isArray(data) ? data : (data.items || []);
 
-            userSearchInput.addEventListener('input', function () {
-                clearTimeout(debounceTimer);
-                const query = this.value.trim();
-
-                if (query.length < 2) {
-                    userSearchResults.style.display = 'none';
-                    userSearchResults.innerHTML = '';
+                if (!books || books.length === 0) {
+                    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
                     return;
                 }
+                dropdown.innerHTML = '';
+                allSearchResults = books;
+                displayedCount = 0;
+                renderNextBooks();
+            } catch (err) {
+                dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
+            }
+        }
 
-                debounceTimer = setTimeout(async () => {
-                    try {
-                        const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}`);
-                        const users = await res.json();
+        // SADECE ENTER TUŞUNA BASILDIĞINDA TETİKLENİR
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performBookSearch();
+                input.blur();
+            }
+        });
 
-                        if (users.length === 0) {
-                            userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: #777; text-align: center; font-family: 'Unkempt', cursive;">${textUserNotFound}</div>`;
-                            userSearchResults.style.display = 'block';
-                            return;
-                        }
-
-                        const csrfToken = '{{ csrf_token() }}';
-                        userSearchResults.innerHTML = users.map(user => {
-                            let actionHtml = '';
-                            if (user.status === 'accepted') {
-                                actionHtml = `<span style="font-size: 12px; color: #1a3c11; font-weight: bold; font-family: 'Unkempt', cursive;">${textFriendsStatus}</span>`;
-                            } else if (user.status === 'pending') {
-                                actionHtml = user.is_sender 
-                                    ? `<span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">${textPendingStatus}</span>`
-                                    : `<span style="font-size: 12px; color: #c62828; font-family: 'Unkempt', cursive;">${textRequestedStatus}</span>`;
-                            } else {
-                                actionHtml = `
-                                    <form action="/friends/${user.id}/request" method="POST" style="margin: 0;" onclick="event.stopPropagation();">
-                                        <input type="hidden" name="_token" value="${csrfToken}">
-                                        <button type="submit" style="background: #2d5a27; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; font-family: 'Unkempt', cursive;" title="{{ __('Add Friend') }}">+</button>
-                                    </form>
-                                `;
-                            }
-
-                            let userAvatarSrc = defaultAvatar;
-                            if (user.avatar && user.avatar.startsWith('http')) {
-                                userAvatarSrc = user.avatar;
-                            }
-
-                            return `
-                                <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <div style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
-                                            <img src="${userAvatarSrc}" alt="${user.username}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
-                                        </div>
-                                        <div style="font-size: 14px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
-                                            @${user.username}
-                                        </div>
-                                    </div>
-                                    <div>${actionHtml}</div>
-                                </div>
-                            `;
-                        }).join('');
-
-                        userSearchResults.style.display = 'block';
-                    } catch (err) {
-                        userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: red; text-align: center; font-family: 'Unkempt', cursive;">${textUserSearchError}</div>`;
-                    }
-                }, 300);
-            });
-
-            document.addEventListener('click', function (e) {
-                if (!userSearchInput.contains(e.target) && !userSearchResults.contains(e.target)) {
-                    userSearchResults.style.display = 'none';
-                }
+        // YILDIZ İKONUNA TIKLANDIĞINDA TETİKLENİR
+        if (searchStarBtn) {
+            searchStarBtn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                performBookSearch();
             });
         }
-    });
-    </script>
+
+        document.addEventListener('click', function (e) {
+            if (!input.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+            }
+        });
+    }
+
+    // KULLANICI ARAMA
+    const userSearchInput = document.getElementById('userSearchInput');
+    const userSearchResults = document.getElementById('userSearchResults');
+
+    if (userSearchInput && userSearchResults) {
+        let debounceTimer;
+        const defaultAvatar = "{{ asset('images/profile.jpg') }}";
+
+        const textUserNotFound = @json(__('no user was found, are u sure u spelt that correctly?'));
+        const textUserSearchError = @json(__('An error occurred.'));
+        const textFriendsStatus = @json(__('✓ friends'));
+        const textPendingStatus = @json(__('pending'));
+        const textRequestedStatus = @json(__('requested'));
+
+        userSearchInput.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            const query = this.value.trim();
+
+            if (query.length < 2) {
+                userSearchResults.style.display = 'none';
+                userSearchResults.innerHTML = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/search-users?q=${encodeURIComponent(query)}`);
+                    const users = await res.json();
+
+                    if (users.length === 0) {
+                        userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: #777; text-align: center; font-family: 'Unkempt', cursive;">${textUserNotFound}</div>`;
+                        userSearchResults.style.display = 'block';
+                        return;
+                    }
+
+                    const csrfToken = '{{ csrf_token() }}';
+                    userSearchResults.innerHTML = users.map(user => {
+                        let actionHtml = '';
+                        if (user.status === 'accepted') {
+                            actionHtml = `<span style="font-size: 12px; color: #1a3c11; font-weight: bold; font-family: 'Unkempt', cursive;">${textFriendsStatus}</span>`;
+                        } else if (user.status === 'pending') {
+                            actionHtml = user.is_sender 
+                                ? `<span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">${textPendingStatus}</span>`
+                                : `<span style="font-size: 12px; color: #c62828; font-family: 'Unkempt', cursive;">${textRequestedStatus}</span>`;
+                        } else {
+                            actionHtml = `
+                                <form action="/friends/${user.id}/request" method="POST" style="margin: 0;" onclick="event.stopPropagation();">
+                                    <input type="hidden" name="_token" value="${csrfToken}">
+                                    <button type="submit" style="background: #2d5a27; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; font-family: 'Unkempt', cursive;" title="{{ __('Add Friend') }}">+</button>
+                                </form>
+                            `;
+                        }
+
+                        let userAvatarSrc = defaultAvatar;
+                        if (user.avatar && user.avatar.startsWith('http')) {
+                            userAvatarSrc = user.avatar;
+                        }
+
+                        return `
+                            <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <div style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
+                                        <img src="${userAvatarSrc}" alt="${user.username}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
+                                    </div>
+                                    <div style="font-size: 14px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
+                                        @${user.username}
+                                    </div>
+                                </div>
+                                <div>${actionHtml}</div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    userSearchResults.style.display = 'block';
+                } catch (err) {
+                    userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: red; text-align: center; font-family: 'Unkempt', cursive;">${textUserSearchError}</div>`;
+                }
+            }, 300);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!userSearchInput.contains(e.target) && !userSearchResults.contains(e.target)) {
+                userSearchResults.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
     @include('partials.chat')
 </body>
 </html>

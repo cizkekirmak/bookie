@@ -326,7 +326,7 @@ class BookController extends Controller
             return response()->json([]);
         }
 
-        $cacheKey = 'search_exact_' . md5(mb_strtolower($query, 'UTF-8'));
+        $cacheKey = 'search_safe_' . md5(mb_strtolower($query, 'UTF-8'));
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
             if (!empty($cached)) {
@@ -334,16 +334,12 @@ class BookController extends Controller
             }
         }
 
-        // 1. Open Library Doğrudan Başlık Araması (Öncelikli)
-        $openLibResults = $this->searchOpenLibrary($query);
-
-        // 2. Google Books Başlık Araması
-        $googleResults = $this->searchGoogleBooks($query);
-
-        // 3. Veritabanı
-        $localBooks = Book::where('title', 'LIKE', "%{$query}%")
+        $localBooks = Book::where(function ($q) use ($query) {
+                $q->where('title', 'LIKE', "%{$query}%")
+                  ->orWhere('author', 'LIKE', "%{$query}%");
+            })
             ->whereNotNull('cover_image')
-            ->limit(3)
+            ->limit(5)
             ->get()
             ->map(function ($b) {
                 return [
@@ -354,34 +350,70 @@ class BookController extends Controller
                 ];
             })->toArray();
 
-        // 4. Hepsini birleştir
-        $merged = array_merge($openLibResults, $googleResults, $localBooks);
+        $googleResults = $this->searchGoogleBooks($query);
+        $openLibResults = $this->searchOpenLibrary($query);
 
-        // 5. Başlığa Benzerlik Sıralaması (Open Library Benzerlik Mantığı)
-        $cleanSearch = mb_strtolower(preg_replace('/[^\p{L}\p{N}]/u', '', $query), 'UTF-8');
-
-        usort($merged, function ($a, $b) use ($cleanSearch) {
-            $tA = mb_strtolower(preg_replace('/[^\p{L}\p{N}]/u', '', $a['title'] ?? ''), 'UTF-8');
-            $tB = mb_strtolower(preg_replace('/[^\p{L}\p{N}]/u', '', $b['title'] ?? ''), 'UTF-8');
-
-            similar_text($cleanSearch, $tA, $percentA);
-            similar_text($cleanSearch, $tB, $percentB);
-
-            return $percentB <=> $percentA; // En çok benzeyen en üste
+        $merged = array_merge($localBooks, $googleResults, $openLibResults);
+        
+        $cleanQuery = mb_strtolower($query, 'UTF-8');
+        $stopwords = ['ve', 'ile', 'de', 'da', 'bir', 'the', 'and', 'of', 'in', 'a', 'an'];
+        $queryWords = array_filter(explode(' ', $cleanQuery), function($w) use ($stopwords) {
+            return mb_strlen($w, 'UTF-8') > 1 && !in_array($w, $stopwords);
         });
 
-        // 6. Tekilleştir ve ilk 10 sonucu al
-        $results = [];
-        $seen = [];
+        $filteredResults = [];
+        $seenKeys = [];
 
         foreach ($merged as $item) {
-            $key = mb_strtolower(trim($item['title']), 'UTF-8');
-            if (!isset($seen[$key])) {
-                $seen[$key] = true;
-                $results[] = $item;
+            $titleLower = mb_strtolower($item['title'], 'UTF-8');
+            $authorLower = mb_strtolower($item['authors'] ?? '', 'UTF-8');
+
+            $isRelevant = false;
+            foreach ($queryWords as $word) {
+                if (str_contains($titleLower, $word) || str_contains($authorLower, $word)) {
+                    $isRelevant = true;
+                    break;
+                }
             }
-            if (count($results) >= 10) break;
+
+            if (!$isRelevant) {
+                continue;
+            }
+
+            $uniqueKey = $titleLower . '_' . mb_substr($authorLower, 0, 8);
+            if (!isset($seenKeys[$uniqueKey])) {
+                $seenKeys[$uniqueKey] = true;
+                $filteredResults[] = $item;
+            }
         }
+
+        usort($filteredResults, function ($a, $b) use ($cleanQuery, $queryWords) {
+            $tA = mb_strtolower($a['title'], 'UTF-8');
+            $tB = mb_strtolower($b['title'], 'UTF-8');
+
+            if ($tA === $cleanQuery && $tB !== $cleanQuery) return -1;
+            if ($tA !== $cleanQuery && $tB === $cleanQuery) return 1;
+
+            $startsA = str_starts_with($tA, $cleanQuery);
+            $startsB = str_starts_with($tB, $cleanQuery);
+            if ($startsA && !$startsB) return -1;
+            if (!$startsA && $startsB) return 1;
+
+            $scoreA = 0;
+            $scoreB = 0;
+            foreach ($queryWords as $word) {
+                if (str_contains($tA, $word)) $scoreA++;
+                if (str_contains($tB, $word)) $scoreB++;
+            }
+
+            if ($scoreA !== $scoreB) {
+                return $scoreB <=> $scoreA;
+            }
+
+            return 0;
+        });
+
+        $results = array_slice($filteredResults, 0, 10);
 
         if (!empty($results)) {
             foreach ($results as $book) {
@@ -389,7 +421,7 @@ class BookController extends Controller
                     'title'       => $book['title'],
                     'authors'     => $book['authors'],
                     'coverUrl'    => $book['cover'],
-                    'description' => 'No description available.',
+                    'description' => 'Açıklama yükleniyor...',
                 ], 604800);
             }
             Cache::put($cacheKey, $results, now()->addHours(24));
@@ -398,58 +430,9 @@ class BookController extends Controller
         return response()->json($results);
     }
 
-    private function searchOpenLibrary(string $query): array
-    {
-        try {
-            // Open Library resmi başlık araması
-            $response = Http::withoutVerifying()
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BookieApp/1.0',
-                    'Accept'     => 'application/json',
-                ])
-                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->timeout(4)
-                ->get('https://openlibrary.org/search.json', [
-                    'title' => $query,
-                    'limit' => 15,
-                ]);
-
-            if (!$response->successful()) {
-                return [];
-            }
-
-            $docs = $response->json('docs') ?? [];
-            $results = [];
-
-            foreach ($docs as $doc) {
-                $coverId = $doc['cover_i'] ?? null;
-                $title = $doc['title'] ?? null;
-
-                if (empty($coverId) || empty($title)) {
-                    continue;
-                }
-
-                $rawKey = $doc['key'] ?? '';
-                $cleanId = str_replace(['/works/', '/books/'], '', $rawKey);
-
-                $results[] = [
-                    'id'      => 'OL_' . $cleanId,
-                    'title'   => $title,
-                    'authors' => isset($doc['author_name']) ? implode(', ', array_slice($doc['author_name'], 0, 2)) : 'Bilinmeyen Yazar',
-                    'cover'   => "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg",
-                ];
-            }
-
-            return $results;
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
     private function searchGoogleBooks(string $query): array
     {
         try {
-            // Sadece başlıkta arama yapması için intitle filtresi
             $params = [
                 'q'          => 'intitle:' . $query,
                 'maxResults' => 15,
@@ -474,18 +457,22 @@ class BookController extends Controller
 
             foreach ($items as $item) {
                 $info = $item['volumeInfo'] ?? [];
+                
                 $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
-
-                if (empty($rawCover) || empty($info['title'])) {
+                if (empty($rawCover)) {
                     continue;
                 }
 
                 $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover);
+                $title = $info['title'] ?? null;
+                if (!$title) continue;
+
+                $authors = isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : 'Bilinmeyen Yazar';
 
                 $results[] = [
                     'id'      => $item['id'],
-                    'title'   => $info['title'],
-                    'authors' => isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : __('Unknown Author'),
+                    'title'   => $title,
+                    'authors' => $authors,
                     'cover'   => $cover,
                 ];
             }
@@ -496,6 +483,57 @@ class BookController extends Controller
         }
     }
 
+    private function searchOpenLibrary(string $query): array
+    {
+        try {
+            $response = Http::withoutVerifying()
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept'     => 'application/json',
+                ])
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->timeout(4)
+                ->get('https://openlibrary.org/search.json', [
+                    'title' => $query,
+                    'limit' => 20,
+                ]);
+
+            if (!$response->successful()) {
+                return [];
+            }
+
+            $docs = $response->json('docs') ?? [];
+            $results = [];
+
+            foreach ($docs as $doc) {
+                $coverId = $doc['cover_i'] ?? null;
+                if (empty($coverId)) {
+                    continue;
+                }
+
+                $title = $doc['title'] ?? null;
+                if (!$title) continue;
+
+                $rawKey = $doc['key'] ?? '';
+                $cleanId = str_replace(['/works/', '/books/'], '', $rawKey);
+                $bookId = 'OL_' . $cleanId;
+
+                $authors = isset($doc['author_name']) ? implode(', ', array_slice($doc['author_name'], 0, 2)) : 'Bilinmeyen Yazar';
+                $cover = "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg";
+
+                $results[] = [
+                    'id'      => $bookId,
+                    'title'   => $title,
+                    'authors' => $authors,
+                    'cover'   => $cover,
+                ];
+            }
+
+            return $results;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
     public function store(Request $request)
     {
         $request->validate([
