@@ -66,7 +66,7 @@
             height: 76px;
             background-color: #477c35;
             background-image: 
-                url('{{ asset('images/profil-header.png') }}'),
+                url('{{ asset('images/ayarlar.png') }}'),
                 url('{{ asset('images/bosluk.png') }}');
             background-size: 
                 auto 100%, 
