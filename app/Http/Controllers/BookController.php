@@ -11,14 +11,13 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
-use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class BookController extends Controller
 {
     private string $googleApiKey = 'AIzaSyBGjDodZWAvBQ57QjOZ24VAGHOKf2p0Pus';
 
     /**
-     * Kapağı Cloudinary'ye yükleyip kalıcı CDN URL'sini döner
+     * Kapağı Cloudinary API'sine doğrudan yükleyip kalıcı CDN URL'sini döner
      */
     private function getCachedCoverUrl(?string $url, string $key): ?string
     {
@@ -31,19 +30,33 @@ class BookController extends Controller
             return $url;
         }
 
-        $url = str_replace('http://', 'https://', $url);
-        $cleanKey = preg_replace('/[^A-Za-z0-9_\-]/', '_', $key);
+        $cloudName = env('CLOUDINARY_CLOUD_NAME', 'fxyz37re');
+        $apiKey    = env('CLOUDINARY_API_KEY', '899324875961436');
+        $apiSecret = env('CLOUDINARY_API_SECRET', '8z8E_0aF6fG7Q68bCq48b9v2NqI');
+
+        $timestamp = time();
+        $folder    = 'bookie_covers';
+        $publicId  = 'cover_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $key);
+
+        // İmza üretimi (Parametreler alfabetik sırada olmalı)
+        $paramsToSign = "folder={$folder}&public_id={$publicId}&timestamp={$timestamp}";
+        $signature    = sha1($paramsToSign . $apiSecret);
 
         try {
-            // Cloudinary doğrudan harici web linkinden yüklemeyi destekler
-            $uploadedFile = Cloudinary::upload($url, [
-                'folder'        => 'bookie_covers',
-                'public_id'     => 'cover_' . $cleanKey,
-                'overwrite'     => false,
-                'resource_type' => 'image'
+            $response = Http::withoutVerifying()->post("https://api.cloudinary.com/v1_1/{$cloudName}/image/upload", [
+                'file'      => $url,
+                'api_key'   => $apiKey,
+                'timestamp' => $timestamp,
+                'folder'    => $folder,
+                'public_id' => $publicId,
+                'signature' => $signature,
             ]);
 
-            return $uploadedFile->getSecurePath();
+            if ($response->successful()) {
+                return $response->json('secure_url');
+            } else {
+                Log::warning('Cloudinary kapak API yanıt hatası: ' . $response->body());
+            }
         } catch (\Throwable $e) {
             Log::warning('Cloudinary kapak yükleme hatası: ' . $e->getMessage());
         }
