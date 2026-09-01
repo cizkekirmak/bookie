@@ -20,17 +20,16 @@ class ResetPasswordNotification extends Notification
 
     public function via($notifiable)
     {
-        return ['custom_brevo'];
+        return [];
     }
 
-    public function toCustomBrevo($notifiable)
+    public function send($notifiable)
     {
         $url = url(route('password.reset', [
             'token' => $this->token,
             'email' => $notifiable->getEmailForPasswordReset(),
         ], false));
 
-        // Mail içeriği (HTML)
         $htmlContent = '
         <div style="background-color: #f4f7f4; padding: 30px; font-family: sans-serif;">
             <div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e0e0e0;">
@@ -50,7 +49,6 @@ class ResetPasswordNotification extends Notification
             </div>
         </div>';
 
-        // Brevo REST API İsteği
         $response = Http::withHeaders([
             'api-key' => env('BREVO_KEY'),
             'Content-Type' => 'application/json',
@@ -70,10 +68,5 @@ class ResetPasswordNotification extends Notification
         if (!$response->successful()) {
             Log::error('Brevo API Mail Error: ' . $response->body());
         }
-    }
-
-    public function toArray(object $notifiable): array
-    {
-        return [];
     }
 }
