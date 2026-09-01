@@ -25,7 +25,6 @@ class BookController extends Controller
             return null;
         }
 
-        // Zaten Cloudinary üzerindeyse tekrar yükleme
         if (str_contains($url, 'res.cloudinary.com')) {
             return $url;
         }
@@ -38,7 +37,6 @@ class BookController extends Controller
         $folder    = 'bookie_covers';
         $publicId  = 'cover_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $key);
 
-        // İmza üretimi (Parametreler alfabetik sırada olmalı)
         $paramsToSign = "folder={$folder}&public_id={$publicId}&timestamp={$timestamp}";
         $signature    = sha1($paramsToSign . $apiSecret);
 
@@ -323,13 +321,15 @@ class BookController extends Controller
 
     public function searchApi(Request $request)
     {
-        $query = trim($request->get('q', ''));
+        $rawQuery = trim($request->get('q', ''));
 
-        if (mb_strlen($query) < 2) {
+        if (mb_strlen($rawQuery) < 2) {
             return response()->json([]);
         }
 
-        $cacheKey = 'search_safe_' . md5(mb_strtolower($query, 'UTF-8'));
+        $cleanQuery = trim(preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $rawQuery));
+        $cacheKey = 'search_safe_' . md5(mb_strtolower($cleanQuery, 'UTF-8'));
+
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
             if (!empty($cached)) {
@@ -337,12 +337,12 @@ class BookController extends Controller
             }
         }
 
-        $localBooks = Book::where(function ($q) use ($query) {
-                $q->where('title', 'LIKE', "%{$query}%")
-                  ->orWhere('author', 'LIKE', "%{$query}%");
+        $localBooks = Book::where(function ($q) use ($cleanQuery) {
+                $q->where('title', 'LIKE', "%{$cleanQuery}%")
+                  ->orWhere('author', 'LIKE', "%{$cleanQuery}%");
             })
             ->whereNotNull('cover_image')
-            ->limit(5)
+            ->limit(4)
             ->get()
             ->map(function ($b) {
                 return [
@@ -353,70 +353,21 @@ class BookController extends Controller
                 ];
             })->toArray();
 
-        $googleResults = $this->searchGoogleBooks($query);
-        $openLibResults = $this->searchOpenLibrary($query);
+        $googleResults = $this->searchGoogleBooks($cleanQuery);
+        $openLibResults = $this->searchOpenLibrary($cleanQuery);
 
         $merged = array_merge($localBooks, $googleResults, $openLibResults);
-        
-        $cleanQuery = mb_strtolower($query, 'UTF-8');
-        $stopwords = ['ve', 'ile', 'de', 'da', 'bir', 'the', 'and', 'of', 'in', 'a', 'an'];
-        $queryWords = array_filter(explode(' ', $cleanQuery), function($w) use ($stopwords) {
-            return mb_strlen($w, 'UTF-8') > 1 && !in_array($w, $stopwords);
-        });
-
-        $filteredResults = [];
-        $seenKeys = [];
+        $results = [];
+        $seen = [];
 
         foreach ($merged as $item) {
-            $titleLower = mb_strtolower($item['title'], 'UTF-8');
-            $authorLower = mb_strtolower($item['authors'], 'UTF-8');
-
-            $isRelevant = false;
-            foreach ($queryWords as $word) {
-                if (str_contains($titleLower, $word) || str_contains($authorLower, $word)) {
-                    $isRelevant = true;
-                    break;
-                }
+            $key = mb_strtolower(trim($item['title']), 'UTF-8') . '_' . mb_substr(mb_strtolower(trim($item['authors'] ?? ''), 'UTF-8'), 0, 6);
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
+                $results[] = $item;
             }
-
-            if (!$isRelevant) {
-                continue;
-            }
-
-            $uniqueKey = $titleLower . '_' . mb_substr($authorLower, 0, 8);
-            if (!isset($seenKeys[$uniqueKey])) {
-                $seenKeys[$uniqueKey] = true;
-                $filteredResults[] = $item;
-            }
+            if (count($results) >= 10) break;
         }
-
-        usort($filteredResults, function ($a, $b) use ($cleanQuery, $queryWords) {
-            $tA = mb_strtolower($a['title'], 'UTF-8');
-            $tB = mb_strtolower($b['title'], 'UTF-8');
-
-            if ($tA === $cleanQuery && $tB !== $cleanQuery) return -1;
-            if ($tA !== $cleanQuery && $tB === $cleanQuery) return 1;
-
-            $startsA = str_starts_with($tA, $cleanQuery);
-            $startsB = str_starts_with($tB, $cleanQuery);
-            if ($startsA && !$startsB) return -1;
-            if (!$startsA && $startsB) return 1;
-
-            $scoreA = 0;
-            $scoreB = 0;
-            foreach ($queryWords as $word) {
-                if (str_contains($tA, $word)) $scoreA++;
-                if (str_contains($tB, $word)) $scoreB++;
-            }
-
-            if ($scoreA !== $scoreB) {
-                return $scoreB <=> $scoreA;
-            }
-
-            return 0;
-        });
-
-        $results = array_slice($filteredResults, 0, 10);
 
         if (!empty($results)) {
             foreach ($results as $book) {
@@ -424,7 +375,7 @@ class BookController extends Controller
                     'title'       => $book['title'],
                     'authors'     => $book['authors'],
                     'coverUrl'    => $book['cover'],
-                    'description' => 'Açıklama yükleniyor...',
+                    'description' => 'No description available.',
                 ], 604800);
             }
             Cache::put($cacheKey, $results, now()->addHours(24));
@@ -437,7 +388,7 @@ class BookController extends Controller
     {
         try {
             $params = [
-                'q'          => 'intitle:' . $query,
+                'q'          => $query,
                 'maxResults' => 15,
                 'printType'  => 'books',
             ];
@@ -448,7 +399,7 @@ class BookController extends Controller
 
             $response = Http::withoutVerifying()
                 ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->timeout(4)
+                ->timeout(3.5)
                 ->get('https://www.googleapis.com/books/v1/volumes', $params);
 
             if (!$response->successful()) {
@@ -462,19 +413,16 @@ class BookController extends Controller
                 $info = $item['volumeInfo'] ?? [];
                 
                 $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
-                if (empty($rawCover)) {
+                if (empty($rawCover) || empty($info['title'])) {
                     continue;
                 }
 
                 $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover);
-                $title = $info['title'] ?? null;
-                if (!$title) continue;
-
-                $authors = isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : 'Bilinmeyen Yazar';
+                $authors = isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : __('Unknown Author');
 
                 $results[] = [
                     'id'      => $item['id'],
-                    'title'   => $title,
+                    'title'   => $info['title'],
                     'authors' => $authors,
                     'cover'   => $cover,
                 ];
@@ -491,7 +439,7 @@ class BookController extends Controller
         try {
             $response = Http::withoutVerifying()
                 ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     'Accept'     => 'application/json',
                 ])
                 ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
@@ -608,7 +556,8 @@ class BookController extends Controller
     {
         return $this->store($request);
     }
-public function getRandomRecommendation(Request $request)
+
+    public function getRandomRecommendation(Request $request)
     {
         $genre = $request->query('genre', 'random');
 
@@ -626,7 +575,6 @@ public function getRandomRecommendation(Request $request)
         $searchTerm = $genreQueries[$genre] ?? 'fiction';
         $randomOffset = rand(0, 30);
 
-        // 1. ÖNCELİK: Google Books API (API Key + IPv4 Zorlaması ile)
         try {
             $params = [
                 'q'            => 'subject:"' . $searchTerm . '"',
@@ -661,7 +609,6 @@ public function getRandomRecommendation(Request $request)
                     $cover = $info['imageLinks']['thumbnail'] ?? $info['imageLinks']['smallThumbnail'];
                     $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $cover);
 
-                    // Başlık ve kapak meta verilerini cache'e yaz (show sayfasında hızlı açılsın)
                     Cache::put('book_meta_' . $chosen['id'], [
                         'title'       => $info['title'],
                         'authors'     => isset($info['authors']) ? implode(', ', $info['authors']) : 'Unknown Author',
@@ -687,7 +634,6 @@ public function getRandomRecommendation(Request $request)
             Log::warning('Google Books Random API hatası: ' . $e->getMessage());
         }
 
-        // 2. YEDEK: Open Library API
         try {
             $olSubject = str_replace(' ', '_', $searchTerm);
             $openLibRes = Http::withoutVerifying()
@@ -735,7 +681,6 @@ public function getRandomRecommendation(Request $request)
             Log::warning('Open Library Random API hatası: ' . $e->getMessage());
         }
 
-        // 3. SON ÇARE: Veritabanı
         $randomDbBook = Book::whereNotNull('cover_image')->inRandomOrder()->first();
         if ($randomDbBook) {
             return response()->json([
@@ -753,6 +698,7 @@ public function getRandomRecommendation(Request $request)
 
         return response()->json(['success' => false], 404);
     }
+
     private function downloadCoverImage(?string $url, string $openLibraryKey): ?string
     {
         return $this->getCachedCoverUrl($url, $openLibraryKey);
