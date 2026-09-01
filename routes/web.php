@@ -92,8 +92,8 @@ Route::post('/forgotpassword', function (Request $request) {
     $status = Password::sendResetLink($request->only('email'));
 
     return $status === Password::RESET_LINK_SENT
-        ? back()->with('status', 'check your email !!(its probably in the junk folder)')
-        : back()->withErrors(['email' => __($status)]);
+    ? back()->with('status', __('check your email !!(its probably in the junk folder)'))
+    : back()->withErrors(['email' => __($status)]);
 })->name('password.email');
 
 Route::get('/reset-password/{token}', function (string $token) {

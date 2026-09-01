@@ -159,5 +159,15 @@
     "Send reset link": "send reset link",
     "do u wanna go back?": "do u wanna go back?",
     " (no rating)": " (no rating)",
-    "Search": "search"
+    "Search": "search",
+    "Bookie - Reset Password Notification": "Bookie - Reset Password Notification",
+    "haiii !!": "haiii !!",
+    "we heard that you want to reset your password :( dont worry i got u, here is your link": "we heard that you want to reset your password :( dont worry i got u, here is your link",
+    "reset password": "reset password",
+    "this link will die in 60 minutes, be quick !": "this link will die in 60 minutes, be quick !",
+    "if u didnt request this link, just ignore it :p": "if u didnt request this link, just ignore it :p",
+    "with love,\nBookie Team": "with love,\nBookie Team",
+    "Please wait before retrying.": "please wait before retrying.",
+    "We have emailed your password reset link.": "we have emailed your password reset link.",
+    "We can't find a user with that email address.": "we can't find a user with that email address."
 }

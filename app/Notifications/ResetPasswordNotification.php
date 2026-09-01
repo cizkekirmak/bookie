@@ -23,22 +23,21 @@ class ResetPasswordNotification extends Notification
     }
 
     public function toMail($notifiable)
-    {
-        $url = url(route("password.reset", [
-            "token" => $this->token,
-            "email" => $notifiable->getEmailForPasswordReset(),
-        ], false));
+{
+    $url = url(route("password.reset", [
+        "token" => $this->token,
+        "email" => $notifiable->getEmailForPasswordReset(),
+    ], false));
 
-        return (new MailMessage)
-            ->subject("Bookie - Reset Password Notification")
-            ->greeting("haiii !!")
-            ->line('we heard that you want to reset your password :( dont worry i got u, here is your link')
-            ->action('reset password', $url)
-            ->line("this link will die in 60 minutes, be quick !")
-            ->line("if u didnt request this link, just ignore it :p")
-            ->salutation("with love,\nBookie Team");
-    }
-
+    return (new MailMessage)
+        ->subject(__("Bookie - Reset Password Notification"))
+        ->greeting(__("haiii !!"))
+        ->line(__('we heard that you want to reset your password :( dont worry i got u, here is your link'))
+        ->action(__('reset password'), $url)
+        ->line(__("this link will die in 60 minutes, be quick !"))
+        ->line(__("if u didnt request this link, just ignore it :p"))
+        ->salutation(__("with love,\nBookie Team"));
+}
     /**
      * Get the array representation of the notification.
      *

@@ -160,5 +160,15 @@
     "Send reset link": "sıfırlama linki gönder",
     "do u wanna go back?": "geri dönmek ister misin?",
     " (no rating)": " (puan yok)",
-    "Search": "ara"
+    "Search": "ara",
+    "Bookie - Reset Password Notification": "Bookie - Şifre Sıfırlama Bildirimi",
+    "haiii !!": "selaamm !!",
+    "we heard that you want to reset your password :( dont worry i got u, here is your link": "şifreni sıfırlamak istediğini duyduk :( merak etme hallederiz, işte linkin",
+    "reset password": "şifreyi sıfırla",
+    "this link will die in 60 minutes, be quick !": "bu link 60 dakika içinde geçerliliğini yitirecek, acele et !",
+    "if u didnt request this link, just ignore it :p": "eğer bu linki sen istemediysen görmezden gelebilirsin :p",
+    "with love,\nBookie Team": "sevgilerle,\nBookie Ekibi",
+    "Please wait before retrying.": "lütfen tekrar denemeden önce bekleyin.",
+    "We have emailed your password reset link.": "şifre sıfırlama linkini e-posta adresinize gönderdik.",
+    "We can't find a user with that email address.": "bu e-posta adresine sahip bir kullanıcı bulunamadı."
 }
