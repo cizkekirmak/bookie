@@ -172,5 +172,18 @@
     "We have emailed your password reset link.": "şifre sıfırlama linkini e-posta adresinize gönderdik.",
     "We can't find a user with that email address.": "bu e-posta adresine sahip bir kullanıcı bulunamadı.",
     "If you're having trouble clicking the \"reset password\" button, copy and paste the URL below into your web browser:": "\"şifreyi sıfırla\" butonuna tıklamakta sorun yaşıyorsanız aşağıdaki bağlantıyı kopyalayıp tarayıcınıza yapıştırabilirsiniz ^^:",
-    "check your email !!(its probably in the junk folder)": "e-postanı kontrol et !!(muhtemelen spam klasöründe)"
+    "check your email !!(its probably in the junk folder)": "e-postanı kontrol et !!(muhtemelen spam klasöründe)",
+    
+    "where is your username?": "kullanıcı adın nerede",
+    "username must be at least 3 characters": "kullanıcı adı en az 3 karakter olmalı",
+    "username cannot exceed 50 characters": "kullanıcı adı 50 karakteri geçemez",
+    "this username is already taken": "bu kullanıcı adı zaten alınmış",
+    "email is required": "e-posta adresi gerekli",
+    "email must be a valid email address": "geçerli bir e-posta adresi girin",
+    "email is already taken": "bu e-posta adresi zaten kullanımda",
+    "password is required": "şifre gerekli",
+    "password must be at least 6 characters": "şifre en az 6 karakter olmalı",
+    "username or email is required": "kullanıcı adı veya e-posta gerekli",
+    "are u sure these are correct?": "bu bilgilerin doğru olduğuna emin misin?"
+
 }

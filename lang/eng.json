@@ -169,5 +169,18 @@
     "with love,\nBookie Team": "with love,\nBookie Team",
     "Please wait before retrying.": "please wait before retrying.",
     "We have emailed your password reset link.": "we have emailed your password reset link.",
-    "We can't find a user with that email address.": "we can't find a user with that email address."
+    "We can't find a user with that email address.": "we can't find a user with that email address.",
+    
+    "where is your username?": "where is your username?",
+    "username must be at least 3 characters": "username must be at least 3 characters",
+    "username cannot exceed 50 characters": "username cannot exceed 50 characters",
+    "this username is already taken": "this username is already taken",
+    "email is required": "email is required",
+    "email must be a valid email address": "email must be a valid email address",
+    "email is already taken": "email is already taken",
+    "password is required": "password is required",
+    "password must be at least 6 characters": "password must be at least 6 characters",
+    "username or email is required": "username or email is required",
+    "are u sure these are correct?": "are u sure these are correct?"
+
 }
