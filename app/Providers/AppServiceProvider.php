@@ -22,14 +22,5 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Mail::extend('brevo', function (array $config = []) {
-            return (new BrevoTransportFactory)->create(
-                new Dsn(
-                    'brevo+api',
-                    'default',
-                    $config['key'] ?? config('services.brevo.key') ?? env('BREVO_KEY')
-                )
-            );
-        });
     }
 }
