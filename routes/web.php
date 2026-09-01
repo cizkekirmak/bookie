@@ -313,6 +313,12 @@ Route::get('/lang/{locale}', function ($locale) {
         app()->setLocale($locale);
     }
 
-    // JSON API rotalarına geri düşmeyi engelleyen güvenli yönlendirme:
-    return redirect()->back(fallback: route('dashboard'));
+    $referer = url()->previous();
+
+    // Eğer önceki URL bildirim/mesaj API isteğiyse doğrudan dashboard'a veya ana sayfaya at
+    if (str_contains($referer, 'unread') || str_contains($referer, 'api') || str_contains($referer, 'notification')) {
+        return auth()->check() ? redirect()->route('dashboard') : redirect('/');
+    }
+
+    return redirect()->to($referer ?: route('dashboard'));
 })->name('lang.switch');
