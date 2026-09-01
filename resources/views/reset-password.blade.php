@@ -22,6 +22,7 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            position: relative;
         }
 
         .dis-kapsayici {
@@ -80,6 +81,13 @@
         }
 
         button:hover { background-color: #45a049; }
+
+        .floating-lang-switch {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
     </style>
 </head>
 <body>
@@ -115,6 +123,11 @@
                 <button type="submit">{{ __('Update Password') }}</button>
             </form>
         </div>
+    </div>
+
+    {{-- SAĞ ALT KÖŞE DİL BUTONU --}}
+    <div class="floating-lang-switch">
+        @include('partials.lang-switch')
     </div>
 </body>
 </html>

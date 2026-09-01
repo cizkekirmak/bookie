@@ -31,6 +31,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            position: relative;
         }
 
         .container {
@@ -124,6 +125,13 @@
             text-align: center;
             outline: none;
             color: #1f5117;
+        }
+
+        .floating-lang-switch {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
         }
 
         /* MOBİL UYARLAMA */
@@ -484,6 +492,11 @@
 
         </div>
     </div>
+</div>
+
+{{-- SAĞ ALT KÖŞE DİL BUTONU --}}
+<div class="floating-lang-switch">
+    @include('partials.lang-switch')
 </div>
 
 <script>

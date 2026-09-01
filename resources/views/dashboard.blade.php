@@ -288,7 +288,7 @@
                 position: absolute;
                 top: 70px !important;
                 right: 8px !important;
-                width: 64px !important;
+                width: 68px !important;
                 background: #c6e085;
                 border: 2px solid #4b813b;
                 border-radius: 14px !important;
@@ -297,6 +297,7 @@
                 gap: 8px !important;
                 box-shadow: 0 8px 24px rgba(0,0,0,0.3);
                 z-index: 100000;
+                align-items: center;
             }
 
             .mobile-dropdown-menu.hidden {
@@ -460,58 +461,46 @@
 
             <div class="header-search-wrap">
                 <div class="header-search-bar-box" id="searchBarBox">
-                    <img src="{{ asset('images/yıldız.png') }}" id="searchStarBtn" alt="Search" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
+                    <img src="{{ asset('images/yıldız.png') }}" id="searchStarBtn" alt="{{ __('Search') }}" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
                     <input type="text" id="bookSearchInput" placeholder="{{ __('what are you looking for?') }}" autocomplete="off" enterkeyhint="search">
                 </div>
                 <div id="searchResultsDropdown" style="display: none; position: absolute; top: 54px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 100010;"></div>
             </div>
             
             <div class="header-desktop-actions">
-                {{-- DİL SEÇİCİ (TR / EN) --}}
-                <div style="font-family: 'Unkempt', cursive; font-size: 15px; display: flex; gap: 6px; align-items: center; margin-right: 4px;">
-                    <a href="{{ route('lang.switch', 'tr') }}" 
-                       style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'tr' ? 'bold' : 'normal' }};">
-                       TR
-                    </a>
-                    <span style="color: #badfa0;">|</span>
-                    <a href="{{ route('lang.switch', 'en') }}" 
-                       style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'en' ? 'bold' : 'normal' }};">
-                       EN
-                    </a>
-                </div>
+                {{-- DİL SEÇİCİ PARTIAL --}}
+                @include('partials.lang-switch')
 
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
                     @include('partials.notifications')
                 </div>
 
                 <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="ayarlar" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="{{ __('Settings') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
                 </a>
                 
                 <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/profile.jpg') }}" alt="profile" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                    <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
                 </a>
             </div>
 
             <div class="mobile-menu-trigger" id="mobileMenuBtn">
-                <img src="{{ asset('images/profile.jpg') }}" alt="Menu">
+                <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}">
             </div>
 
             <div class="mobile-dropdown-menu hidden" id="mobileDropdownMenu">
                 {{-- Mobil Dil Seçici --}}
-                <div class="mobile-icon-box" style="font-size: 13px; font-weight: bold; gap: 3px;">
-                    <a href="{{ route('lang.switch', 'tr') }}" style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#1f5117' : '#888' }};">TR</a>
-                    <span>/</span>
-                    <a href="{{ route('lang.switch', 'en') }}" style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#1f5117' : '#888' }};">EN</a>
+                <div style="width: 100%; display: flex; justify-content: center; padding: 2px 0;">
+                    @include('partials.lang-switch')
                 </div>
                 <div class="mobile-icon-box">
                     @include('partials.notifications')
                 </div>
                 <a href="{{ route('ayarlar') }}" class="mobile-icon-box">
-                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="Settings">
+                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="{{ __('Settings') }}">
                 </a>
                 <a href="{{ route('profile') }}" class="mobile-icon-box">
-                    <img src="{{ asset('images/profile.jpg') }}" alt="Profile">
+                    <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}">
                 </a>
             </div>
 

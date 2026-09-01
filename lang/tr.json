@@ -155,5 +155,10 @@
     "An error occurred.": "bir hata oluştu.",
     "✓ friends": "✓ arkadaşlar",
     "pending": "istek gönderildi",
-    "requested": "istek var"
+    "requested": "istek var",
+    "accepted your friend request, yay!": "arkadaşlık isteğini kabul etti, yipie!",
+    "Send reset link": "sıfırlama linki gönder",
+    "do u wanna go back?": "geri dönmek ister misin?",
+    " (no rating)": " (puan yok)",
+    "Search": "ara"
 }

@@ -314,24 +314,14 @@
 
             {{-- SAĞ İKONLAR & DİL SEÇİCİ --}}
             <div style="display: flex; align-items: center; gap: 14px; flex-shrink: 0;">
-                <div style="font-family: 'Unkempt', cursive; font-size: 15px; display: flex; gap: 6px; align-items: center; margin-right: 4px;">
-                    <a href="{{ route('lang.switch', 'tr') }}" 
-                       style="text-decoration: none; color: {{ app()->getLocale() == 'tr' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'tr' ? 'bold' : 'normal' }};">
-                       TR
-                    </a>
-                    <span style="color: #badfa0;">|</span>
-                    <a href="{{ route('lang.switch', 'en') }}" 
-                       style="text-decoration: none; color: {{ app()->getLocale() == 'en' ? '#ffffff' : '#badfa0' }}; font-weight: {{ app()->getLocale() == 'en' ? 'bold' : 'normal' }};">
-                       EN
-                    </a>
-                </div>
+                @include('partials.lang-switch')
 
                 <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/profile.jpg') }}" alt="profile" class="header-icon-box">
+                    <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}" class="header-icon-box">
                 </a>
                 
                 <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/dash.jpg') }}" alt="dashboard" class="header-icon-box">
+                    <img src="{{ asset('images/dash.jpg') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
                 </a>
             </div>
 
@@ -373,7 +363,7 @@
                 <div class="avatar-preview-wrap">
                     <img id="avatar-preview" 
                          src="{{ $avatarSrc }}" 
-                         alt="Avatar" 
+                         alt="{{ __('Profile') }}" 
                          class="avatar-preview-img"
                          referrerpolicy="no-referrer"
                          onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
