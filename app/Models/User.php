@@ -26,7 +26,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function sendPasswordResetNotification($token)
+   public function sendPasswordResetNotification($token)
     {
         $url = url(route('password.reset', [
             'token' => $token,
@@ -34,23 +34,54 @@ class User extends Authenticatable
         ], false));
 
         $htmlContent = '
-        <div style="background-color: #f4f7f4; padding: 30px; font-family: sans-serif;">
-            <div style="max-width: 500px; margin: 0 auto; background: #ffffff; padding: 30px; border-radius: 12px; border: 1px solid #e0e0e0;">
-                <h2 style="color: #2d5a27; margin-top: 0;">' . e(__('haiii !!')) . '</h2>
-                <p style="color: #444; font-size: 15px; line-height: 1.5;">' . e(__('we heard that you want to reset your password :( dont worry i got u, here is your link')) . '</p>
-                <div style="text-align: center; margin: 30px 0;">
-                    <a href="' . $url . '" style="background-color: #2d5a27; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block; font-size: 15px;">' . e(__('reset password')) . '</a>
-                </div>
-                <p style="color: #666; font-size: 14px;">' . e(__('this link will die in 60 minutes, be quick !')) . '</p>
-                <p style="color: #666; font-size: 14px;">' . e(__('if u didnt request this link, just ignore it :p')) . '</p>
-                <p style="color: #2d5a27; font-size: 14px; margin-top: 25px; white-space: pre-line; font-weight: bold;">' . e(__('with love,\nBookie Team')) . '</p>
-                <hr style="border: none; border-top: 1px solid #eee; margin: 25px 0;">
-                <p style="color: #999; font-size: 12px; word-break: break-all;">
-                    ' . e(__('If you\'re having trouble clicking the "reset password" button, copy and paste the URL below into your web browser:')) . '<br>
-                    <a href="' . $url . '" style="color: #2d5a27;">' . $url . '</a>
-                </p>
-            </div>
-        </div>';
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        </head>
+        <body style="margin: 0; padding: 0; background-color: #c2e2a3; font-family: -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, Helvetica, Arial, sans-serif;">
+            <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #c2e2a3; padding: 40px 15px;">
+                <tr>
+                    <td align="center">
+                        <!-- Logo -->
+                        <div style="margin-bottom: 25px; text-align: center;">
+                            <span style="font-family: Georgia, serif; font-size: 42px; font-weight: bold; color: #2d5a27; letter-spacing: -1px;">B<span style="font-style: italic;">oo</span>kie</span>
+                        </div>
+
+                        <!-- Card -->
+                        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 570px; background-color: #ffffff; border-radius: 4px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); padding: 40px 35px; text-align: left;">
+                            <tr>
+                                <td>
+                                    <h2 style="font-size: 19px; font-weight: bold; color: #1f2937; margin-top: 0; margin-bottom: 20px;">' . e(__('haiii !!')) . '</h2>
+                                    
+                                    <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 25px;">' . e(__('we heard that you want to reset your password :( dont worry i got u, here is your link')) . '</p>
+
+                                    <!-- Buton -->
+                                    <div style="text-align: center; margin: 30px 0;">
+                                        <a href="' . $url . '" style="background-color: #24292f; color: #ffffff; padding: 12px 28px; text-decoration: none; border-radius: 6px; font-size: 14px; font-weight: 600; display: inline-block; letter-spacing: 0.3px;">' . e(__('reset password')) . '</a>
+                                    </div>
+
+                                    <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 12px;">' . e(__('this link will die in 60 minutes, be quick !')) . '</p>
+                                    <p style="font-size: 15px; color: #4b5563; line-height: 1.6; margin-bottom: 25px;">' . e(__('if u didnt request this link, just ignore it :p')) . '</p>
+
+                                    <p style="font-size: 15px; color: #4b5563; line-height: 1.5; margin-bottom: 30px;">' . nl2br(e(__('with love,\nBookie Team'))) . '</p>
+
+                                    <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0 20px 0;">
+
+                                    <!-- Alt Bilgi -->
+                                    <p style="font-size: 12px; color: #6b7280; line-height: 1.5; margin: 0; word-break: break-all;">
+                                        ' . e(__('If you\'re having trouble clicking the "reset password" button, copy and paste the URL below into your web browser:')) . '<br>
+                                        <a href="' . $url . '" style="color: #2563eb; text-decoration: underline;">' . $url . '</a>
+                                    </p>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>';
 
         $response = Http::withHeaders([
             'api-key' => env('BREVO_KEY'),
