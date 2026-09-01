@@ -48,7 +48,7 @@ Route::get('/api/search-users', function (Request $request) {
             return [
                 "id"        => $targetUser->id,
                 "username"  => $targetUser->username,
-                "avatar"    => $targetUser->avatar, // <-- İŞTE EKSİK OLAN SATIR
+                "avatar"    => $targetUser->avatar,
                 "status"    => $status,
                 "is_sender" => $friendship ? ($friendship->user_id == $authId) : false,
             ];
@@ -92,8 +92,8 @@ Route::post('/forgotpassword', function (Request $request) {
     $status = Password::sendResetLink($request->only('email'));
 
     return $status === Password::RESET_LINK_SENT
-    ? back()->with('status', __('check your email !!(its probably in the junk folder)'))
-    : back()->withErrors(['email' => __($status)]);
+        ? back()->with('status', __('check your email !!(its probably in the junk folder)'))
+        : back()->withErrors(['email' => __($status)]);
 })->name('password.email');
 
 Route::get('/reset-password/{token}', function (string $token) {
@@ -122,7 +122,7 @@ Route::post('/reset-password', function (Request $request) {
 
 /*
 |--------------------------------------------------------------------------
-| Kimlik Doğrulaması Gerektiren Rotalar (Auth Middleware)
+| Kimlik Doğrulaması Gerektiren Sayfalar (HTML Döndürenler)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
@@ -137,14 +137,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
     Route::post('/profile/books/bulk-remove', [ProfileController::class, 'bulkRemoveBooks'])->name('profile.books.bulkRemove');
 
-    Route::get('/messages/friends', [MessageController::class, 'getFriends']);
-    Route::get('/messages/unread-count', [MessageController::class, 'getUnreadCount']);
-    Route::get('/messages/{friendId}', [MessageController::class, 'getMessages']);
-    Route::post('/messages/send', [MessageController::class, 'sendMessage']);
-
-
     Route::get('/ayarlar', [ProfileController::class, 'settings'])->name('ayarlar');
-    Route::post('/ayarlar', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::post('/ayarlar', [ProfileController::class, 'updateProfile'])->name('profile.settings.update');
     Route::get('/profile/{id?}', [ProfileController::class, 'show'])->name('profile');
 
     Route::post("/friends/{id}/request", function ($id) {
@@ -160,7 +154,6 @@ Route::middleware(['auth'])->group(function () {
         })->first();
 
         if ($existing) {
-            // İstek pending aşamasındaysa ve biz atmışsak isteği iptal et
             if ($existing->status === 'pending' && $existing->user_id === $authId) {
                 $existing->delete();
             }
@@ -176,148 +169,174 @@ Route::middleware(['auth'])->group(function () {
     })->name('friends.request');
 
     Route::post('/friends/{id}/accept', function ($id) {
-    $authId = auth()->id();
-    $targetId = (int)$id;
+        $authId = auth()->id();
+        $targetId = (int)$id;
 
-    \App\Models\friendship::where(function($q) use ($authId, $targetId) {
-        $q->where('user_id', $targetId)->where('friend_id', $authId);
-    })->orWhere(function($q) use ($authId, $targetId) {
-        $q->where('user_id', $authId)->where('friend_id', $targetId);
-    })->update(['status' => 'accepted']);
+        \App\Models\friendship::where(function($q) use ($authId, $targetId) {
+            $q->where('user_id', $targetId)->where('friend_id', $authId);
+        })->orWhere(function($q) use ($authId, $targetId) {
+            $q->where('user_id', $authId)->where('friend_id', $targetId);
+        })->update(['status' => 'accepted']);
 
-    $sender = \App\Models\User::find($targetId);
-    $currentUser = auth()->user();
+        $sender = \App\Models\User::find($targetId);
+        $currentUser = auth()->user();
 
-    if ($sender) {
-        $sender->notify(new \App\Notifications\FriendRequestAccepted($currentUser));
-    }
-
-    \Illuminate\Support\Facades\DB::table('notifications')->insert([
-        'id' => (string) \Illuminate\Support\Str::uuid(),
-        'type' => 'App\Notifications\FriendRequestAcceptedSelf',
-        'notifiable_type' => 'App\Models\User',
-        'notifiable_id' => $authId,
-        'data' => json_encode([
-            'type' => 'accepted_self',
-            'sender_id' => $sender->id ?? $targetId,
-            'sender_name' => $sender->name ?? $sender->username ?? 'Kullanıcı',
-            'message' => 'arkadaşlık isteğini kabul ettin. Artık arkadaşsınız!',
-        ]),
-        'read_at' => now(),
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Accepted'
-    ]);
-})->name("friends.accept");
-
-Route::post('/friends/{id}/reject', function ($id) {
-    $authId = auth()->id();
-    $targetId = (int)$id;
-
-    $deleted = Friendship::where('user_id', $targetId)
-        ->where('friend_id', $authId)
-        ->where('status', 'pending')
-        ->delete();
-
-    if ($deleted) {
-        $sender = User::find($targetId);
         if ($sender) {
-            $sender->notify(new FriendRequestRejected(auth()->user()));
+            $sender->notify(new \App\Notifications\FriendRequestAccepted($currentUser));
         }
-    }
 
-    if (request()->ajax() || request()->wantsJson()) {
-        return response()->json(['success' => true]);
-    }
+        \Illuminate\Support\Facades\DB::table('notifications')->insert([
+            'id' => (string) \Illuminate\Support\Str::uuid(),
+            'type' => 'App\Notifications\FriendRequestAcceptedSelf',
+            'notifiable_type' => 'App\Models\User',
+            'notifiable_id' => $authId,
+            'data' => json_encode([
+                'type' => 'accepted_self',
+                'sender_id' => $sender->id ?? $targetId,
+                'sender_name' => $sender->name ?? $sender->username ?? 'Kullanıcı',
+                'message' => 'arkadaşlık isteğini kabul ettin. Artık arkadaşsınız!',
+            ]),
+            'read_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
 
-    return back();
-})->name("friends.reject");
+        return response()->json([
+            'success' => true,
+            'message' => 'Accepted'
+        ]);
+    })->name("friends.accept");
 
-Route::post('/friends/{id}/remove', function ($id) {
-    $authId = auth()->id();
-    $targetId = (int)$id;
+    Route::post('/friends/{id}/reject', function ($id) {
+        $authId = auth()->id();
+        $targetId = (int)$id;
 
-    friendship::where(function($q) use ($authId, $targetId) {
-        $q->where('user_id', $authId)->where('friend_id', $targetId);
-    })->orWhere(function($q) use ($authId, $targetId) {
-        $q->where('user_id', $targetId)->where('friend_id', $authId);
-    })->delete();
+        $deleted = Friendship::where('user_id', $targetId)
+            ->where('friend_id', $authId)
+            ->where('status', 'pending')
+            ->delete();
 
-    if (request()->ajax() || request()->wantsJson()) {
-        return response()->json(['success' => true]);
-    }
+        if ($deleted) {
+            $sender = User::find($targetId);
+            if ($sender) {
+                $sender->notify(new FriendRequestRejected(auth()->user()));
+            }
+        }
 
-    return back();
-})->name("friends.remove");
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back();
+    })->name("friends.reject");
+
+    Route::post('/friends/{id}/remove', function ($id) {
+        $authId = auth()->id();
+        $targetId = (int)$id;
+
+        friendship::where(function($q) use ($authId, $targetId) {
+            $q->where('user_id', $authId)->where('friend_id', $targetId);
+        })->orWhere(function($q) use ($authId, $targetId) {
+            $q->where('user_id', $targetId)->where('friend_id', $authId);
+        })->delete();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back();
+    })->name("friends.remove");
+
     Route::get('/adminRecommendation', [AdminRecommendationController::class, "index"])->name('adminRecommendation');
     Route::post('/adminRecommendation', [AdminRecommendationController::class, "store"])->name('adminRecommendation.store');
 });
 
-
-Route::post('/notifications/mark-as-read', function () {
-    try {
-        $userId = auth()->id();
-
-        if ($userId) {
-            DB::table('notifications')
-                ->where('notifiable_id', $userId)
-                ->whereNull('read_at')
-                ->update(['read_at' => now()]);
+/*
+|--------------------------------------------------------------------------
+| ARKA PLAN / AJAX ROTALARI (Session Previous URL'yi ASLA Ezmez)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    // Mesajlaşma arka plan rotaları
+    Route::get('/messages/friends', function (Request $request) {
+        // Son geçerli sayfayı session'da koru
+        if ($request->headers->has('referer')) {
+            session()->setPreviousUrl($request->headers->get('referer'));
         }
+        return app(MessageController::class)->getFriends();
+    });
 
-        return response()->json(['success' => true]);
-    } catch (\Throwable $e) {
+    Route::get('/messages/unread-count', function (Request $request) {
+        if ($request->headers->has('referer')) {
+            session()->setPreviousUrl($request->headers->get('referer'));
+        }
+        return app(MessageController::class)->getUnreadCount();
+    });
+
+    Route::get('/messages/{friendId}', [MessageController::class, 'getMessages']);
+    Route::post('/messages/send', [MessageController::class, 'sendMessage']);
+
+    // Bildirimler
+    Route::get("/notifications/unread-count", function (Request $request) {
+        if ($request->headers->has('referer')) {
+            session()->setPreviousUrl($request->headers->get('referer'));
+        }
+        $user = auth()->user();
+        $pendingList = $user->pendingFriendRequests()->with('sender')->get();
+        $notifications = $user->notifications;
+        $totalCount = $pendingList->count() + $user->unreadNotifications()->count();
+
+        $html = view("partials.notifications-items", compact("pendingList", "notifications", "totalCount"))->render();
+
         return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-})->name('notifications.markRead');
+            "total" => $totalCount,
+            "has_unread" => $totalCount > 0,
+            "html" => $html
+        ]);
+    })->name("notifications.unreadCount");
 
-Route::post("/notifications/clear-all", function() {
-    auth()->user()->notifications()->delete();
-    return response()->json(["success" => true]);
-})->name("notifications.clearAll");
+    Route::post('/notifications/mark-as-read', function () {
+        try {
+            $userId = auth()->id();
+            if ($userId) {
+                DB::table('notifications')
+                    ->where('notifiable_id', $userId)
+                    ->whereNull('read_at')
+                    ->update(['read_at' => now()]);
+            }
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            return response()->json(['success' => false, 'error' => $e->getMessage()], 500);
+        }
+    })->name('notifications.markRead');
 
-Route::get("/notifications/unread-count", function() {
-    $user = auth()->user();
-    $pendingList = $user->pendingFriendRequests()->with('sender')->get();
-    $notifications = $user->notifications;
-    $totalCount = $pendingList->count() + $user->unreadNotifications()->count();
-
-    $html = view("partials.notifications-items", compact("pendingList", "notifications", "totalCount"))->render();
-
-    return response()->json([
-        "total" => $totalCount,
-        "has_unread" => $totalCount > 0,
-        "html" => $html
-    ]);
-})->middleware("auth")->name("notifications.unreadCount");
+    Route::post("/notifications/clear-all", function() {
+        auth()->user()->notifications()->delete();
+        return response()->json(["success" => true]);
+    })->name("notifications.clearAll");
+});
 
 Route::get('/api/random-book-recommendation', [BookController::class, 'getRandomRecommendation']);
+
 Route::get('/fix-render', function () {
-    // 1. Storage linkini oluşturur
     \Illuminate\Support\Facades\Artisan::call('storage:link');
-    
-    // 2. Cache'i temizler ki backend eksik kapakları diske tekrar indirsin
     \Illuminate\Support\Facades\Cache::flush();
-    
     return 'Bağlantılar ve önbellek yenilendi! Sayfayı yenileyebilirsin.';
 });
-Route::get('/lang/{locale}', function (\Illuminate\Http\Request $request, $locale) {
+
+/*
+|--------------------------------------------------------------------------
+| Dil Değiştirici (Tamamen Güvenli Referer Koruması)
+|--------------------------------------------------------------------------
+*/
+Route::get('/lang/{locale}', function (Request $request, $locale) {
     if (in_array($locale, ['tr', 'en'])) {
         session()->put('locale', $locale);
         app()->setLocale($locale);
     }
 
-    // Tarayıcının gerçekte bulunduğu sayfanın URL'si
     $referer = $request->headers->get('referer');
 
-    // Eğer referer yoksa veya mesaj/api/unread/notification endpoint'i içeriyorsa güvenli sayfaya dön
     if (
         !$referer ||
         str_contains($referer, '/messages/') ||
