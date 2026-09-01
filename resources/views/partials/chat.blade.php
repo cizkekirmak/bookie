@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
-    // --- SES MOTORU (GARANTİLİ TAZE ÇALMA) ---
+    // --- SES TANIMLARI & AYARLARI ---
     const SOUND_URLS = {
         closed: "{{ asset('sounds/yeni-mesaj.mp3') }}",
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
@@ -406,7 +406,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isDragging = false;
     let shiftX, shiftY;
     let lastLoadedMessagesCount = 0;
-    let isFirstLoadForActiveFriend = false;
+    let isInitialChatLoad = false; // Sohbet açılırken mesaj sesini kilitleyen bayrak
     let lastUnreadTotal = 0;
     let pollInterval = null;
 
@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const isSelected = (activeFriendId === friend.id);
                 item.className = `chat-friend-item ${isSelected ? 'active' : ''}`;
                 
-                // Seçili arkadaşta nokta asla gösterilmez
+                // Seçili arkadaşta nokta gösterilmez
                 const showBadge = (!isSelected && friend.unread_count > 0);
                 const badgeHtml = showBadge ? '<span class="chat-friend-dot"></span>' : '';
 
@@ -498,6 +498,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 item.addEventListener('click', () => selectFriend(friend));
                 friendsList.appendChild(item);
             });
+
+            // Bildirim geldiğinde chati açınca mesajı olan kişiyi doğrudan açar (gecikmeyi önler)
+            if (!activeFriendId && friends.length > 0) {
+                const unreadFriend = friends.find(f => f.unread_count > 0);
+                if (unreadFriend) {
+                    selectFriend(unreadFriend);
+                }
+            }
         } catch (e) {
             console.error('Arkadaş listesi yüklenemedi:', e);
         }
@@ -506,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
-        isFirstLoadForActiveFriend = true;
+        isInitialChatLoad = true; // Odaya ilk girişteki yüklemede ses çalmayı kesin engelle
         
         headerPlaceholder.style.display = 'none';
         headerUser.style.display = 'flex';
@@ -523,6 +531,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loadFriends();
         await loadMessages(true);
+
+        // Odaya giriş mesajları çizildikten kısa süre sonra ses kilidini kaldır
+        setTimeout(() => {
+            isInitialChatLoad = false;
+        }, 600);
+
         startPolling();
         checkUnread();
     }
@@ -535,14 +549,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const messages = await res.json();
 
-            // İlk açılış değilse ve yeni mesaj geldiyse sohbet içi ses çal
-            if (!isFirstLoadForActiveFriend && lastLoadedMessagesCount > 0 && messages.length > lastLoadedMessagesCount) {
+            // YALNIZCA oda açıkken canlı gelen yeni mesajlarda ses çal (ilk girişte asla çalmaz)
+            if (!isInitialChatLoad && lastLoadedMessagesCount > 0 && messages.length > lastLoadedMessagesCount) {
                 const newestMessage = messages[messages.length - 1];
                 if (!newestMessage.is_mine) {
                     playSound('inChat');
                 }
             }
-            isFirstLoadForActiveFriend = false;
 
             if (messages.length === lastLoadedMessagesCount && !forceScroll) {
                 return;
@@ -610,7 +623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             if (res.ok) {
-                playSound('inChat'); // Gönderilince ses anında tetiklenir
+                playSound('inChat'); // Mesaj atıldığında anında ses çal
                 messageInput.value = '';
                 stickerPicker.style.display = 'none';
                 await loadMessages(true);
@@ -654,13 +667,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 unreadDot.style.display = (currentCount > 0) ? 'block' : 'none';
             }
 
-            // 2. BİLDİRİM SESİ: Chat kapalıyken mesaj arttıysa doğrudan çal
+            // 2. BİLDİRİM SESİ: Yalnızca chat kutusu kapalıyken mesaj sayısı arttıysa çal
             if (!isPopupOpen && currentCount > lastUnreadTotal) {
                 playSound('closed');
             }
             lastUnreadTotal = currentCount;
 
-            // 3. Popup açıksa listeyi ve aktif odayı tazele
+            // 3. Chat açıksa arkadaş listesini ve konuşmayı yenile
             if (isPopupOpen) {
                 loadFriends();
                 if (activeFriendId) {
