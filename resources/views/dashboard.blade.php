@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="referrer" content="no-referrer">
     <title>Bookie - Dashboard</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,6 +72,7 @@
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
             user-select: none;
             z-index: 10001;
+            text-decoration: none;
         }
 
         .header-search-wrap {
@@ -128,7 +128,7 @@
             display: none !important;
         }
 
-        /* ANA GÖVDE: Masaüstü (2x2 Orijinal Düzen) */
+        /* ANA GÖVDE */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -188,9 +188,7 @@
             object-fit: cover !important;
         }
 
-        /* ==========================================================================
-           TELEFON / MOBİL UYARLAMA
-           ========================================================================== */
+        /* MOBİL UYARLAMA */
         @media (max-width: 768px) {
             body {
                 overflow-x: hidden !important;
@@ -214,10 +212,11 @@
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
+                position: relative !important;
             }
 
             .header-logo {
-                font-size: 28px !important;
+                font-size: 26px !important;
                 margin-top: 0 !important;
                 flex-shrink: 0 !important;
             }
@@ -227,7 +226,8 @@
             }
 
             .header-search-wrap {
-                position: static !important;
+                position: relative !important;
+                left: auto !important;
                 transform: none !important;
                 flex: 1 !important;
                 max-width: none !important;
@@ -252,6 +252,16 @@
                 font-size: 14px !important;
                 display: block !important;
                 width: 100% !important;
+            }
+
+            #searchResultsDropdown {
+                position: fixed !important;
+                top: 70px !important;
+                left: 10px !important;
+                right: 10px !important;
+                width: calc(100vw - 20px) !important;
+                max-height: 60vh !important;
+                z-index: 1000005 !important;
             }
 
             .mobile-menu-trigger {
@@ -317,7 +327,6 @@
                 display: none !important;
             }
 
-            /* ANA ALAN: Mobilde tam ortalanmış ve kenarlardan eşit */
             .app-container {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -370,7 +379,6 @@
                 min-width: 0 !important;
             }
 
-            /* ÇEKMECE: Mobilde en alta kadar uzanır, boşluk kalmaz */
             .right-sidebar-panel {
                 position: fixed !important;
                 top: 0 !important;
@@ -446,16 +454,16 @@
     <header class="site-header-outer">
         <div class="site-header-inner">
             
-            <div class="header-logo">
+            <a href="{{ route('dashboard') }}" class="header-logo">
                 Bookie
-            </div>
+            </a>
 
             <div class="header-search-wrap">
-                <div class="header-search-bar-box" onclick="document.getElementById('bookSearchInput').focus();">
-                    <img src="{{ asset('images/yıldız.png') }}" alt="Search" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
-                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="off">
+                <div class="header-search-bar-box" id="searchBarBox">
+                    <img src="{{ asset('images/yıldız.png') }}" id="searchStarBtn" alt="Search" style="width: 30px; height: 30px; object-fit: contain; flex-shrink: 0; cursor: pointer;">
+                    <input type="text" id="bookSearchInput" placeholder="what are you looking for?" autocomplete="off" enterkeyhint="search">
                 </div>
-                <div id="searchResultsDropdown" style="display: none; position: absolute; top: 52px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 100010;"></div>
+                <div id="searchResultsDropdown" style="display: none; position: absolute; top: 54px; left: 0; width: 100%; max-height: 320px; overflow-y: auto; background: #ffffff; border: 1.5px solid #2d5a27; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.25); z-index: 100010;"></div>
             </div>
             
             <div class="header-desktop-actions">
@@ -512,7 +520,7 @@
         {{-- SOL PANEL --}}
         <div class="left-content-area">
             
-            {{-- 1. ÜST SATIR (Masaüstü: Continue & Popular Books) --}}
+            {{-- 1. ÜST SATIR --}}
             <div class="dashboard-row-equal">
                 <div class="item-continue" style="flex-shrink: 0;">
                     @include('partials.continue-reading')
@@ -527,7 +535,7 @@
                 <div class="equal-spacer"></div>
             </div>
 
-            {{-- 2. ALT SATIR (Masaüstü: Admin & Cat) --}}
+            {{-- 2. ALT SATIR --}}
             <div class="dashboard-row-equal">
                 <div class="item-admin" style="flex-shrink: 0;">
                     @include('partials.adminRecommendation')
@@ -705,14 +713,16 @@
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
         }
 
-        // KİTAP ARAMA (LOAD MORE & ORİJİNAL ÇALIŞAN HALİ)
+        // KİTAP ARAMA SİSTEMİ (MOBİL VE MASAÜSTÜ TAM DESTEKLİ)
         const input = document.getElementById('bookSearchInput');
+        const searchStarBtn = document.getElementById('searchStarBtn');
         const dropdown = document.getElementById('searchResultsDropdown');
 
         if (input && dropdown) {
             let allSearchResults = [];
             let displayedCount = 0;
             const PAGE_SIZE = 6;
+            let searchDebounceTimer;
 
             function renderNextBooks() {
                 const oldBtn = document.getElementById('searchLoadMoreContainer');
@@ -747,32 +757,56 @@
                 }
             }
 
-            input.addEventListener('keydown', async function (e) {
+            async function performBookSearch() {
+                const q = input.value.trim();
+                if (q.length < 2) {
+                    dropdown.style.display = 'none';
+                    dropdown.innerHTML = '';
+                    return;
+                }
+
+                dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Aranıyor... 🌱</div>';
+                dropdown.style.display = 'block';
+
+                try {
+                    const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
+                    const data = await res.json();
+                    const books = Array.isArray(data) ? data : (data.items || []);
+
+                    if (!books || books.length === 0) {
+                        dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Sonuç bulunamadı.</div>';
+                        return;
+                    }
+                    dropdown.innerHTML = '';
+                    allSearchResults = books;
+                    displayedCount = 0;
+                    renderNextBooks();
+                } catch (err) {
+                    dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: red; text-align: center;">Arama sırasında hata oluştu.</div>';
+                }
+            }
+
+            // Mobilde hem Enter hem yıldız ikonu hem de yazma dinleyicisi
+            input.addEventListener('keydown', function (e) {
                 if (e.key === 'Enter') {
                     e.preventDefault();
-                    const q = input.value.trim();
-                    if (q.length < 2) return;
-
-                    dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Aranıyor... 🌱</div>';
-                    dropdown.style.display = 'block';
-                    try {
-                        const res = await fetch(`/api/search-books?q=${encodeURIComponent(q)}`);
-                        const data = await res.json();
-                        const books = Array.isArray(data) ? data : (data.items || []);
-
-                        if (!books || books.length === 0) {
-                            dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: #666; text-align: center;">Sonuç bulunamadı.</div>';
-                            return;
-                        }
-                        dropdown.innerHTML = '';
-                        allSearchResults = books;
-                        displayedCount = 0;
-                        renderNextBooks();
-                    } catch (err) {
-                        dropdown.innerHTML = '<div style="padding: 12px; font-family: \'Unkempt\', cursive; color: red; text-align: center;">Arama sırasında hata oluştu.</div>';
-                    }
+                    clearTimeout(searchDebounceTimer);
+                    performBookSearch();
+                    input.blur();
                 }
             });
+
+            input.addEventListener('input', function () {
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = setTimeout(performBookSearch, 450);
+            });
+
+            if (searchStarBtn) {
+                searchStarBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    performBookSearch();
+                });
+            }
 
             document.addEventListener('click', function (e) {
                 if (!input.contains(e.target) && !dropdown.contains(e.target)) {
@@ -829,17 +863,15 @@
                             }
 
                             let userAvatarSrc = defaultAvatar;
-                            if (user.avatar) {
-                                userAvatarSrc = user.avatar.startsWith('http') || user.avatar.startsWith('data:') 
-                                    ? user.avatar 
-                                    : `/storage/${user.avatar.replace(/^(\/)?(storage\/)?/, '')}`;
+                            if (user.avatar && user.avatar.startsWith('http')) {
+                                userAvatarSrc = user.avatar;
                             }
 
                             return `
                                 <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
                                     <div style="display: flex; align-items: center; gap: 10px;">
                                         <div style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
-                                            <img src="${userAvatarSrc}" alt="${user.username}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
+                                            <img src="${userAvatarSrc}" alt="${user.username}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
                                         </div>
                                         <div style="font-size: 14px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
                                             @${user.username}
