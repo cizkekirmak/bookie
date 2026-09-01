@@ -635,8 +635,12 @@
                         ->take(10)
                         ->get();
 
-                    $ratingColors = [
-                        1 => '#d9534f', 2 => '#f0ad4e', 3 => '#ffd700', 4 => '#5cb85c', 5 => '#2e7d32',
+                    $ratingColors = [     
+                        1 => '#d43b82',
+                        2 => '#e67e22',
+                        3 => '#fee16c',
+                        4 => '#8dd04e',
+                        5 => '#3a91bc'
                     ];
                 @endphp
 
