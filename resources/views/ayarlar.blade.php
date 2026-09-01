@@ -115,8 +115,8 @@
 
         /* ÇERÇEVESİZ LOGO/İKON (DASHBOARD BUTONU) */
         .header-icon-raw {
-            width: 52px;
-            height: 52px;
+            width: 70px;
+            height: 70px;
             object-fit: contain;
             border: none !important;
             outline: none !important;
