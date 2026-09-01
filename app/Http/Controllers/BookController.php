@@ -318,7 +318,120 @@ class BookController extends Controller
 
         return response()->json(['page_count' => $pageCount ? (int)$pageCount : null]);
     }
+    public function searchApi(Request $request)
+    {
+        $rawQuery = trim($request->get('q', ''));
 
+        if (mb_strlen($rawQuery) < 2) {
+            return response()->json([]);
+        }
+
+        // Cache kontrolü
+        $cacheKey = 'search_v2_' . md5(mb_strtolower($rawQuery, 'UTF-8'));
+        if (Cache::has($cacheKey)) {
+            $cached = Cache::get($cacheKey);
+            if (!empty($cached)) {
+                return response()->json($cached);
+            }
+        }
+
+        // 1. Google Books ve Open Library'den temiz arama
+        $googleResults = $this->searchGoogleBooks($rawQuery);
+        $openLibResults = $this->searchOpenLibrary($rawQuery);
+
+        // 2. Kendi DB'mizden hızlı eşleşmeler
+        $localBooks = Book::where('title', 'LIKE', "%{$rawQuery}%")
+            ->orWhere('author', 'LIKE', "%{$rawQuery}%")
+            ->whereNotNull('cover_image')
+            ->limit(3)
+            ->get()
+            ->map(function ($b) {
+                return [
+                    'id'      => $b->google_book_id ?? ($b->open_library_key ?? (string)$b->id),
+                    'title'   => $b->title,
+                    'authors' => $b->author,
+                    'cover'   => $b->cover_image,
+                ];
+            })->toArray();
+
+        // 3. Sonuçları birleştir ve tekrarları temizle
+        $merged = array_merge($localBooks, $googleResults, $openLibResults);
+        $results = [];
+        $seen = [];
+
+        foreach ($merged as $item) {
+            $key = mb_strtolower(trim($item['title']), 'UTF-8');
+            if (!isset($seen[$key])) {
+                $seen[$key] = true;
+                $results[] = $item;
+            }
+            if (count($results) >= 10) break;
+        }
+
+        if (!empty($results)) {
+            foreach ($results as $book) {
+                Cache::put('book_meta_' . $book['id'], [
+                    'title'       => $book['title'],
+                    'authors'     => $book['authors'],
+                    'coverUrl'    => $book['cover'],
+                    'description' => 'No description available.',
+                ], 604800);
+            }
+            Cache::put($cacheKey, $results, now()->addHours(24));
+        }
+
+        return response()->json($results);
+    }
+
+    private function searchGoogleBooks(string $query): array
+    {
+        try {
+            $params = [
+                'q'          => $query,
+                'maxResults' => 15,
+                'printType'  => 'books',
+            ];
+
+            if (!empty($this->googleApiKey)) {
+                $params['key'] = $this->googleApiKey;
+            }
+
+            $response = Http::withoutVerifying()
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->timeout(4)
+                ->get('https://www.googleapis.com/books/v1/volumes', $params);
+
+            if (!$response->successful()) {
+                return [];
+            }
+
+            $items = $response->json('items') ?? [];
+            $results = [];
+
+            foreach ($items as $item) {
+                $info = $item['volumeInfo'] ?? [];
+                
+                $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
+                if (empty($rawCover) || empty($info['title'])) {
+                    continue;
+                }
+
+                $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover);
+                $authors = isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : __('Unknown Author');
+
+                $results[] = [
+                    'id'      => $item['id'],
+                    'title'   => $info['title'],
+                    'authors' => $authors,
+                    'cover'   => $cover,
+                ];
+            }
+
+            return $results;
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
     
 
     private function searchOpenLibrary(string $query): array
