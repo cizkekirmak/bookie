@@ -25,7 +25,6 @@ class BookController extends Controller
             return null;
         }
 
-        // Zaten Cloudinary üzerindeyse tekrar yükleme
         if (str_contains($url, 'res.cloudinary.com')) {
             return $url;
         }
@@ -38,7 +37,6 @@ class BookController extends Controller
         $folder    = 'bookie_covers';
         $publicId  = 'cover_' . preg_replace('/[^A-Za-z0-9_\-]/', '_', $key);
 
-        // İmza üretimi (Parametreler alfabetik sırada olmalı)
         $paramsToSign = "folder={$folder}&public_id={$publicId}&timestamp={$timestamp}";
         $signature    = sha1($paramsToSign . $apiSecret);
 
@@ -54,8 +52,6 @@ class BookController extends Controller
 
             if ($response->successful()) {
                 return $response->json('secure_url');
-            } else {
-                Log::warning('Cloudinary kapak API yanıt hatası: ' . $response->body());
             }
         } catch (\Throwable $e) {
             Log::warning('Cloudinary kapak yükleme hatası: ' . $e->getMessage());
@@ -178,28 +174,6 @@ class BookController extends Controller
             $authors = $book->author;
             $pageCount = $book->page_count;
 
-            if (empty($pageCount) && !empty($title) && $title !== 'Unknown book' && $title !== 'Unknown Title') {
-                try {
-                    $params = ['q' => 'intitle:' . $title, 'maxResults' => 1];
-                    if (!empty($this->googleApiKey)) {
-                        $params['key'] = $this->googleApiKey;
-                    }
-
-                    $gRes = Http::withoutVerifying()
-                        ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                        ->timeout(3)
-                        ->get('https://www.googleapis.com/books/v1/volumes', $params);
-
-                    if ($gRes->successful()) {
-                        $foundPages = $gRes->json('items.0.volumeInfo.pageCount');
-                        if ($foundPages) {
-                            $pageCount = (int)$foundPages;
-                            $book->update(['page_count' => $pageCount]);
-                        }
-                    }
-                } catch (\Throwable $e) {}
-            }
-
             $rawCover = $book->cover_image;
             if (!empty($rawCover) && !str_contains($rawCover, 'res.cloudinary.com')) {
                 $cachedPath = $this->getCachedCoverUrl($rawCover, $cleanKey);
@@ -258,69 +232,6 @@ class BookController extends Controller
         ));
     }
 
-    public function fetchPageCount($key)
-    {
-        $cleanKey = trim((string)$key);
-        $book = Book::where('open_library_key', $cleanKey)
-            ->orWhere('google_book_id', $cleanKey)
-            ->orWhere('id', is_numeric($cleanKey) ? (int)$cleanKey : 0)
-            ->first();
-
-        if ($book && $book->page_count > 0) {
-            return response()->json(['page_count' => $book->page_count]);
-        }
-
-        $pageCount = null;
-
-        if (str_contains($cleanKey, 'OL') || str_contains($cleanKey, '/works/')) {
-            try {
-                $pureWorkId = preg_replace('/^(OL_)+/', '', str_replace('/works/', '', $cleanKey));
-                if (!str_starts_with($pureWorkId, 'OL')) {
-                    $pureWorkId = 'OL' . $pureWorkId;
-                }
-
-                $res = Http::withHeaders(['User-Agent' => 'BookieApp/1.0'])
-                    ->withoutVerifying()
-                    ->timeout(3)
-                    ->get('https://openlibrary.org/search.json', [
-                        'q'     => 'key:/works/' . $pureWorkId,
-                        'limit' => 1
-                    ]);
-
-                if ($res->successful()) {
-                    $doc = $res->json('docs.0');
-                    $pageCount = $doc['number_of_pages_median'] ?? ($doc['number_of_pages'] ?? null);
-                }
-            } catch (\Throwable $e) {}
-        }
-
-        if (empty($pageCount)) {
-            try {
-                $title = $book->title ?? '';
-                $googleQuery = !empty($title) && $title !== 'Unknown book' ? 'intitle:' . $title : $cleanKey;
-                $params = ['q' => $googleQuery, 'maxResults' => 1];
-                if (!empty($this->googleApiKey)) {
-                    $params['key'] = $this->googleApiKey;
-                }
-
-                $res = Http::withOptions(['verify' => false, 'curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                    ->timeout(3)
-                    ->get('https://www.googleapis.com/books/v1/volumes', $params);
-
-                if ($res->successful()) {
-                    $items = $res->json('items');
-                    $pageCount = $items[0]['volumeInfo']['pageCount'] ?? null;
-                }
-            } catch (\Throwable $e) {}
-        }
-
-        if ($book && $pageCount) {
-            $book->update(['page_count' => (int)$pageCount]);
-        }
-
-        return response()->json(['page_count' => $pageCount ? (int)$pageCount : null]);
-    }
-
     public function searchApi(Request $request)
     {
         $query = trim($request->get('q', ''));
@@ -337,6 +248,7 @@ class BookController extends Controller
             }
         }
 
+        // 1. Yerel Veritabanı
         $localBooks = Book::where(function ($q) use ($query) {
                 $q->where('title', 'LIKE', "%{$query}%")
                   ->orWhere('author', 'LIKE', "%{$query}%");
@@ -353,6 +265,7 @@ class BookController extends Controller
                 ];
             })->toArray();
 
+        // 2. Dış API'ler
         $googleResults = $this->searchGoogleBooks($query);
         $openLibResults = $this->searchOpenLibrary($query);
 
@@ -369,7 +282,7 @@ class BookController extends Controller
 
         foreach ($merged as $item) {
             $titleLower = mb_strtolower($item['title'], 'UTF-8');
-            $authorLower = mb_strtolower($item['authors'], 'UTF-8');
+            $authorLower = mb_strtolower($item['authors'] ?? '', 'UTF-8');
 
             $isRelevant = false;
             foreach ($queryWords as $word) {
@@ -390,6 +303,7 @@ class BookController extends Controller
             }
         }
 
+        // Orijinal Sıralama Mantığı
         usort($filteredResults, function ($a, $b) use ($cleanQuery, $queryWords) {
             $tA = mb_strtolower($a['title'], 'UTF-8');
             $tB = mb_strtolower($b['title'], 'UTF-8');
@@ -491,7 +405,7 @@ class BookController extends Controller
         try {
             $response = Http::withoutVerifying()
                 ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BookieApp/1.0',
                     'Accept'     => 'application/json',
                 ])
                 ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
@@ -568,18 +482,10 @@ class BookController extends Controller
                 'title'            => $request->input('title'),
                 'author'           => $request->input('author') ?? 'Unknown Author',
                 'cover_image'      => $coverValue,
-                'page_count'       => $request->filled('page_count') ? (int)$request->input('page_count') : null,
             ]);
         } else {
-            $updates = [];
             if (empty($book->cover_image) && !empty($coverValue)) {
-                $updates['cover_image'] = $coverValue;
-            }
-            if ($request->filled('page_count') && empty($book->page_count)) {
-                $updates['page_count'] = (int)$request->input('page_count');
-            }
-            if (!empty($updates)) {
-                $book->update($updates);
+                $book->update(['cover_image' => $coverValue]);
             }
         }
 
@@ -594,10 +500,9 @@ class BookController extends Controller
                 'book_id' => $book->id,
             ],
             [
-                'status'       => $status,
-                'current_page' => $request->current_page ?? 0,
-                'rating'       => $request->filled('rating') ? (int)$request->rating : null,
-                'review'       => $request->filled('review') ? $request->review : null,
+                'status' => $status,
+                'rating' => $request->filled('rating') ? (int)$request->rating : null,
+                'review' => $request->filled('review') ? $request->review : null,
             ]
         );
 
@@ -608,7 +513,8 @@ class BookController extends Controller
     {
         return $this->store($request);
     }
-public function getRandomRecommendation(Request $request)
+
+    public function getRandomRecommendation(Request $request)
     {
         $genre = $request->query('genre', 'random');
 
@@ -626,7 +532,6 @@ public function getRandomRecommendation(Request $request)
         $searchTerm = $genreQueries[$genre] ?? 'fiction';
         $randomOffset = rand(0, 30);
 
-        // 1. ÖNCELİK: Google Books API (API Key + IPv4 Zorlaması ile)
         try {
             $params = [
                 'q'            => 'subject:"' . $searchTerm . '"',
@@ -661,7 +566,6 @@ public function getRandomRecommendation(Request $request)
                     $cover = $info['imageLinks']['thumbnail'] ?? $info['imageLinks']['smallThumbnail'];
                     $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $cover);
 
-                    // Başlık ve kapak meta verilerini cache'e yaz (show sayfasında hızlı açılsın)
                     Cache::put('book_meta_' . $chosen['id'], [
                         'title'       => $info['title'],
                         'authors'     => isset($info['authors']) ? implode(', ', $info['authors']) : 'Unknown Author',
@@ -683,59 +587,8 @@ public function getRandomRecommendation(Request $request)
                     ]);
                 }
             }
-        } catch (\Throwable $e) {
-            Log::warning('Google Books Random API hatası: ' . $e->getMessage());
-        }
+        } catch (\Throwable $e) {}
 
-        // 2. YEDEK: Open Library API
-        try {
-            $olSubject = str_replace(' ', '_', $searchTerm);
-            $openLibRes = Http::withoutVerifying()
-                ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BookieApp/1.0'])
-                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->timeout(3.5)
-                ->get("https://openlibrary.org/subjects/{$olSubject}.json", [
-                    'limit'  => 25,
-                    'offset' => rand(0, 4) * 20
-                ]);
-
-            if ($openLibRes->successful()) {
-                $works = $openLibRes->json('works', []);
-                $validWorks = array_values(array_filter($works, fn($w) => !empty($w['cover_id']) && !empty($w['title'])));
-
-                if (!empty($validWorks)) {
-                    $chosen = $validWorks[array_rand($validWorks)];
-                    $cleanId = str_replace(['/works/', '/books/'], '', $chosen['key'] ?? '');
-                    $bookKey = 'OL_' . $cleanId;
-                    $coverUrl = "https://covers.openlibrary.org/b/id/{$chosen['cover_id']}-M.jpg";
-                    $authorName = $chosen['authors'][0]['name'] ?? __('Unknown Author');
-
-                    Cache::put('book_meta_' . $bookKey, [
-                        'title'       => $chosen['title'],
-                        'authors'     => $authorName,
-                        'coverUrl'    => $coverUrl,
-                        'description' => 'No description available.',
-                        'pageCount'   => $chosen['number_of_pages_median'] ?? null,
-                    ], 604800);
-
-                    return response()->json([
-                        'success' => true,
-                        'book'    => [
-                            'id'         => $bookKey,
-                            'title'      => $chosen['title'],
-                            'author'     => $authorName,
-                            'cover'      => $coverUrl,
-                            'page_count' => $chosen['number_of_pages_median'] ?? null,
-                            'url'        => route('show', $bookKey),
-                        ]
-                    ]);
-                }
-            }
-        } catch (\Throwable $e) {
-            Log::warning('Open Library Random API hatası: ' . $e->getMessage());
-        }
-
-        // 3. SON ÇARE: Veritabanı
         $randomDbBook = Book::whereNotNull('cover_image')->inRandomOrder()->first();
         if ($randomDbBook) {
             return response()->json([
@@ -752,9 +605,5 @@ public function getRandomRecommendation(Request $request)
         }
 
         return response()->json(['success' => false], 404);
-    }
-    private function downloadCoverImage(?string $url, string $openLibraryKey): ?string
-    {
-        return $this->getCachedCoverUrl($url, $openLibraryKey);
     }
 }
