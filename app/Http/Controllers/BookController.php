@@ -515,7 +515,7 @@ class BookController extends Controller
         }
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
         $request->validate([
             'title'  => 'required|string',
@@ -545,10 +545,18 @@ class BookController extends Controller
                 'title'            => $request->input('title'),
                 'author'           => $request->input('author') ?? 'Unknown Author',
                 'cover_image'      => $coverValue,
+                'page_count'       => $request->filled('page_count') ? (int)$request->input('page_count') : null,
             ]);
         } else {
+            $updates = [];
             if (empty($book->cover_image) && !empty($coverValue)) {
-                $book->update(['cover_image' => $coverValue]);
+                $updates['cover_image'] = $coverValue;
+            }
+            if ($request->filled('page_count') && empty($book->page_count)) {
+                $updates['page_count'] = (int)$request->input('page_count');
+            }
+            if (!empty($updates)) {
+                $book->update($updates);
             }
         }
 
@@ -563,15 +571,18 @@ class BookController extends Controller
                 'book_id' => $book->id,
             ],
             [
-                'status' => $status,
-                'rating' => $request->filled('rating') ? (int)$request->rating : null,
-                'review' => $request->filled('review') ? $request->review : null,
+                'status'       => $status,
+                'current_page' => $request->current_page ?? 0,
+                'rating'       => $request->filled('rating') ? (int)$request->rating : null,
+                'review'       => $request->filled('review') ? $request->review : null,
             ]
         );
 
-        return back()->with('success', 'Kitap kütüphanene kaydedildi!');
+        // Hatalı 'return back()' yerine garanti kitap detay sayfasına yönlendirme:
+        $targetKey = $book->open_library_key ?? ($book->google_book_id ?? $book->id);
+        return redirect()->route('show', $targetKey)->with('success', 'Kitap kütüphanene kaydedildi!');
     }
-
+    
     public function saveOrUpdate(Request $request, $key)
     {
         return $this->store($request);
