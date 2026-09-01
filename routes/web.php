@@ -143,8 +143,8 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/ayarlar', [ProfileController::class, 'settings'])->name('ayarlar');
-    Route::post('/profile/update', [ProfileController::class, 'updateProfile'])->name('profile.update');
-    Route::get("/profile/{id?}", [ProfileController::class, "show"])->name('profile');
+    Route::post('/ayarlar', [ProfileController::class, 'updateProfile'])->name('profile.update');
+    Route::get('/profile/{id?}', [ProfileController::class, 'show'])->name('profile');
 
     Route::post("/friends/{id}/request", function ($id) {
         $authId = auth()->id();

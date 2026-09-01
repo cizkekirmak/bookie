@@ -4,12 +4,9 @@
             $sender = $req->sender ?? null;
             $defaultAvatar = asset('images/profile.jpg');
             
-            $avatarSrc = $defaultAvatar;
-            if (!empty($sender?->avatar)) {
-                $avatarSrc = str_starts_with($sender->avatar, 'http') 
-                    ? $sender->avatar 
-                    : asset('storage/' . $sender->avatar);
-            }
+            $avatarSrc = (!empty($sender?->avatar) && str_starts_with($sender->avatar, 'http'))
+                ? $sender->avatar
+                : $defaultAvatar;
         @endphp
 
         <div class="notification-item" style="display: flex; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #f0f4ec; align-items: flex-start;">
@@ -19,6 +16,7 @@
                style="width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;">
                 <img src="{{ $avatarSrc }}" 
                      alt="{{ $sender?->username ?? 'Profil' }}" 
+                     referrerpolicy="no-referrer"
                      style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                      onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
             </a>
@@ -50,12 +48,9 @@
             $notifUser = $senderId ? \App\Models\User::find($senderId) : null;
             $defaultAvatar = asset('images/profile.jpg');
             
-            $notifAvatarSrc = $defaultAvatar;
-            if (!empty($notifUser?->avatar)) {
-                $notifAvatarSrc = str_starts_with($notifUser->avatar, 'http')
-                    ? $notifUser->avatar
-                    : asset('storage/' . $notifUser->avatar);
-            }
+            $notifAvatarSrc = (!empty($notifUser?->avatar) && str_starts_with($notifUser->avatar, 'http'))
+                ? $notifUser->avatar
+                : $defaultAvatar;
 
             $bookKey = $notifData['google_book_id'] 
                 ?? $notifData['open_library_key'] 
@@ -79,6 +74,7 @@
                        style="display: block; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; background: #badfa0; cursor: pointer; text-decoration: none;">
                         <img src="{{ $notifAvatarSrc }}" 
                              alt="{{ $notifData['sender_name'] ?? 'Profil' }}" 
+                             referrerpolicy="no-referrer"
                              style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                              onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                     </a>
@@ -110,6 +106,7 @@
                    style="display: flex; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;">
                     <img src="{{ $notifAvatarSrc }}" 
                          alt="{{ $notifData['sender_name'] ?? 'Profil' }}" 
+                         referrerpolicy="no-referrer"
                          style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                          onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                 </a>

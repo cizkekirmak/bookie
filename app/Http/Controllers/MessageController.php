@@ -33,13 +33,9 @@ class MessageController extends Controller
                 ->where('is_read', false)
                 ->count();
 
-            // Avatar belirleme
-            if ($friend->avatar) {
-                if (str_starts_with($friend->avatar, 'http')) {
-                    $avatar = $friend->avatar;
-                } else {
-                    $avatar = asset('storage/' . ltrim($friend->avatar, '/'));
-                }
+            // Avatar belirleme (Cloudinary URL veya Varsayılan Görsel)
+            if ($friend->avatar && str_starts_with($friend->avatar, 'http')) {
+                $avatar = $friend->avatar;
             } else {
                 $avatar = asset('images/profile.jpg');
             }
@@ -60,6 +56,7 @@ class MessageController extends Controller
 
         return response()->json($data);
     }
+
     // 2. Mesaj Geçmişi
     public function getMessages($friendId)
     {

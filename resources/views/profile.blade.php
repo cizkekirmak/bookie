@@ -232,9 +232,7 @@
             display: none !important;
         }
 
-        /* ==========================================================================
-           TELEFON / MOBİL UYARLAMA
-           ========================================================================== */
+        /* TELEFON / MOBİL UYARLAMA */
         @media (max-width: 768px) {
             .site-header-outer {
                 height: 68px !important;
@@ -278,7 +276,6 @@
                 overflow-x: hidden !important;
             }
 
-            /* SAĞDAN AÇILAN ÇEKMECE */
             .profile-sidebar-panel {
                 position: fixed !important;
                 top: 0 !important;
@@ -329,7 +326,6 @@
                 display: none !important;
             }
 
-            /* SAĞDAKİ POST-IT BUTONU */
             .mobile-profile-tab {
                 display: flex !important;
                 align-items: center;
@@ -353,7 +349,6 @@
                 transform: rotate(-1.5deg);
             }
 
-            /* BEYAZ ALAN */
             .profile-main-content {
                 width: 100% !important;
                 max-width: 440px !important;
@@ -415,7 +410,7 @@
         </div>
     </header>
 
-    {{-- GÖVDE: Boxed Container --}}
+    {{-- GÖVDE --}}
     <div class="profile-container">
 
         {{-- SAĞDAN AÇILAN ÇEKMECE PANEL --}}
@@ -425,19 +420,12 @@
 
             @php
                 $defaultAvatar = asset('images/profile.jpg');
-                $userAvatar = $defaultAvatar;
-
-                if (!empty($user->avatar)) {
-                    if (str_starts_with($user->avatar, 'data:image') || str_starts_with($user->avatar, 'http')) {
-                        $userAvatar = $user->avatar;
-                    } else {
-                        $clean = ltrim($user->avatar, '/');
-                        $userAvatar = str_starts_with($clean, 'storage/') ? asset($clean) : asset('storage/' . $clean);
-                    }
-                }
+                $userAvatar = (!empty($user->avatar) && str_starts_with($user->avatar, 'http')) 
+                    ? $user->avatar 
+                    : $defaultAvatar;
             @endphp
 
-            {{-- Profil Fotoğrafı / Fide (Base64 + Storage + Fallback Destekli) --}}
+            {{-- Profil Fotoğrafı --}}
             <div style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #2d5a27; background: #eaf3e4; display: flex; justify-content: center; align-items: center; margin-bottom: 0; overflow: hidden; flex-shrink: 0;">
                 @if(!empty($user->avatar))
                     <img src="{{ $userAvatar }}" 
@@ -723,15 +711,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
             @forelse($friendsList as $friend)
                 @php
-                    $friendAvatarUrl = asset('images/profile.jpg');
-                    if (!empty($friend->avatar)) {
-                        if (str_starts_with($friend->avatar, 'data:image') || str_starts_with($friend->avatar, 'http')) {
-                            $friendAvatarUrl = $friend->avatar;
-                        } else {
-                            $cleanFriendAvatar = ltrim($friend->avatar, '/');
-                            $friendAvatarUrl = str_starts_with($cleanFriendAvatar, 'storage/') ? asset($cleanFriendAvatar) : asset('storage/' . $cleanFriendAvatar);
-                        }
-                    }
+                    $friendAvatarUrl = (!empty($friend->avatar) && str_starts_with($friend->avatar, 'http'))
+                        ? $friend->avatar
+                        : asset('images/profile.jpg');
                 @endphp
                 <div 
                     onclick="window.location.href='/profile/{{ $friend->id }}'" 
@@ -769,7 +751,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 font-size: 15px; 
                                 color: #1a3c11; 
                                 font-weight: bold; 
-                                font-family: 'Unkempt', cursive;
+                                font-family: 'Unkempt', cursive; 
                                 overflow: hidden;
                             "
                         >

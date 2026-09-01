@@ -31,7 +31,7 @@
             flex-direction: column;
         }
 
-        /* HEADER: Masaüstü (Birebir 76px Orijinal Boyut) */
+        /* HEADER: Masaüstü (76px) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -233,9 +233,7 @@
             border: 1px solid #f5c6cb;
         }
 
-        /* ==========================================================================
-           TELEFON / MOBİL UYARLAMA
-           ========================================================================== */
+        /* MOBİL UYARLAMA */
         @media (max-width: 768px) {
             .site-header-outer {
                 height: 68px !important;
@@ -347,16 +345,25 @@
                 </div>
             @endif
 
-            <form action="{{ route('ayarlar') }}" method="POST" enctype="multipart/form-data" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+            <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
                 @csrf
 
                 {{-- Avatar Önizleme --}}
+                @php
+                    $currentAvatar = auth()->user()->avatar;
+                    $defaultAvatar = asset('images/profile.jpg');
+                    $avatarSrc = (!empty($currentAvatar) && str_starts_with($currentAvatar, 'http'))
+                        ? $currentAvatar
+                        : $defaultAvatar;
+                @endphp
+
                 <div class="avatar-preview-wrap">
-                    @if(auth()->user()->avatar)
-                        <img id="avatar-preview" src="{{ asset('storage/' . auth()->user()->avatar) }}" alt="Avatar" class="avatar-preview-img">
-                    @else
-                        <img id="avatar-preview" src="{{ asset('images/profile.jpg') }}" alt="Avatar" class="avatar-preview-img">
-                    @endif
+                    <img id="avatar-preview" 
+                         src="{{ $avatarSrc }}" 
+                         alt="Avatar" 
+                         class="avatar-preview-img"
+                         referrerpolicy="no-referrer"
+                         onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                 </div>
 
                 {{-- Avatar Yükleme Butonu --}}
