@@ -24,6 +24,20 @@
     font-style: normal;
     font-display: swap;
 }
+
+  * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
         body { 
             font-family: "Mystery Quest" , system-ui;
             display: flex;

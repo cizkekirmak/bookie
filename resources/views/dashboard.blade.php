@@ -355,6 +355,20 @@
                 display: block !important;
             }
 
+            * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
+
             .left-content-area {
                 display: grid !important;
                 grid-template-columns: repeat(2, minmax(0, 1fr)) !important;

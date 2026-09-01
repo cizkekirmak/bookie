@@ -38,6 +38,19 @@
             background-repeat: no-repeat;
             position: relative;
         }
+          * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
 
         .dis-kapsayici {
             display: flex;

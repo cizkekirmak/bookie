@@ -13,22 +13,48 @@
 
     <style>
         @font-face {
-    font-family: 'Unkempt';
-    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+            font-family: 'Unkempt';
+            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'Henny Penny';
-    src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'Henny Penny';
+            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        /* TIKLANABİLİR ELEMANLARDA MAVİ VURGU VE METİN SEÇİMİNİ ENGELLE */
+        a,
+        button,
+        input,
+        label,
+        .radio-label,
+        .back-link,
+        .star-btn,
+        .review-submit-btn {
+            -webkit-tap-highlight-color: transparent !important;
+            -webkit-touch-callout: none !important;
+            outline: none !important;
+        }
+
+        button,
+        .back-link,
+        .radio-label,
+        .star-btn,
+        .star-rating-multi,
+        .review-submit-btn {
+            user-select: none !important;
+            -webkit-user-select: none !important;
         }
 
         body {

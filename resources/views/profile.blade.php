@@ -100,6 +100,19 @@
             overflow-x: hidden;
             font-family: 'Unkempt', cursive;
         }
+          * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
 
         /* HEADER: Masaüstü (76px) */
         .site-header-outer {

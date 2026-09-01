@@ -30,6 +30,20 @@
             box-sizing: border-box;
         }
 
+          * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
+
         html, body {
             margin: 0;
             padding: 0;

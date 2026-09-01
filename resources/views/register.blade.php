@@ -46,6 +46,20 @@
             align-items: center;
             gap: 0px;
         }
+
+          * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
+
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
         label {
             display: block;
             margin-bottom: -2px;
