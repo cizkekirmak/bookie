@@ -124,9 +124,9 @@ class ProfileController extends Controller
                 ->where('user_id', auth()->id())
                 ->delete();
 
-            return redirect()->back()->with('success', count($ids) . ' kitap kitaplığından kaldırıldı! 🗑️');
+            return redirect()->route('profile')->with('success', count($ids) . ' kitap kitaplığından kaldırıldı! 🗑️');
         }
 
-        return redirect()->back();
+        return redirect()->route('profile');
     }
 }
