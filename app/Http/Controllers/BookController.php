@@ -10,15 +10,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class BookController extends Controller
 {
     private string $googleApiKey = 'AIzaSyBGjDodZWAvBQ57QjOZ24VAGHOKf2p0Pus';
 
     /**
-     * Kapağı Storage diske indirip /storage/covers/... yolunu döner
+     * Kapağı Cloudinary'ye yükleyip kalıcı CDN URL'sini döner
      */
     private function getCachedCoverUrl(?string $url, string $key): ?string
     {
@@ -26,34 +26,27 @@ class BookController extends Controller
             return null;
         }
 
-        if (str_starts_with($url, '/storage/') || str_starts_with($url, 'storage/')) {
-            return str_starts_with($url, '/') ? $url : '/' . $url;
+        // Zaten Cloudinary üzerindeyse tekrar yükleme
+        if (str_contains($url, 'res.cloudinary.com')) {
+            return $url;
         }
 
         $url = str_replace('http://', 'https://', $url);
         $cleanKey = preg_replace('/[^A-Za-z0-9_\-]/', '_', $key);
-        $filename = 'covers/' . $cleanKey . '.jpg';
-        $disk = Storage::disk('public');
-
-        if ($disk->exists($filename)) {
-            return '/storage/' . $filename;
-        }
 
         try {
-            $response = Http::withHeaders(['User-Agent' => 'BookieApp/1.0'])
-                ->withOptions([
-                    'verify'          => false,
-                    'allow_redirects' => true,
-                    'curl'            => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]
-                ])
-                ->timeout(6)
-                ->get($url);
+            // Cloudinary doğrudan harici web linkinden yüklemeyi destekler
+            $uploadedFile = Cloudinary::upload($url, [
+                'folder'        => 'bookie_covers',
+                'public_id'     => 'cover_' . $cleanKey,
+                'overwrite'     => false,
+                'resource_type' => 'image'
+            ]);
 
-            if ($response->successful() && strlen($response->body()) > 300) {
-                $disk->put($filename, $response->body());
-                return '/storage/' . $filename;
-            }
-        } catch (\Throwable $e) {}
+            return $uploadedFile->getSecurePath();
+        } catch (\Throwable $e) {
+            Log::warning('Cloudinary kapak yükleme hatası: ' . $e->getMessage());
+        }
 
         return $url;
     }
@@ -66,10 +59,9 @@ class BookController extends Controller
         $popularBooks = Cache::remember($cacheKey, 604800, function () use ($currentWeek) {
             $savedBooks = [];
 
-            // 1. Doğrudan OpenLibrary'den haftalık ofsetle çek
             try {
                 $weekNumber = (int) now()->format('W');
-                $offset = ($weekNumber * 6) % 60; // Her hafta 6 kitap kaydırır
+                $offset = ($weekNumber * 6) % 60;
 
                 $response = Http::withoutVerifying()
                     ->withHeaders(['User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'])
@@ -86,7 +78,6 @@ class BookController extends Controller
                     foreach ($docs as $doc) {
                         $title = $doc['title'] ?? '';
                         
-                        // Başlık boşsa, kapak yoksa, 'gutenberg' içeriyorsa VEYA Türkçe/Latin harf ve temel noktalama işaretleri DIŞINDA bir alfabe (Hintçe, Çince, Rusça, Arapça vb.) barındırıyorsa atla:
                         if (
                             empty($title) || 
                             empty($doc['cover_i']) || 
@@ -130,7 +121,6 @@ class BookController extends Controller
                 Log::warning('Haftalık popüler kitaplar çekilemedi: ' . $e->getMessage());
             }
 
-            // 2. Yedek: DB'deki mevcut kitapları dön
             return Book::whereNotNull('cover_image')->latest('id')->take(6)->get()->map(function ($b) {
                 return [
                     'id'     => $b->open_library_key ?? $b->google_book_id ?? (string)$b->id,
@@ -155,12 +145,11 @@ class BookController extends Controller
         ]);
     }
 
-   public function show($key)
+    public function show($key)
     {
         $cleanKey = trim((string)$key);
         $pageCount = null;
 
-        // 1. Veritabanında Her İhtimalle Kitabı Bul (ID, OL Key, Google ID)
         $book = Book::where('id', is_numeric($cleanKey) ? (int)$cleanKey : 0)
             ->orWhere('open_library_key', $cleanKey)
             ->orWhere('google_book_id', $cleanKey)
@@ -176,7 +165,6 @@ class BookController extends Controller
             $authors = $book->author;
             $pageCount = $book->page_count;
 
-            // Sayfa sayısı boşsa Google Books'tan otomatik tamamla
             if (empty($pageCount) && !empty($title) && $title !== 'Unknown book' && $title !== 'Unknown Title') {
                 try {
                     $params = ['q' => 'intitle:' . $title, 'maxResults' => 1];
@@ -200,7 +188,7 @@ class BookController extends Controller
             }
 
             $rawCover = $book->cover_image;
-            if (!empty($rawCover) && str_starts_with($rawCover, 'http')) {
+            if (!empty($rawCover) && !str_contains($rawCover, 'res.cloudinary.com')) {
                 $cachedPath = $this->getCachedCoverUrl($rawCover, $cleanKey);
                 if ($cachedPath !== $rawCover) {
                     $book->update(['cover_image' => $cachedPath]);
@@ -208,7 +196,7 @@ class BookController extends Controller
                 }
             }
 
-            $coverUrl = $rawCover ? (str_starts_with($rawCover, 'http') || str_starts_with($rawCover, '/storage') ? $rawCover : asset($rawCover)) : null;
+            $coverUrl = $rawCover ?: null;
             $description = $book->description ?? 'No description available.';
 
             if (auth()->check()) {
@@ -217,7 +205,6 @@ class BookController extends Controller
                     ->first();
             }
 
-            // Kitaba ait tüm yorumları çek (Bildirime tıklayınca odaklanılacak yorumlar burada)
             $allReviews = UserBook::with(['user', 'likes'])
                 ->where('book_id', $book->id)
                 ->where(function ($q) {
@@ -230,7 +217,6 @@ class BookController extends Controller
                 ->latest()
                 ->get();
         } else {
-            // DB'de yoksa Cache veya API
             $cacheKey = "book_meta_{$cleanKey}";
             $cached = Cache::get($cacheKey);
 
@@ -259,7 +245,6 @@ class BookController extends Controller
         ));
     }
 
-    // Arka planda asenkron sayfa sayısı getiren metot
     public function fetchPageCount($key)
     {
         $cleanKey = trim((string)$key);
@@ -274,7 +259,6 @@ class BookController extends Controller
 
         $pageCount = null;
 
-        // 1. Open Library
         if (str_contains($cleanKey, 'OL') || str_contains($cleanKey, '/works/')) {
             try {
                 $pureWorkId = preg_replace('/^(OL_)+/', '', str_replace('/works/', '', $cleanKey));
@@ -297,7 +281,6 @@ class BookController extends Controller
             } catch (\Throwable $e) {}
         }
 
-        // 2. Google Books
         if (empty($pageCount)) {
             try {
                 $title = $book->title ?? '';
@@ -353,9 +336,7 @@ class BookController extends Controller
                     'id'      => $b->google_book_id ?? ($b->open_library_key ?? (string)$b->id),
                     'title'   => $b->title,
                     'authors' => $b->author,
-                    'cover'   => str_starts_with($b->cover_image, 'http') || str_starts_with($b->cover_image, '/storage')
-                        ? $b->cover_image 
-                        : asset($b->cover_image),
+                    'cover'   => $b->cover_image,
                 ];
             })->toArray();
 
@@ -647,7 +628,6 @@ class BookController extends Controller
 
                     $book = Book::where('open_library_key', $openLibraryKey)->first();
 
-                    // Sayfa sayısı belirleme adımı
                     $pageCount = $book?->page_count;
 
                     if (!$pageCount) {

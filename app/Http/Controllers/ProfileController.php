@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use App\Models\UserBook;
 use App\Models\User;
 use App\Models\friendship;
@@ -56,11 +57,11 @@ class ProfileController extends Controller
         $user = auth()->user();
 
         if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            
-            // Resmi doğrudan Base64 formatına çevirip veritabanına kaydeder
-            $base64 = 'data:' . $file->getMimeType() . ';base64,' . base64_encode(file_get_contents($file->getRealPath()));
-            $user->avatar = $base64;
+            // Görseli Cloudinary'ye yükle ve dönen güvenli URL'yi kaydet
+            $uploadedFile = Cloudinary::upload($request->file('avatar')->getRealPath(), [
+                'folder' => 'bookie_avatars'
+            ]);
+            $user->avatar = $uploadedFile->getSecurePath();
         }
 
         $user->bio = $request->input('bio');
