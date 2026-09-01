@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="referrer" content="no-referrer">
     <title>Bookie - Dashboard</title>
@@ -30,7 +30,7 @@
             font-family: 'Unkempt', cursive;
         }
 
-        /* HEADER: Masaüstü (76px) */
+        /* HEADER: Masaüstü */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -75,7 +75,6 @@
             z-index: 10001;
         }
 
-        /* ARAMA ÇUBUĞU */
         .header-search-wrap {
             position: absolute;
             left: 50%;
@@ -129,7 +128,7 @@
             display: none !important;
         }
 
-        /* ANA GÖVDE: Masaüstü (Birebir Eski Orijinal Hali) */
+        /* ANA GÖVDE: Masaüstü (2x2 Orijinal Düzen) */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -195,9 +194,13 @@
         @media (max-width: 768px) {
             body {
                 overflow-x: hidden !important;
+                width: 100vw !important;
             }
 
             .site-header-outer {
+                width: 100% !important;
+                left: 0 !important;
+                right: 0 !important;
                 height: 68px !important;
                 background-image: 
                     url('{{ asset('images/profil-header.png') }}'),
@@ -205,15 +208,16 @@
             }
 
             .site-header-inner {
-                padding: 0 12px !important;
-                gap: 10px !important;
+                width: 100% !important;
+                padding: 0 8px !important;
+                gap: 6px !important;
                 display: flex !important;
                 align-items: center !important;
                 justify-content: space-between !important;
             }
 
             .header-logo {
-                font-size: 30px !important;
+                font-size: 28px !important;
                 margin-top: 0 !important;
                 flex-shrink: 0 !important;
             }
@@ -226,26 +230,26 @@
                 position: static !important;
                 transform: none !important;
                 flex: 1 !important;
-                max-width: 220px !important;
-                margin: 0 6px !important;
+                max-width: none !important;
+                margin: 0 4px !important;
                 display: block !important;
                 z-index: 10005 !important;
             }
 
             .header-search-bar-box {
-                height: 44px !important;
-                padding: 0 12px !important;
-                gap: 8px !important;
+                height: 42px !important;
+                padding: 0 10px !important;
+                gap: 6px !important;
                 border-radius: 24px !important;
             }
 
             .header-search-bar-box img {
-                width: 24px !important;
-                height: 24px !important;
+                width: 22px !important;
+                height: 22px !important;
             }
 
             #bookSearchInput {
-                font-size: 15px !important;
+                font-size: 14px !important;
                 display: block !important;
                 width: 100% !important;
             }
@@ -254,8 +258,8 @@
                 display: flex !important;
                 align-items: center;
                 justify-content: center;
-                width: 44px !important;
-                height: 44px !important;
+                width: 42px !important;
+                height: 42px !important;
                 background: #f4fbf0;
                 border: 2px solid #4b813b;
                 border-radius: 10px !important;
@@ -264,16 +268,16 @@
             }
 
             .mobile-menu-trigger img {
-                width: 36px !important;
-                height: 36px !important;
+                width: 34px !important;
+                height: 34px !important;
                 border-radius: 6px !important;
             }
 
             .mobile-dropdown-menu {
                 display: flex !important;
                 position: absolute;
-                top: 72px !important;
-                right: 10px !important;
+                top: 70px !important;
+                right: 8px !important;
                 width: 64px !important;
                 background: #c6e085;
                 border: 2px solid #4b813b;
@@ -313,22 +317,24 @@
                 display: none !important;
             }
 
+            /* ANA ALAN: Mobilde tam ortalanmış ve kenarlardan eşit */
             .app-container {
-                padding: 12px 10px 95px 10px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 12px 10px 85px 10px !important;
+                margin: 0 !important;
                 min-height: calc(100vh - 68px) !important;
                 min-height: calc(100dvh - 68px) !important;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: flex-start !important;
-                align-items: stretch !important;
+                display: block !important;
             }
 
-            /* MOBİLDE SIRALAMA VE DÜZEN */
             .left-content-area {
                 display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 12px !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 10px !important;
                 width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 auto !important;
                 padding: 0 !important;
             }
 
@@ -340,35 +346,41 @@
                 grid-column: 1 !important;
                 grid-row: 1 !important;
                 width: 100% !important;
+                min-width: 0 !important;
             }
 
             .item-admin {
                 grid-column: 2 !important;
                 grid-row: 1 !important;
                 width: 100% !important;
+                min-width: 0 !important;
             }
 
             .item-popular {
                 grid-column: 1 / span 2 !important;
                 grid-row: 2 !important;
                 width: 100% !important;
+                min-width: 0 !important;
             }
 
             .item-cat {
                 grid-column: 1 / span 2 !important;
                 grid-row: 3 !important;
                 width: 100% !important;
+                min-width: 0 !important;
             }
 
-            /* Çekmece */
+            /* ÇEKMECE: Mobilde en alta kadar uzanır, boşluk kalmaz */
             .right-sidebar-panel {
                 position: fixed !important;
                 top: 0 !important;
+                bottom: 0 !important;
                 right: 0 !important;
                 width: 86vw !important;
                 max-width: 340px !important;
                 height: 100vh !important;
-                max-height: 100vh !important;
+                height: 100dvh !important;
+                max-height: 100% !important;
                 border-radius: 16px 0 0 16px !important;
                 z-index: 100001 !important;
                 transform: translateX(100%);
@@ -693,7 +705,7 @@
             if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
         }
 
-        // KİTAP ARAMA (LOAD MORE & ORİJİNAL AKIŞ)
+        // KİTAP ARAMA (LOAD MORE & ORİJİNAL ÇALIŞAN HALİ)
         const input = document.getElementById('bookSearchInput');
         const dropdown = document.getElementById('searchResultsDropdown');
 
