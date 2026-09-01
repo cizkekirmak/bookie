@@ -387,7 +387,7 @@ if (!window.notifInitialized) {
     };
 
     window.checkNewNotifications = function() {
-        fetch("{{ route('notifications.unreadCount') }}", {
+        fetch('/notifications/unread-count', {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -408,7 +408,7 @@ if (!window.notifInitialized) {
                     });
                 }
 
-                fetch("{{ route('notifications.unreadCount') }}?render_list=1", {
+                fetch('/notifications/unread-count?render_list=1', {
                     headers: {'X-Requested-With' : 'XMLHttpRequest' }
                 })
                 .then(r => r.json())
