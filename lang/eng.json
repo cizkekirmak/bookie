@@ -181,6 +181,8 @@
     "password is required": "password is required",
     "password must be at least 6 characters": "password must be at least 6 characters",
     "username or email is required": "username or email is required",
-    "are u sure these are correct?": "are u sure these are correct?"
+    "are u sure these are correct?": "are u sure these are correct?",
+    "Profile updated successfully!": "Profile updated successfully!",
+    ":count books removed from your bookshelf! 🗑️": ":count books removed from your bookshelf! 🗑️"
 
 }

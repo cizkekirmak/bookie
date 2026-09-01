@@ -112,7 +112,7 @@ class ProfileController extends Controller
         $user->bio = $request->input('bio');
         $user->save();
 
-        return redirect()->back()->with('success', 'Profil başarıyla güncellendi!');
+        return redirect()->back()->with('success', __('Profile updated successfully!'));
     }
 
     public function bulkRemoveBooks(Request $request)
@@ -124,7 +124,7 @@ class ProfileController extends Controller
                 ->where('user_id', auth()->id())
                 ->delete();
 
-            return redirect()->route('profile')->with('success', count($ids) . ' kitap kitaplığından kaldırıldı! 🗑️');
+            return redirect()->route('profile')->with('success', __(':count books removed from your bookshelf! 🗑️', ['count' => count($ids)]));
         }
 
         return redirect()->route('profile');

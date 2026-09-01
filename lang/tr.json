@@ -183,5 +183,7 @@
     "password is required": "şifre gerekli",
     "password must be at least 6 characters": "şifre en az 6 karakter olmalı",
     "username or email is required": "kullanıcı adı veya e-posta gerekli",
-    "are u sure these are correct?": "bu bilgilerin doğru olduğuna emin misin?"
+    "are u sure these are correct?": "bu bilgilerin doğru olduğuna emin misin?",
+    "Profile updated successfully!": "Profil başarıyla güncellendi!",
+    ":count books removed from your bookshelf! 🗑️": ":count kitap kitaplığından kaldırıldı! 🗑️"
 }
