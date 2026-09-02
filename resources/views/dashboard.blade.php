@@ -963,5 +963,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
     @include('partials.chat')
+    @include('partials.about-me-popup')
 </body>
 </html>
