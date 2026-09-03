@@ -105,6 +105,7 @@
             user-select: none;
             overflow: hidden;
             transition: box-shadow 0.15s;
+            touch-action: none;
         }
         .cork-postit:active {
             cursor: grabbing;
@@ -129,24 +130,24 @@
             pointer-events: none;
         }
 
-        /* PANODAKİ METİN VE STICKER SÜRÜKLEMEYİ ENGELLEMEZ */
-        .postit-text-content {
+        /* PANODAKİ YAZI VE STICKER SÜRÜKLEMEYİ ENGELLEMESİN */
+        #corkboardArea .postit-text-content {
             font-size: 14px;
             line-height: 1.2;
             color: #1a3c11;
             word-wrap: break-word;
             position: absolute;
             user-select: none;
-            pointer-events: none;
+            pointer-events: none !important;
             transform-origin: center center;
         }
 
-        .postit-sticker-img {
+        #corkboardArea .postit-sticker-img {
             position: absolute;
             object-fit: contain;
             user-select: none;
-            -webkit-user-drag: none;
-            pointer-events: none;
+            -webkit-user-drag: none !important;
+            pointer-events: none !important;
             transform-origin: center center;
         }
 
@@ -176,12 +177,14 @@
             align-items: center;
             justify-content: center;
             z-index: 25;
+            pointer-events: auto;
         }
-        .is-editing .postit-delete-btn {
+        .is-editing .postit-delete-btn,
+        .can-delete .postit-delete-btn {
             display: flex;
         }
 
-        /* SAĞDAKİ ŞEFFAF 3x3 ASKI ALANI */
+        /* SAĞDAKİ 3x3 ASKI ALANI */
         .keychain-area-wrapper {
             display: flex;
             flex-direction: column;
@@ -221,6 +224,7 @@
             margin-bottom: -5px;
         }
 
+        /* HERKES İÇİN SALLANMA HOVER EFEKTİ */
         .keychain-plush-img {
             width: 100%;
             height: 100%;
@@ -230,7 +234,6 @@
             cursor: pointer;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
             pointer-events: auto !important;
-            -webkit-user-drag: none;
         }
         .keychain-plush-img:hover {
             transform: rotate(8deg) scale(1.08);
@@ -265,7 +268,6 @@
             height: 52px;
             object-fit: contain;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
-            -webkit-user-drag: none;
         }
         .folder-label {
             font-size: 11px;
@@ -346,7 +348,7 @@
         .bag-badge-card.unlocked { cursor: pointer; }
         .bag-badge-card.locked { opacity: 0.55; filter: grayscale(85%); background: #f3f3f3; cursor: not-allowed; }
 
-        .bag-badge-img { width: 46px; height: 46px; object-fit: contain; -webkit-user-drag: none; }
+        .bag-badge-img { width: 46px; height: 46px; object-fit: contain; }
         .bag-badge-title { font-size: 12px; font-weight: bold; color: #1a3c11; margin: 0; }
         .bag-badge-desc { font-size: 10px; color: #555; margin: 0; }
         .bag-badge-status { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 8px; }
@@ -402,7 +404,7 @@
         .color-ball { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); cursor: pointer; }
         .color-ball.selected { border: 2px solid #1a3c11; transform: scale(1.15); }
 
-        /* STORY SEÇİM ÇERÇEVESİ (ÖNİZLEME MODU) */
+        /* MODAL İÇİ DÜZENLEME KUTUSU */
         .transform-box {
             position: absolute;
             cursor: move;
@@ -533,14 +535,14 @@
                     
                     <!-- Metin Kapsayıcısı -->
                     <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:12px; width:100px; height:auto;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; width:100%; pointer-events:auto;">Hello!</div>
+                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; width:100%;">Hello!</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
                     </div>
 
                     <!-- Sticker Kapsayıcısı -->
                     <div id="stickerTransformBox" class="transform-box" style="display:none; top:45px; left:35px; width:55px; height:55px;">
-                        <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:100%; position:relative; pointer-events:auto;">
+                        <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:100%; position:relative;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
@@ -592,20 +594,22 @@ function getAllAchievementsList() {
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     let isEditing = false;
 
-    // --- LOCALSTORAGE KALICILIK YÖNETİMİ ---
+    // --- KALICILIK (LOCALSTORAGE) ---
     const STORAGE_KEY_NOTES = `bookie_board_notes_${PROFILE_USER_ID}`;
     const STORAGE_KEY_KEYCHAINS = `bookie_board_keychains_${PROFILE_USER_ID}`;
 
     function saveBoardToStorage() {
         const notes = [];
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
+            const authorText = item.querySelector('.postit-author') ? item.querySelector('.postit-author').innerText : '';
             notes.push({
                 shapeClass: item.classList.contains('size-portrait') ? 'size-portrait' : (item.classList.contains('size-landscape') ? 'size-landscape' : 'size-square'),
                 bg: item.style.backgroundColor,
                 top: item.style.top,
                 left: item.style.left,
                 transform: item.style.transform,
-                html: item.innerHTML
+                html: item.innerHTML,
+                author: authorText
             });
         });
         localStorage.setItem(STORAGE_KEY_NOTES, JSON.stringify(notes));
@@ -632,15 +636,22 @@ function getAllAchievementsList() {
                 noteDiv.style.transform = n.transform;
                 noteDiv.innerHTML = n.html;
                 
+                // Kendi notuysa veya profil sahibiyse silme butonunu yetkilendir
+                const isAuthor = n.author.includes(`@${CURRENT_USERNAME}`);
+                if (IS_OWN_PROFILE || isAuthor) {
+                    noteDiv.classList.add('can-delete');
+                }
+
                 const delBtn = noteDiv.querySelector('.postit-delete-btn');
                 if (delBtn) {
-                    delBtn.onclick = function() {
+                    delBtn.onclick = function(e) {
+                        e.stopPropagation();
                         noteDiv.remove();
                         saveBoardToStorage();
                     };
                 }
 
-                makePostitDraggable(noteDiv);
+                makePostitDraggable(noteDiv, isAuthor);
                 corkboard.appendChild(noteDiv);
             });
         } else {
@@ -653,7 +664,7 @@ function getAllAchievementsList() {
                 </div>
             `;
             const defaultNote = corkboard.querySelector('.cork-postit');
-            if (defaultNote) makePostitDraggable(defaultNote);
+            if (defaultNote) makePostitDraggable(defaultNote, false);
         }
 
         const savedHooks = localStorage.getItem(STORAGE_KEY_KEYCHAINS);
@@ -681,6 +692,7 @@ function getAllAchievementsList() {
         }
     }
 
+    // --- DÜZENLEME BUTONU (Sadece Pano Sahibi Genel Düzeni Kaydeder) ---
     if (toggleEditBtn) {
         toggleEditBtn.addEventListener('click', function() {
             isEditing = !isEditing;
@@ -697,7 +709,7 @@ function getAllAchievementsList() {
         });
     }
 
-    // --- STORY TARZI KÖŞE VE SÜRÜKLEME KONTROLLERİ ---
+    // --- STORY TUTAMAÇLARI ---
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         const rotateBtn = box.querySelector('.handle-rotate');
@@ -840,12 +852,13 @@ function getAllAchievementsList() {
         }
     });
 
+    // --- BAŞKASININ VEYA KENDİ PROFİLİNDE YENİ NOT OLUŞTURMA ---
     function pinNoteToBoard() {
         const text = textInput.value.trim() || 'Cozy note!';
         const newNote = document.createElement('div');
-        newNote.className = `cork-postit ${selectedShape}`;
+        newNote.className = `cork-postit ${selectedShape} can-delete`;
         newNote.style.backgroundColor = selectedColor;
-        newNote.style.top = '25%';
+        newNote.style.top = '30%';
         newNote.style.left = '35%';
         newNote.style.transform = `rotate(${Math.floor(Math.random() * 8 - 4)}deg)`;
 
@@ -867,10 +880,13 @@ function getAllAchievementsList() {
             <div class="postit-author">@${CURRENT_USERNAME}</div>
         `;
 
-        makePostitDraggable(newNote);
+        // Yeni eklenen not, kimin profili olursa olsun DOĞRUDAN sürüklenebilir!
+        makePostitDraggable(newNote, true);
+
         corkboard.appendChild(newNote);
         closePostitModal();
 
+        // Formu temizle
         textInput.value = '';
         stickerBox.style.display = 'none';
         previewSticker.src = '';
@@ -879,13 +895,20 @@ function getAllAchievementsList() {
         saveBoardToStorage();
     }
 
-    // --- HATASIZ SÜRÜKLEME FONKSİYONU (RESİM KOPMASINI ENGELLER) ---
-    function makePostitDraggable(element) {
-        element.ondragstart = function() { return false; };
+    // --- SERBEST VE PÜRÜZSÜZ SÜRÜKLEME MANTIĞI ---
+    function makePostitDraggable(element, isMyNote = false) {
+        element.ondragstart = () => false;
 
         element.onmousedown = function(e) {
+            // Çarpıya basıldıysa taşıma
             if (e.target.classList.contains('postit-delete-btn')) return;
-            if (!IS_OWN_PROFILE && !isEditing) return;
+
+            // Yetki Kontrolü:
+            // 1. Profil sahibi 'Edit' modundaysa tüm notları taşır.
+            // 2. Ziyaretçi ise SADECE kendi yazdığı notu taşır (isMyNote = true).
+            // İkisi de değilse başkasının notuna dokunamaz.
+            if (!IS_OWN_PROFILE && !isMyNote) return;
+            if (IS_OWN_PROFILE && !isEditing && !isMyNote) return;
 
             e.preventDefault();
 
@@ -967,7 +990,7 @@ function getAllAchievementsList() {
                 return;
             }
         }
-        alert('Tüm 9 kanca dolu!');
+        alert('Tüm 9 kanca dolu! Birini kaldırmak için üzerine tıkla.');
     }
 
     function handleHookSlotClick(slotNum) {
