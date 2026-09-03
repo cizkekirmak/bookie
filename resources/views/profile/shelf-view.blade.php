@@ -65,20 +65,23 @@
             overflow: hidden;
         }
 
-        /* PANO KİLİT SİMGESİ (lock.png / unlocked.png) */
+        /* DAHA BELİRGİN VE BÜYÜK KİLİT BUTONU */
         .board-lock-badge {
             position: absolute;
-            top: 12px;
-            right: 14px;
-            width: 36px;
-            height: 36px;
-            z-index: 1000;
+            top: 14px;
+            right: 16px;
+            width: 48px;
+            height: 48px;
+            z-index: 10000;
             cursor: pointer;
-            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.22));
+            filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
             transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .board-lock-badge:hover {
-            transform: scale(1.12);
+            transform: scale(1.15);
         }
         .board-lock-badge img {
             width: 100%;
@@ -126,13 +129,12 @@
             filter: grayscale(60%);
         }
 
-        /* POST-IT DIŞ KAPSAYICI */
         .cork-postit {
             position: absolute;
             cursor: grab;
             user-select: none;
             touch-action: none;
-            transform-origin: top left;
+            transform-origin: center center;
         }
         .cork-postit:active { cursor: grabbing; }
 
@@ -149,7 +151,7 @@
 
         .cork-postit.is-selected .postit-inner-card {
             outline: 2px dashed #2d5a27;
-            outline-offset: 3px;
+            outline-offset: 4px;
         }
 
         .postit-pin {
@@ -192,25 +194,24 @@
         .postit-delete-btn {
             display: none;
             position: absolute;
-            top: 3px;
-            right: 3px;
+            top: -10px;
+            left: -10px;
             background: #ff7675;
             color: white;
-            border: none;
+            border: 1.5px solid #fff;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 11px;
+            width: 22px;
+            height: 22px;
+            font-size: 12px;
             cursor: pointer;
             align-items: center;
             justify-content: center;
-            z-index: 30;
-            pointer-events: auto;
+            z-index: 60;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
         }
         .is-editing .postit-delete-btn,
-        .can-delete .postit-delete-btn { display: flex; }
+        .can-delete.is-selected .postit-delete-btn { display: flex; }
 
-        /* SERBEST STICKER WRAPPER */
         .free-sticker-wrapper {
             position: absolute;
             cursor: grab;
@@ -219,11 +220,12 @@
             display: inline-block;
             min-width: 30px;
             min-height: 30px;
+            transform-origin: center center;
         }
         .free-sticker-wrapper:active { cursor: grabbing; }
         .free-sticker-wrapper.is-selected {
             outline: 2px dashed #2d5a27;
-            outline-offset: 3px;
+            outline-offset: 4px;
         }
         .free-sticker-wrapper img {
             width: 100%;
@@ -235,7 +237,6 @@
             filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
         }
 
-        /* ASKI ALANI */
         .keychain-area-wrapper {
             display: flex;
             flex-direction: column;
@@ -334,7 +335,6 @@
             margin-top: 2px;
         }
 
-        /* ÇEKMECE */
         .keychain-collection-drawer {
             position: fixed;
             top: 50%;
@@ -411,7 +411,6 @@
             word-break: break-word;
         }
 
-        /* MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -525,12 +524,12 @@
         .handle-btn {
             display: none;
             position: absolute;
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             border-radius: 50%;
             border: 1.5px solid #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
-            z-index: 50;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            z-index: 60;
         }
         .transform-box.is-selected .handle-btn,
         .free-sticker-wrapper.is-selected .handle-btn,
@@ -540,9 +539,9 @@
             justify-content: center;
         }
 
-        .handle-delete { top: -9px; left: -9px; background: #ff7675; color: white; font-size: 11px; cursor: pointer; }
-        .handle-rotate { top: -15px; left: 50%; transform: translateX(-50%); background: #fab1a0; color: #2d3436; font-size: 11px; cursor: grab; }
-        .handle-resize { bottom: -9px; right: -9px; background: #74b9ff; color: white; font-size: 11px; cursor: nwse-resize; }
+        .handle-delete { top: -10px; left: -10px; background: #ff7675; color: white; font-size: 11px; cursor: pointer; }
+        .handle-rotate { top: -16px; left: 50%; transform: translateX(-50%); background: #fab1a0; color: #2d3436; font-size: 11px; cursor: grab; }
+        .handle-resize { bottom: -10px; right: -10px; background: #74b9ff; color: white; font-size: 11px; cursor: nwse-resize; }
 
         @media (max-width: 1024px) {
             .corkboard-main-wrapper { flex-direction: column; align-items: center; gap: 16px; }
@@ -565,22 +564,23 @@
     $boardItems = (isset($board) && is_array($board->board_items)) ? $board->board_items : [];
     $isBoardLocked = $board->is_locked ?? false;
 
+    // GERÇEK AÇILMA / KİLİTLİ DURUMLARI (Test modu bitti)
     $achievements = $achievements ?? [
         'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
         'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
-        'burger'    => ['title' => 'Burger',    'file' => 'burger.png',    'unlocked' => true],
+        'burger'    => ['title' => 'Burger',    'file' => 'burger.png',    'unlocked' => false],
         'cilek'     => ['title' => 'Çilek',     'file' => 'çilek.png',     'unlocked' => true],
-        'elma'      => ['title' => 'Elma',      'file' => 'elma.png',      'unlocked' => true],
-        'geyik'     => ['title' => 'Geyik',     'file' => 'geyik.png',     'unlocked' => true],
+        'elma'      => ['title' => 'Elma',      'file' => 'elma.png',      'unlocked' => false],
+        'geyik'     => ['title' => 'Geyik',     'file' => 'geyik.png',     'unlocked' => false],
         'jake'      => ['title' => 'Jake',      'file' => 'jake.png',      'unlocked' => true],
-        'kedi'      => ['title' => 'Kedi',      'file' => 'kedi.png',      'unlocked' => true],
+        'kedi'      => ['title' => 'Kedi',      'file' => 'kedi.png',      'unlocked' => false],
         'kitap'     => ['title' => 'Kitap',     'file' => 'kitap.png',     'unlocked' => true],
-        'kruvasan'  => ['title' => 'Kruvasan',  'file' => 'kruvasan.png',  'unlocked' => true],
+        'kruvasan'  => ['title' => 'Kruvasan',  'file' => 'kruvasan.png',  'unlocked' => false],
         'maymun'    => ['title' => 'Maymun',    'file' => 'maymun.png',    'unlocked' => true],
-        'tama'      => ['title' => 'Tama',      'file' => 'tama.png',      'unlocked' => true],
+        'tama'      => ['title' => 'Tama',      'file' => 'tama.png',      'unlocked' => false],
         'usagi'     => ['title' => 'Usagi',     'file' => 'usagi.png',     'unlocked' => true],
-        'yengec'    => ['title' => 'Yengeç',    'file' => 'yengeç.png',    'unlocked' => true],
-        'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => true],
+        'yengec'    => ['title' => 'Yengeç',    'file' => 'yengeç.png',    'unlocked' => false],
+        'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => false],
     ];
 @endphp
 
@@ -588,14 +588,14 @@
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
-            <!-- PANO KİLİDİ: lock.png / unlocked.png ARASINDA GEÇİŞ YAPAR -->
+            <!-- PANO KİLİT BUTONU -->
             <div class="board-lock-badge" id="boardLockBtn" 
                  title="{{ $isOwnProfile ? 'Kilitle / Kilidi Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
                 <img id="boardLockImg" 
-                     src="{{ $isBoardLocked ? asset('images/locke.png') : asset('images/unlocked.png') }}" 
+                     src="{{ $isBoardLocked ? asset('images/lock.png') : asset('images/unlocked.png') }}" 
                      alt="Lock Status" 
-                     onerror="this.onerror=null; this.src='{{ asset('images/locke.png') }}';">
+                     onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
             </div>
 
             @foreach($boardItems as $item)
@@ -614,6 +614,8 @@
                             {!! $item['html'] !!}
                         </div>
                         @if($canManage)
+                            <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
+                            <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                             <div class="handle-btn handle-resize" title="Post-it'i Büyüt / Küçült">⤡</div>
                         @endif
                     </div>
@@ -755,14 +757,15 @@
 
 <script>
     const CURRENT_USERNAME = @json(auth()->user()->username ?? (auth()->user()->name ?? 'reader'));
+    const PROFILE_USERNAME = @json($user->username ?? '');
     const IS_OWN_PROFILE = @json($isOwnProfile);
     let isBoardLocked = @json($isBoardLocked);
 
-    // Kilit görsellerinin asset yolları:
-    const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
+    const LOCK_ICON_PATH = '{{ asset("images/lock.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
-    const SAVE_URL = @json(Route::has('board.save') ? route('board.save', $user->username ?? '') : '');
+    // Rota kontrolü ve fallback URL
+    const SAVE_URL = PROFILE_USERNAME ? `/u/${PROFILE_USERNAME}/board/save` : '';
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
     const ACHIEVEMENTS_DATA = @json($achievements ?? []);
@@ -782,12 +785,10 @@
         element.style.zIndex = globalMaxZIndex;
     }
 
-    // --- PANO KİLİTLEME DÜĞMESİ (lock.png <-> unlocked.png) ---
+    // --- PANO KİLİTLEME DÜĞMESİ (BÜYÜK BOYUT & DİNAMİK GEÇİŞ) ---
     if (boardLockBtn && IS_OWN_PROFILE) {
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
-            
-            // Görseli değiştir
             boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
             boardLockBtn.title = isBoardLocked ? 'Pano Kilitli (Açmak için tıkla)' : 'Pano Açık (Kilitlemek için tıkla)';
             
@@ -800,7 +801,7 @@
         });
     }
 
-    // --- VERİTABANINA KAYDETME ---
+    // --- VERİTABANINA ASYNC KAYIT VE LOCALSTORAGE GÜVENLİK YEDEĞİ ---
     async function saveBoardToDatabase() {
         const boardItems = [];
         
@@ -841,11 +842,12 @@
             hookSlots.push(img ? img.dataset.key : null);
         });
 
+        // Çift taraflı güvence: Hem LocalStorage'a hem DB'ye anında yaz
         localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots, isBoardLocked }));
 
         if (SAVE_URL) {
             try {
-                await fetch(SAVE_URL, {
+                const response = await fetch(SAVE_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -858,28 +860,56 @@
                         is_locked: isBoardLocked
                     })
                 });
+                const resData = await response.json();
+                console.log('Pano veritabanına başarıyla kaydedildi:', resData);
             } catch (error) {
-                console.error('Kayıt hatası:', error);
+                console.error('Veritabanına kaydedilirken hata oluştu (LocalStorage devrede):', error);
             }
         }
     }
 
+    // Sayfa açıldığında panodaki mevcut elemanları aktifleştir
     document.addEventListener('DOMContentLoaded', () => {
+        // Eğer DB boşsa fakat localStorage yedeği varsa geri yükle
+        const localBackup = localStorage.getItem(`bookie_board_backup_${@json($user->id ?? 0)}`);
+        if (localBackup && (!document.querySelector('.cork-postit') && !document.querySelector('.free-sticker-wrapper'))) {
+            try {
+                const parsed = JSON.parse(localBackup);
+                if (parsed.boardItems && parsed.boardItems.length > 0) {
+                    parsed.boardItems.forEach(item => {
+                        if (item.type === 'postit') {
+                            const postitWrapper = document.createElement('div');
+                            postitWrapper.className = 'cork-postit can-delete';
+                            postitWrapper.style.top = item.top;
+                            postitWrapper.style.left = item.left;
+                            postitWrapper.style.zIndex = item.zIndex || 10;
+                            postitWrapper.dataset.scale = item.scale || '0.65';
+                            postitWrapper.dataset.rotation = item.rotation || '0';
+                            postitWrapper.style.transform = `scale(${item.scale || 0.65}) rotate(${item.rotation || 0}deg)`;
+
+                            postitWrapper.innerHTML = `
+                                <div class="postit-inner-card ${item.shapeClass}" style="background-color: ${item.bg};">
+                                    ${item.html}
+                                </div>
+                                <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
+                                <div class="handle-btn handle-rotate" title="Döndür">↻</div>
+                                <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
+                            `;
+                            corkboard.appendChild(postitWrapper);
+                        } else if (item.type === 'free_sticker') {
+                            createFreeStickerElement(item.src, item.top, item.left, item.width, item.height, item.transform);
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error('Yedek yüklenemedi:', e);
+            }
+        }
+
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const isAuthor = wrapper.querySelector('.postit-author')?.innerText.includes(`@${CURRENT_USERNAME}`);
             const canManage = (IS_OWN_PROFILE || isAuthor) && !isBoardLocked;
-
-            const delBtn = wrapper.querySelector('.postit-delete-btn');
-            if (delBtn) {
-                delBtn.onclick = function(e) {
-                    e.stopPropagation();
-                    if (isBoardLocked) return;
-                    wrapper.remove();
-                    saveBoardToDatabase();
-                };
-            }
-
-            setupPostitScaling(wrapper, canManage);
+            setupPostitControls(wrapper, canManage);
             makeItemDraggable(wrapper, canManage);
         });
 
@@ -891,7 +921,8 @@
         });
     });
 
-    function setupPostitScaling(wrapper, canEdit) {
+    // --- PANODAKİ POST-IT'İN DÖNDÜRME, BOYUTLANDIRMA VE SİLME KONTROLLERİ ---
+    function setupPostitControls(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             if (isBoardLocked) return;
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
@@ -902,6 +933,19 @@
         if (!canEdit && !IS_OWN_PROFILE) return;
 
         const resizeBtn = wrapper.querySelector('.handle-resize');
+        const rotateBtn = wrapper.querySelector('.handle-rotate');
+        const deleteBtn = wrapper.querySelector('.handle-delete');
+
+        if (deleteBtn) {
+            deleteBtn.onclick = function(e) {
+                e.stopPropagation();
+                if (isBoardLocked) return;
+                wrapper.remove();
+                saveBoardToDatabase();
+            };
+        }
+
+        // POST-IT BÜYÜTME (SCALE)
         if (resizeBtn) {
             resizeBtn.addEventListener('mousedown', (e) => {
                 if (isBoardLocked) return;
@@ -930,8 +974,40 @@
                 window.addEventListener('mouseup', onStop);
             });
         }
+
+        // POST-IT DÖNDÜRME (ROTATE)
+        if (rotateBtn) {
+            rotateBtn.addEventListener('mousedown', (e) => {
+                if (isBoardLocked) return;
+                e.stopPropagation();
+                e.preventDefault();
+                bringToFront(wrapper);
+
+                const rect = wrapper.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                let scale = parseFloat(wrapper.dataset.scale) || 0.65;
+
+                function onRotate(ev) {
+                    const rad = Math.atan2(ev.clientX - centerX, -(ev.clientY - centerY));
+                    let degree = Math.round(rad * (180 / Math.PI));
+                    wrapper.dataset.rotation = degree;
+                    wrapper.style.transform = `scale(${scale}) rotate(${degree}deg)`;
+                }
+
+                function onRotateStop() {
+                    window.removeEventListener('mousemove', onRotate);
+                    window.removeEventListener('mouseup', onRotateStop);
+                    saveBoardToDatabase();
+                }
+
+                window.addEventListener('mousemove', onRotate);
+                window.addEventListener('mouseup', onRotateStop);
+            });
+        }
     }
 
+    // --- PANODAKİ SERBEST STICKER OLUŞTURMA & KONTROLLERİ ---
     function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
@@ -1253,6 +1329,7 @@
         }
     });
 
+    // --- YENİ POST-IT'İ KLONLAYIP PANODA DÖNDÜRME VE BÜYÜTME KONTROLLERİYLE OLUŞTURMA ---
     function pinNoteToBoard() {
         if (isBoardLocked) return;
         const postitWrapper = document.createElement('div');
@@ -1277,26 +1354,16 @@
             box.style.border = 'none';
         });
 
-        const delBtn = document.createElement('button');
-        delBtn.className = 'postit-delete-btn';
-        delBtn.innerText = '✕';
-        delBtn.onclick = function(e) {
-            e.stopPropagation();
-            if (isBoardLocked) return;
-            postitWrapper.remove();
-            saveBoardToDatabase();
-        };
-        clonedCard.appendChild(delBtn);
-
-        const resBtn = document.createElement('div');
-        resBtn.className = 'handle-btn handle-resize';
-        resBtn.title = "Post-it'i Büyüt / Küçült";
-        resBtn.innerText = '⤡';
-
         postitWrapper.appendChild(clonedCard);
-        postitWrapper.appendChild(resBtn);
 
-        setupPostitScaling(postitWrapper, true);
+        // Hem silme, hem döndürme, hem ölçek tutamaçlarını ekle
+        postitWrapper.innerHTML += `
+            <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
+            <div class="handle-btn handle-rotate" title="Döndür">↻</div>
+            <div class="handle-btn handle-resize" title="Post-it'i Büyüt / Küçült">⤡</div>
+        `;
+
+        setupPostitControls(postitWrapper, true);
         makeItemDraggable(postitWrapper, true);
         corkboard.appendChild(postitWrapper);
         closePostitModal();
@@ -1315,7 +1382,7 @@
 
         element.onmousedown = function(e) {
             if (isBoardLocked) return;
-            if (e.target.classList.contains('postit-delete-btn') || e.target.classList.contains('handle-btn')) return;
+            if (e.target.classList.contains('handle-btn')) return;
 
             if (!IS_OWN_PROFILE && !isMyItem) return;
             if (IS_OWN_PROFILE && !isEditing && !isMyItem) return;
