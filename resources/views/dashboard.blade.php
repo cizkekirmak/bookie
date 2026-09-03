@@ -715,7 +715,7 @@
 
     {{-- MOBİL POST-IT BUTONU & OVERLAY --}}
     <div class="mobile-friends-tab" id="openFriendsDrawerBtn">
-        <span>📌 {{ __('Friends') }}</span>
+        <span> {{ __('Friends') }}</span>
     </div>
     <div class="mobile-drawer-overlay hidden" id="drawerOverlay"></div>
 
