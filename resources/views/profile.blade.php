@@ -28,20 +28,23 @@
 
         window.switchProfileView = function(mode) {
             const listView = document.getElementById('profile-list-view');
-            const shelfView = document.getElementById('profile-shelf-view');
+            const boardView = document.getElementById('profile-board-view');
             const btnList = document.getElementById('btn-list-view');
-            const btnShelf = document.getElementById('btn-shelf-view');
+            const btnBoard = document.getElementById('btn-board-view');
+            const mainContainer = document.querySelector('.profile-main-content');
 
             if (mode === 'list') {
                 if (listView) listView.style.display = 'flex';
-                if (shelfView) shelfView.style.display = 'none';
+                if (boardView) boardView.style.display = 'none';
                 if (btnList) { btnList.style.background = '#255719'; btnList.style.color = '#ffffff'; }
-                if (btnShelf) { btnShelf.style.background = 'transparent'; btnShelf.style.color = '#1a3c11'; }
+                if (btnBoard) { btnBoard.style.background = 'transparent'; btnBoard.style.color = '#1a3c11'; }
+                if (mainContainer) mainContainer.classList.remove('board-active');
             } else {
                 if (listView) listView.style.display = 'none';
-                if (shelfView) shelfView.style.display = 'flex';
-                if (btnShelf) { btnShelf.style.background = '#255719'; btnShelf.style.color = '#ffffff'; }
+                if (boardView) boardView.style.display = 'flex';
+                if (btnBoard) { btnBoard.style.background = '#255719'; btnBoard.style.color = '#ffffff'; }
                 if (btnList) { btnList.style.background = 'transparent'; btnList.style.color = '#1a3c11'; }
+                if (mainContainer) mainContainer.classList.add('board-active');
             }
         };
 
@@ -69,20 +72,21 @@
 
     <style>
         @font-face {
-    font-family: 'Unkempt';
-    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+            font-family: 'Unkempt';
+            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'Henny Penny';
-    src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'Henny Penny';
+            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
         * {
             box-sizing: border-box;
         }
@@ -100,19 +104,20 @@
             overflow-x: hidden;
             font-family: 'Unkempt', cursive;
         }
-          * {
-                -webkit-tap-highlight-color: transparent !important;
-            }
 
-            button,
-            a,
-            label,
-            span,
-            img {
-                user-select: none !important;
-                -webkit-user-select: none !important;
-                -webkit-touch-callout: none !important;
-            }
+        * {
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        button,
+        a,
+        label,
+        span,
+        img {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
 
         /* HEADER: Masaüstü (76px) */
         .site-header-outer {
@@ -220,6 +225,22 @@
             background-color: #f7faf5;
         }
 
+        /* PANO AÇILDIĞINDA İÇERİK KUTUSUNUN GENİŞLEMESİ */
+        .profile-main-content.board-active {
+            overflow-y: auto !important;
+        }
+
+        /* Pano Görünümü Kapsayıcısı */
+        #profile-board-view {
+            display: none;
+            width: 100%;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            flex: 1;
+            overflow-y: auto;
+        }
+
         .custom-scroll::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -300,7 +321,7 @@
                 flex-direction: column !important;
                 align-items: center !important;
                 background-color: transparent !important;
-                padding: 16px 12px 100px 12px !important;
+                padding: 16px 8px 100px 8px !important;
                 overflow-x: hidden !important;
             }
 
@@ -379,18 +400,17 @@
 
             .profile-main-content {
                 width: 100% !important;
-                max-width: 440px !important;
-                height: calc(100vh - 165px) !important;
-                height: calc(100dvh - 165px) !important;
-                min-height: 480px !important;
-                padding: 16px 14px !important;
+                max-width: 100% !important; /* Pano mobilde taşmadan tam yayılsın */
+                height: auto !important;
+                min-height: 520px !important;
+                padding: 14px 10px !important;
                 border: 2px solid #4c7237 !important;
                 border-radius: 16px !important;
                 background-color: #f7faf5 !important;
                 box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
                 display: flex !important;
                 flex-direction: column !important;
-                overflow: hidden !important;
+                overflow: visible !important;
                 flex: none !important;
             }
 
@@ -606,15 +626,21 @@
                     <button type="button" id="btn-list-view" onclick="switchProfileView('list')" style="border: none; background: #255719; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
                         {{ __('Book List') }}
                     </button>
-                    <button type="button" id="btn-shelf-view" onclick="switchProfileView('shelf')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
-                        {{ __('Shelf View') }}
+                    <button type="button" id="btn-board-view" onclick="switchProfileView('board')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
+                        📌 {{ __('Board') }}
                     </button>
                 </div>
             </div>
 
-            {{-- PARTIALS ÇAĞRILARI --}}
-            @include('profile.list-view')
-            @include('profile.shelf-view')
+            {{-- 1. KİTAP LİSTESİ GÖRÜNÜMÜ --}}
+            <div id="profile-list-view" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+                @include('profile.list-view')
+            </div>
+
+            {{-- 2. YENİ PANO (BOARD) GÖRÜNÜMÜ (Bookshelf yerine geçen alan) --}}
+            <div id="profile-board-view">
+                @include('profile.shelf-view')
+            </div>
 
         </main>
 
@@ -684,7 +710,6 @@ document.addEventListener('DOMContentLoaded', function() {
             box-shadow: 0 8px 24px rgba(0,0,0,0.25);
         "
     >
-        {{-- Modal Başlığı --}}
         <div 
             style="
                 display: flex; 
@@ -723,7 +748,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </button>
         </div>
 
-        {{-- Liste Alanı --}}
         <div 
             class="custom-scroll" 
             style="
@@ -854,6 +878,6 @@ window.addEventListener('click', function(e) {
 </script>
 
 @include('partials.chat')
+@include('partials.title-modal')
 </body>
 </html>
-@include('partials.title-modal')
