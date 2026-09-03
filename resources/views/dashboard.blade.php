@@ -141,8 +141,7 @@
         .mobile-dropdown-menu,
         .mobile-friends-tab,
         .mobile-drawer-overlay,
-        .mobile-bottom-lang-bar,
-        .mobile-about-tab {
+        .mobile-bottom-lang-bar {
             display: none !important;
         }
 
@@ -452,7 +451,7 @@
                 align-items: center;
                 gap: 6px;
                 position: fixed !important;
-                bottom: 18px !important;
+                bottom: 12px !important;
                 right: 0 !important;
                 background: #fdf5a6;
                 color: #2c441b;
@@ -466,52 +465,43 @@
                 box-shadow: -3px 4px 10px rgba(0,0,0,0.18);
                 cursor: pointer;
                 z-index: 9999;
-                transform: rotate(-1.5deg);
+                transform: none !important;
             }
 
-            /* SOL ALT: CHAT BUTONU (Friends ile aynı alt çizgide) */
+            /* SOL ALT: CHAT PATİ BUTONU (Friends ile tam aynı alt çizgi) */
             #chat-draggable-btn,
             .chat-bubble-btn,
             .chat-toggle-btn {
                 position: fixed !important;
                 left: 14px !important;
-                bottom: 18px !important;
+                bottom: 12px !important;
                 top: auto !important;
                 right: auto !important;
                 z-index: 9999 !important;
+                margin: 0 !important;
             }
 
-            /* ORTA ALT: ABOUT BUTONU (En altta, chat ve friends ile aynı tabanda) */
-            .mobile-about-tab {
-                display: flex !important;
-                align-items: center;
-                justify-content: center;
+            /* ORTA ALT: PARTIAL İÇİNDEN GELEN ABOUT BUTONU */
+            #aboutMeBtn,
+            .about-me-tab,
+            .about-bookie-btn,
+            .about-btn {
                 position: fixed !important;
-                bottom: 18px !important;
+                bottom: 12px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
-                background: #fdf5a6;
-                color: #2c441b;
-                border: 2px solid #5a7d3b;
-                border-radius: 14px;
-                padding: 6px 14px;
-                font-family: 'Unkempt', cursive;
-                font-weight: bold;
-                font-size: 13px;
-                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-                cursor: pointer;
                 z-index: 9998 !important;
-                white-space: nowrap;
+                margin: 0 !important;
             }
 
-            /* ORTA ÜST: DİL SEÇİCİ (About butonunun hemen üstünde yer alır) */
+            /* ORTA ÜST: DİL SEÇİCİ (About butonunun hemen üstünde) */
             .mobile-bottom-lang-bar {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 58px !important;
+                bottom: 56px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
-                z-index: 9998 !important;
+                z-index: 9999 !important;
                 pointer-events: auto !important;
             }
         }
@@ -575,14 +565,9 @@
         </div>
     </header>
 
-    {{-- MOBİL: ABOUT BUTONUNUN ÜSTÜNE GELEN DİL SEÇİCİ --}}
+    {{-- MOBİL EKRANDA EN ALTA ORTALANMIŞ DİL SEÇİCİ (ABOUT BUTONUNUN ÜSTÜNDE) --}}
     <div class="mobile-bottom-lang-bar">
         @include('partials.lang-switch')
-    </div>
-
-    {{-- MOBİL: EN ALTTA ORTALANMIŞ ABOUT BUTONU --}}
-    <div class="mobile-about-tab" onclick="if(typeof openAboutModal === 'function'){ openAboutModal(); } else { const p = document.getElementById('aboutMePopup'); if(p) p.classList.remove('hidden'); }">
-        <span>📌 {{ __('about bookie') }} ▲</span>
     </div>
 
     @if(session('success'))
