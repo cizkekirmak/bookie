@@ -226,7 +226,6 @@
         }
         .keychain-plush-img:hover { transform: rotate(8deg) scale(1.08); }
 
-        /* Edit modunda kancadaki anahtarlığın üzerine gelince hızlı çıkarma hissi */
         .is-editing-mode .keychain-plush-img:hover {
             opacity: 0.6;
             filter: drop-shadow(0 0 6px rgba(231, 76, 60, 0.7));
@@ -272,7 +271,7 @@
             margin-top: 2px;
         }
 
-        /* YENİ MERKEZİ & FERAH KOLEKSİYON ÇEKMECESİ */
+        /* MERKEZİ KOLEKSİYON ÇEKMECESİ */
         .keychain-collection-drawer {
             position: fixed;
             top: 50%;
@@ -309,7 +308,6 @@
         .drawer-header h4 { margin: 0; font-size: 16px; color: #1a3c11; }
         .drawer-close-btn { background: none; border: none; font-size: 20px; font-weight: bold; color: #2d5a27; cursor: pointer; }
 
-        /* SADECE ANAHTARLIK VE İSİM (ÇERÇEVESİZ & ŞEFFAF) */
         .drawer-body {
             padding: 16px 14px;
             overflow-y: auto;
@@ -480,7 +478,6 @@
         @endif
     </div>
 
-    <!-- MERKEZİ KOLEKSİYON ÇEKMECESİ -->
     @if($isOwnProfile)
     <div class="keychain-collection-drawer" id="collectionDrawer">
         <div class="drawer-header">
@@ -559,23 +556,24 @@
 </div>
 
 @php
+// GÖRSELE GÖRE GÜNCELLENEN 15 ANAHTARLIK LİSTESİ
 function getAllAchievementsList() {
     return [
-        'maymun' => ['title' => 'Monkey Reader', 'icon' => asset('images/badges/maymun.png'), 'unlocked' => true],
-        'tavsan' => ['title' => '10+ Friends', 'icon' => asset('images/badges/tavsan.png'), 'unlocked' => true],
-        'kalp'   => ['title' => 'Top Reviewer', 'icon' => asset('images/badges/kalp.png'), 'unlocked' => false],
-        'kaset'  => ['title' => 'Sci-Fi Hero', 'icon' => asset('images/badges/kaset.png'), 'unlocked' => false],
-        'kahve'  => ['title' => 'Classic Reader', 'icon' => asset('images/badges/kahve.png'), 'unlocked' => true],
-        'kedi'   => ['title' => 'Night Owl', 'icon' => asset('images/badges/kedi.png'), 'unlocked' => false],
-        'yildiz' => ['title' => 'Book Worm', 'icon' => asset('images/badges/yildiz.png'), 'unlocked' => false],
-        'kupa'   => ['title' => 'Speed Reader', 'icon' => asset('images/badges/kupa.png'), 'unlocked' => false],
-        'kitap'  => ['title' => 'First Step', 'icon' => asset('images/badges/kitap.png'), 'unlocked' => true],
-        'mektup' => ['title' => 'Postman', 'icon' => asset('images/badges/mektup.png'), 'unlocked' => false],
-        'ayicik' => ['title' => 'Warm Home', 'icon' => asset('images/badges/ayicik.png'), 'unlocked' => false],
-        'cicek'  => ['title' => 'Spring Blossom', 'icon' => asset('images/badges/cicek.png'), 'unlocked' => true],
-        'mantar' => ['title' => 'Fantasy Lover', 'icon' => asset('images/badges/mantar.png'), 'unlocked' => false],
-        'kamera' => ['title' => 'Aesthetic Soul', 'icon' => asset('images/badges/kamera.png'), 'unlocked' => false],
-        'pasta'  => ['title' => 'Birthday Cake', 'icon' => asset('images/badges/pasta.png'), 'unlocked' => false],
+        'ask'       => ['title' => 'Aşk',       'icon' => asset('images/badges/aşk.png'),       'unlocked' => true],
+        'ayicik'    => ['title' => 'Ayıcık',    'icon' => asset('images/badges/ayıcık.png'),    'unlocked' => true],
+        'burger'    => ['title' => 'Burger',    'icon' => asset('images/badges/burger.png'),    'unlocked' => true],
+        'cilek'     => ['title' => 'Çilek',     'icon' => asset('images/badges/çilek.png'),     'unlocked' => true],
+        'elma'      => ['title' => 'Elma',      'icon' => asset('images/badges/elma.png'),      'unlocked' => false],
+        'geyik'     => ['title' => 'Geyik',     'icon' => asset('images/badges/geyik.png'),     'unlocked' => false],
+        'jake'      => ['title' => 'Jake',      'icon' => asset('images/badges/jake.png'),      'unlocked' => true],
+        'kedi'      => ['title' => 'Kedi',      'icon' => asset('images/badges/kedi.png'),      'unlocked' => false],
+        'kitap'     => ['title' => 'Kitap',     'icon' => asset('images/badges/kitap.png'),     'unlocked' => true],
+        'kruvasan'  => ['title' => 'Kruvasan',  'icon' => asset('images/badges/kruvasan.png'),  'unlocked' => false],
+        'maymun'    => ['title' => 'Maymun',    'icon' => asset('images/badges/maymun.png'),    'unlocked' => true],
+        'tama'      => ['title' => 'Tama',      'icon' => asset('images/badges/tama.png'),      'unlocked' => false],
+        'usagi'     => ['title' => 'Usagi',     'icon' => asset('images/badges/usagi.png'),     'unlocked' => true],
+        'yengec'    => ['title' => 'Yengeç',    'icon' => asset('images/badges/yengeç.png'),    'unlocked' => false],
+        'yonca'     => ['title' => 'Yonca',     'icon' => asset('images/badges/yonca.png'),     'unlocked' => false],
     ];
 }
 @endphp
@@ -591,7 +589,7 @@ function getAllAchievementsList() {
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     let isEditing = false;
 
-    // --- KALICILIK ---
+    // --- LOCALSTORAGE KALICILIK ---
     const STORAGE_KEY_NOTES = `bookie_board_notes_${PROFILE_USER_ID}`;
     const STORAGE_KEY_KEYCHAINS = `bookie_board_keychains_${PROFILE_USER_ID}`;
 
@@ -696,7 +694,7 @@ function getAllAchievementsList() {
         }
     }
 
-    // --- DÜZENLEME MODU (EDIT MODU AÇIKKEN TIKLANAN ANAHTARLIK DİREKT KALKAR) ---
+    // --- EDIT MODU (AÇIKKEN KANCAYA TIKLANIRSA DİREKT KALKAR) ---
     if (toggleEditBtn) {
         toggleEditBtn.addEventListener('click', function() {
             isEditing = !isEditing;
@@ -716,13 +714,11 @@ function getAllAchievementsList() {
         });
     }
 
-    // Kancadaki anahtarlığa tıklandığında:
     function handleHookSlotClick(slotNum) {
         if (!IS_OWN_PROFILE) return;
         const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${slotNum}"]`);
         const existingImg = slotElem.querySelector('.keychain-plush-img');
 
-        // EDIT modundaysak tıklandığı an direkt çantaya kaldırılır (Onaysız, anında!)
         if (isEditing && existingImg) {
             existingImg.remove();
             const emptyBox = document.createElement('div');
@@ -732,7 +728,6 @@ function getAllAchievementsList() {
             return;
         }
 
-        // Boş kancaya tıklandıysa çantayı aç
         if (!existingImg && drawer && !drawer.classList.contains('active')) {
             toggleCollectionDrawer();
         }
@@ -973,7 +968,7 @@ function getAllAchievementsList() {
         };
     }
 
-    // --- ÇANTA & SÜRÜKLE-BIRAK (DRAG & DROP) SİSTEMİ ---
+    // --- ÇANTA & SÜRÜKLE-BIRAK (DRAG & DROP) ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
@@ -1000,10 +995,8 @@ function getAllAchievementsList() {
             `;
 
             if (isUnlocked) {
-                // Tıklamayla ilk boş kancaya tak
                 wrap.onclick = () => selectBadgeFromBag(key, item);
 
-                // Sürükle-Bırak (Drag & Drop)
                 wrap.setAttribute('draggable', 'true');
                 wrap.ondragstart = (e) => {
                     e.dataTransfer.setData('text/plain', key);
@@ -1035,7 +1028,6 @@ function getAllAchievementsList() {
         const emptySlot = slotElem.querySelector('.empty-hook-slot');
         if (emptySlot) emptySlot.remove();
 
-        // Varsa eski anahtarlığı temizle
         const oldImg = slotElem.querySelector('.keychain-plush-img');
         if (oldImg) oldImg.remove();
 
@@ -1050,7 +1042,6 @@ function getAllAchievementsList() {
         saveBoardToStorage();
     }
 
-    // Kancalara Sürükleyip Bırakma Dinleyicileri (Drag Over & Drop)
     document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
         hook.ondragover = (e) => {
             e.preventDefault();
