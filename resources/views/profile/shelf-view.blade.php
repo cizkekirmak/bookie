@@ -65,6 +65,29 @@
             overflow: hidden;
         }
 
+        /* PANO KİLİT SİMGESİ (lock.png / unlocked.png) */
+        .board-lock-badge {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            width: 36px;
+            height: 36px;
+            z-index: 1000;
+            cursor: pointer;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.22));
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .board-lock-badge:hover {
+            transform: scale(1.12);
+        }
+        .board-lock-badge img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
         .board-bottom-bar {
             display: flex;
             justify-content: center;
@@ -97,8 +120,13 @@
             border-color: #4b813b;
             color: #1e4215;
         }
+        .btn-action:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(60%);
+        }
 
-        /* POST-IT DIŞ KAPSAYICI (SCALE) */
+        /* POST-IT DIŞ KAPSAYICI */
         .cork-postit {
             position: absolute;
             cursor: grab;
@@ -108,7 +136,6 @@
         }
         .cork-postit:active { cursor: grabbing; }
 
-        /* POST-IT GÖVDE */
         .postit-inner-card {
             position: relative;
             box-shadow: 2px 5px 14px rgba(0,0,0,0.2);
@@ -536,8 +563,8 @@
     $isOwnProfile = auth()->check() && (auth()->id() === ($user->id ?? 0));
     $hookSlots = (isset($board) && is_array($board->hook_slots)) ? $board->hook_slots : array_fill(0, 9, null);
     $boardItems = (isset($board) && is_array($board->board_items)) ? $board->board_items : [];
+    $isBoardLocked = $board->is_locked ?? false;
 
-    // Controller'dan $achievements gönderilmediyse otomatik devreye giren tam liste:
     $achievements = $achievements ?? [
         'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
         'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
@@ -561,11 +588,21 @@
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
+            <!-- PANO KİLİDİ: lock.png / unlocked.png ARASINDA GEÇİŞ YAPAR -->
+            <div class="board-lock-badge" id="boardLockBtn" 
+                 title="{{ $isOwnProfile ? 'Kilitle / Kilidi Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
+                 style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
+                <img id="boardLockImg" 
+                     src="{{ $isBoardLocked ? asset('images/locke.png') : asset('images/unlocked.png') }}" 
+                     alt="Lock Status" 
+                     onerror="this.onerror=null; this.src='{{ asset('images/locke.png') }}';">
+            </div>
+
             @foreach($boardItems as $item)
                 @if(($item['type'] ?? '') === 'postit')
                     @php
                         $isAuthor = str_contains($item['author'] ?? '', '@' . (auth()->user()->username ?? ''));
-                        $canManage = $isOwnProfile || $isAuthor;
+                        $canManage = ($isOwnProfile || $isAuthor) && !$isBoardLocked;
                         $scale = $item['scale'] ?? 0.65;
                         $rot = $item['rotation'] ?? 0;
                     @endphp
@@ -584,7 +621,7 @@
                     <div class="free-sticker-wrapper" 
                          style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; width: {{ $item['width'] ?? '80px' }}; height: {{ $item['height'] ?? '80px' }}; transform: {{ $item['transform'] ?? 'rotate(0deg)' }}; z-index: {{ $item['zIndex'] ?? 10 }};">
                         <img src="{{ $item['src'] }}">
-                        @if($isOwnProfile)
+                        @if($isOwnProfile && !$isBoardLocked)
                             <div class="handle-btn handle-delete" title="Sil">✕</div>
                             <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                             <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
@@ -630,10 +667,12 @@
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
             <button type="button" class="btn-action" onclick="document.getElementById('freeStickerUploadInput').click()">🖼️ ADD STICKER</button>
-            <input type="file" id="freeStickerUploadInput" accept="image/png" style="display:none;">
+            <input type="file" id="freeStickerUploadInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;">
         @endif
         @if(auth()->check())
-            <button id="openPostitModalBtn" class="btn-action">📌 ADD POST-IT</button>
+            <button id="openPostitModalBtn" class="btn-action" {{ $isBoardLocked ? 'disabled' : '' }}>
+                {{ $isBoardLocked ? '🔒 BOARD LOCKED' : '📌 ADD POST-IT' }}
+            </button>
         @endif
     </div>
 
@@ -679,8 +718,8 @@
                 <textarea id="studioTextInput" class="studio-input-box" placeholder="Write something cozy..." maxlength="120"></textarea>
 
                 <label class="btn-gentle-upload">
-                    PNG Sticker Ekle
-                    <input type="file" id="studioFileInput" accept="image/png" style="display:none;">
+                    Resim / Sticker Ekle
+                    <input type="file" id="studioFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;">
                 </label>
             </div>
 
@@ -717,26 +756,51 @@
 <script>
     const CURRENT_USERNAME = @json(auth()->user()->username ?? (auth()->user()->name ?? 'reader'));
     const IS_OWN_PROFILE = @json($isOwnProfile);
-    
-    // Rota tanımlı değilse boş stringe fallback yapar
+    let isBoardLocked = @json($isBoardLocked);
+
+    // Kilit görsellerinin asset yolları:
+    const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
+    const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
+
     const SAVE_URL = @json(Route::has('board.save') ? route('board.save', $user->username ?? '') : '');
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
-    // Hata veren satır güvene alındı:
     const ACHIEVEMENTS_DATA = @json($achievements ?? []);
     const FALLBACK_BADGE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="none" stroke="%23888" stroke-width="4"/><rect x="25" y="32" width="50" height="56" rx="14" fill="%23badfa0" stroke="%234b813b" stroke-width="3"/><circle cx="42" cy="54" r="4" fill="%232d5a27"/><circle cx="58" cy="54" r="4" fill="%232d5a27"/><path d="M 45 64 Q 50 68 55 64" fill="none" stroke="%232d5a27" stroke-width="3" stroke-linecap="round"/></svg>`;
 
     const corkboard = document.getElementById('corkboardArea');
     const toggleEditBtn = document.getElementById('toggleEditBtn');
+    const boardLockBtn = document.getElementById('boardLockBtn');
+    const boardLockImg = document.getElementById('boardLockImg');
+    const openPostitModalBtn = document.getElementById('openPostitModalBtn');
     let isEditing = false;
 
     let globalMaxZIndex = 100;
     function bringToFront(element) {
+        if (isBoardLocked) return;
         globalMaxZIndex++;
         element.style.zIndex = globalMaxZIndex;
     }
 
-    // --- VERİTABANINA KAYDETME (VE LOCALSTORAGE YEDEĞİ) ---
+    // --- PANO KİLİTLEME DÜĞMESİ (lock.png <-> unlocked.png) ---
+    if (boardLockBtn && IS_OWN_PROFILE) {
+        boardLockBtn.addEventListener('click', () => {
+            isBoardLocked = !isBoardLocked;
+            
+            // Görseli değiştir
+            boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
+            boardLockBtn.title = isBoardLocked ? 'Pano Kilitli (Açmak için tıkla)' : 'Pano Açık (Kilitlemek için tıkla)';
+            
+            if (openPostitModalBtn) {
+                openPostitModalBtn.disabled = isBoardLocked;
+                openPostitModalBtn.innerText = isBoardLocked ? '🔒 BOARD LOCKED' : '📌 ADD POST-IT';
+            }
+
+            saveBoardToDatabase();
+        });
+    }
+
+    // --- VERİTABANINA KAYDETME ---
     async function saveBoardToDatabase() {
         const boardItems = [];
         
@@ -777,8 +841,7 @@
             hookSlots.push(img ? img.dataset.key : null);
         });
 
-        // Localstorage yedeği (Backend olmadan da çalışması için)
-        localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots }));
+        localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots, isBoardLocked }));
 
         if (SAVE_URL) {
             try {
@@ -791,7 +854,8 @@
                     },
                     body: JSON.stringify({
                         board_items: boardItems,
-                        hook_slots: hookSlots
+                        hook_slots: hookSlots,
+                        is_locked: isBoardLocked
                     })
                 });
             } catch (error) {
@@ -803,12 +867,13 @@
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const isAuthor = wrapper.querySelector('.postit-author')?.innerText.includes(`@${CURRENT_USERNAME}`);
-            const canManage = IS_OWN_PROFILE || isAuthor;
+            const canManage = (IS_OWN_PROFILE || isAuthor) && !isBoardLocked;
 
             const delBtn = wrapper.querySelector('.postit-delete-btn');
             if (delBtn) {
                 delBtn.onclick = function(e) {
                     e.stopPropagation();
+                    if (isBoardLocked) return;
                     wrapper.remove();
                     saveBoardToDatabase();
                 };
@@ -819,7 +884,7 @@
         });
 
         document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
-            if (IS_OWN_PROFILE) {
+            if (IS_OWN_PROFILE && !isBoardLocked) {
                 setupFreeStickerControls(wrap);
                 makeItemDraggable(wrap, true);
             }
@@ -828,6 +893,7 @@
 
     function setupPostitScaling(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
+            if (isBoardLocked) return;
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
             wrapper.classList.add('is-selected');
             bringToFront(wrapper);
@@ -838,6 +904,7 @@
         const resizeBtn = wrapper.querySelector('.handle-resize');
         if (resizeBtn) {
             resizeBtn.addEventListener('mousedown', (e) => {
+                if (isBoardLocked) return;
                 e.stopPropagation();
                 e.preventDefault();
                 bringToFront(wrapper);
@@ -899,6 +966,7 @@
         const resBtn = wrap.querySelector('.handle-resize');
 
         wrap.addEventListener('mousedown', (e) => {
+            if (isBoardLocked) return;
             if (e.target.classList.contains('handle-btn')) return;
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
             wrap.classList.add('is-selected');
@@ -907,6 +975,7 @@
 
         if (delBtn) {
             delBtn.addEventListener('click', (e) => {
+                if (isBoardLocked) return;
                 e.stopPropagation();
                 wrap.remove();
                 saveBoardToDatabase();
@@ -915,6 +984,7 @@
 
         if (resBtn) {
             resBtn.addEventListener('mousedown', (e) => {
+                if (isBoardLocked) return;
                 e.stopPropagation();
                 e.preventDefault();
                 bringToFront(wrap);
@@ -939,6 +1009,7 @@
 
         if (rotBtn) {
             rotBtn.addEventListener('mousedown', (e) => {
+                if (isBoardLocked) return;
                 e.stopPropagation();
                 e.preventDefault();
                 bringToFront(wrap);
@@ -971,8 +1042,10 @@
     const freeStickerInput = document.getElementById('freeStickerUploadInput');
     if (freeStickerInput) {
         freeStickerInput.addEventListener('change', function() {
+            if (isBoardLocked) return;
             const file = this.files[0];
-            if (file && file.type === 'image/png') {
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+            if (file && validTypes.includes(file.type)) {
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     const newElem = createFreeStickerElement(e.target.result, '30%', '40%');
@@ -1006,7 +1079,7 @@
     }
 
     function handleHookSlotClick(slotNum) {
-        if (!IS_OWN_PROFILE) return;
+        if (!IS_OWN_PROFILE || isBoardLocked) return;
         const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${slotNum}"]`);
         const existingImg = slotElem.querySelector('.keychain-plush-img');
 
@@ -1134,6 +1207,7 @@
 
     if (openModalBtn) {
         openModalBtn.addEventListener('click', () => {
+            if (isBoardLocked) return;
             document.getElementById('previewAuthorLabel').innerText = '@' + CURRENT_USERNAME;
             modal.classList.add('active');
         });
@@ -1166,7 +1240,8 @@
 
     fileInput.addEventListener('change', function() {
         const file = this.files[0];
-        if (file && file.type === 'image/png') {
+        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+        if (file && validTypes.includes(file.type)) {
             const reader = new FileReader();
             reader.onload = (e) => {
                 previewSticker.src = e.target.result;
@@ -1179,6 +1254,7 @@
     });
 
     function pinNoteToBoard() {
+        if (isBoardLocked) return;
         const postitWrapper = document.createElement('div');
         postitWrapper.className = 'cork-postit can-delete';
         postitWrapper.style.top = '25%';
@@ -1206,6 +1282,7 @@
         delBtn.innerText = '✕';
         delBtn.onclick = function(e) {
             e.stopPropagation();
+            if (isBoardLocked) return;
             postitWrapper.remove();
             saveBoardToDatabase();
         };
@@ -1237,6 +1314,7 @@
         element.ondragstart = () => false;
 
         element.onmousedown = function(e) {
+            if (isBoardLocked) return;
             if (e.target.classList.contains('postit-delete-btn') || e.target.classList.contains('handle-btn')) return;
 
             if (!IS_OWN_PROFILE && !isMyItem) return;
@@ -1277,7 +1355,7 @@
     const drawerList = document.getElementById('drawerBadgesList');
 
     function toggleCollectionDrawer() {
-        if (!IS_OWN_PROFILE || !drawer) return;
+        if (!IS_OWN_PROFILE || !drawer || isBoardLocked) return;
         drawer.classList.toggle('active');
         if (drawer.classList.contains('active')) renderDrawerAchievements();
     }
@@ -1298,7 +1376,7 @@
                 <span class="bag-badge-title">${item.title}</span>
             `;
 
-            if (isUnlocked) {
+            if (isUnlocked && !isBoardLocked) {
                 wrap.onclick = () => selectBadgeFromBag(key, item);
 
                 wrap.setAttribute('draggable', 'true');
@@ -1316,7 +1394,7 @@
     }
 
     function selectBadgeFromBag(key, item) {
-        if (!IS_OWN_PROFILE) return;
+        if (!IS_OWN_PROFILE || isBoardLocked) return;
         const slots = document.querySelectorAll('.keychain-hook-unit');
         for (let slot of slots) {
             const emptySlot = slot.querySelector('.empty-hook-slot');
@@ -1348,6 +1426,7 @@
 
     document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
         hook.ondragover = (e) => {
+            if (isBoardLocked) return;
             e.preventDefault();
             hook.classList.add('drag-over');
         };
@@ -1355,6 +1434,7 @@
             hook.classList.remove('drag-over');
         };
         hook.ondrop = (e) => {
+            if (isBoardLocked) return;
             e.preventDefault();
             hook.classList.remove('drag-over');
             const key = e.dataTransfer.getData('text/plain');
