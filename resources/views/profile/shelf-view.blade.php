@@ -60,7 +60,7 @@
             background-position: center;
             background-repeat: no-repeat;
             position: relative;
-            box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.15);
             border-radius: 14px;
             overflow: hidden;
         }
@@ -73,26 +73,36 @@
             width: 100%;
         }
 
+        /* NAZİK BUTONLAR */
         .btn-action {
-            background: #fdf5a6;
-            border: 2px solid #5a7d3b;
-            border-radius: 14px;
-            padding: 8px 24px;
+            background: #fdfaf0;
+            border: 1px solid #7ea863;
+            border-radius: 20px;
+            padding: 7px 20px;
             font-family: 'Unkempt', cursive;
-            font-size: 15px;
-            font-weight: bold;
-            color: #2c441b;
+            font-size: 14px;
+            font-weight: 600;
+            color: #2b461c;
             cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            transition: transform 0.15s, background-color 0.2s;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
-        .btn-action:hover { transform: scale(1.05); }
-        .btn-action.saving { background: #badfa0; }
+        .btn-action:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            background: #ffffff;
+            border-color: #5a7d3b;
+        }
+        .btn-action.saving {
+            background: #d8eed0;
+            border-color: #4b813b;
+            color: #1e4215;
+        }
 
-        /* POST-IT BOYUTLARI (KÜÇÜLTÜLDÜ) */
+        /* POST-IT BOYUTLARI (PANODA KÜÇÜK) */
         .cork-postit {
             position: absolute;
-            box-shadow: 2px 4px 10px rgba(0,0,0,0.22);
+            box-shadow: 2px 4px 10px rgba(0,0,0,0.18);
             padding: 6px;
             cursor: grab;
             user-select: none;
@@ -100,7 +110,7 @@
             transition: box-shadow 0.15s;
             touch-action: none;
         }
-        .cork-postit:active { cursor: grabbing; box-shadow: 3px 6px 14px rgba(0,0,0,0.35); }
+        .cork-postit:active { cursor: grabbing; box-shadow: 3px 6px 14px rgba(0,0,0,0.28); }
         .cork-postit.size-square { width: 96px; height: 96px; }
         .cork-postit.size-portrait { width: 90px; height: 125px; }
         .cork-postit.size-landscape { width: 125px; height: 90px; }
@@ -114,7 +124,7 @@
             height: 9px;
             background: #e74c3c;
             border-radius: 50%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
             border: 1px solid #c0392b;
             z-index: 20;
             pointer-events: none;
@@ -140,19 +150,29 @@
             transform-origin: center center;
         }
 
-        /* SERBEST KULLANICI STICKER'I */
-        .cork-free-sticker {
+        /* PANODAKİ SERBEST STICKER VE SEÇİM KUTUSU */
+        .free-sticker-wrapper {
             position: absolute;
-            width: 75px;
-            height: 75px;
-            object-fit: contain;
             cursor: grab;
             user-select: none;
-            -webkit-user-drag: none;
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
+            touch-action: none;
             z-index: 15;
+            display: inline-block;
         }
-        .cork-free-sticker:active { cursor: grabbing; }
+        .free-sticker-wrapper:active { cursor: grabbing; }
+        .free-sticker-wrapper.is-selected {
+            outline: 1.5px dashed #2d5a27;
+            outline-offset: 2px;
+        }
+        .free-sticker-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            pointer-events: none;
+            -webkit-user-drag: none;
+            filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
+        }
 
         .postit-author {
             position: absolute;
@@ -169,7 +189,7 @@
             position: absolute;
             top: 2px;
             right: 2px;
-            background: #ff5e57;
+            background: #ff7675;
             color: white;
             border: none;
             border-radius: 50%;
@@ -227,7 +247,7 @@
             margin-bottom: -5px;
         }
 
-        /* ÇİVİYE OTURAN ZİNCİR AYARI (-12px) */
+        /* KEYCHAIN (EKSTRA PADDING/MARGIN KALDIRILMIŞ DOĞAL HALİ) */
         .keychain-plush-img {
             width: 100%;
             height: 100%;
@@ -237,9 +257,6 @@
             cursor: pointer;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
             pointer-events: auto !important;
-            margin-top: -12px;
-            position: relative;
-            z-index: 1;
         }
         .keychain-plush-img:hover { transform: rotate(8deg) scale(1.08); }
 
@@ -298,9 +315,9 @@
             max-width: 460px;
             max-height: 75vh;
             background: #fdfaf3;
-            border: 3px solid #5a7d3b;
+            border: 2px solid #7ea863;
             border-radius: 22px;
-            box-shadow: 0 16px 40px rgba(0,0,0,0.28);
+            box-shadow: 0 14px 36px rgba(0,0,0,0.22);
             display: none;
             flex-direction: column;
             z-index: 100000;
@@ -319,11 +336,11 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 18px;
-            background: #eef7e6;
-            border-bottom: 2px solid #9dc384;
+            background: #f4f9f0;
+            border-bottom: 1.5px solid #bddbb0;
         }
-        .drawer-header h4 { margin: 0; font-size: 16px; color: #1a3c11; }
-        .drawer-close-btn { background: none; border: none; font-size: 20px; font-weight: bold; color: #2d5a27; cursor: pointer; }
+        .drawer-header h4 { margin: 0; font-size: 15px; color: #1a3c11; }
+        .drawer-close-btn { background: none; border: none; font-size: 18px; font-weight: bold; color: #2d5a27; cursor: pointer; }
 
         .drawer-body {
             padding: 16px 14px;
@@ -365,11 +382,11 @@
             word-break: break-word;
         }
 
-        /* MODAL VE KONTROLLER */
+        /* POST-IT OLUŞTURUCU MODAL & DAHA BÜYÜK PREVIEW */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.4);
             backdrop-filter: blur(2px);
             z-index: 100000;
             display: none;
@@ -379,46 +396,114 @@
         .modal-overlay.active { display: flex; }
 
         .studio-modal-box {
-            background: #fdfaf3;
-            border: 3px solid #5a7d3b;
+            background: #fdfcf8;
+            border: 2px solid #7ea863;
             border-radius: 20px;
-            padding: 20px;
+            padding: 22px;
             width: 95%;
-            max-width: 580px;
+            max-width: 660px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+            gap: 16px;
+            box-shadow: 0 12px 34px rgba(0,0,0,0.18);
         }
 
-        .studio-columns { display: flex; gap: 18px; }
-        .studio-tools { flex: 1; display: flex; flex-direction: column; gap: 10px; }
-        .studio-preview { width: 190px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+        .studio-columns {
+            display: flex;
+            gap: 24px;
+            align-items: center;
+        }
+        .studio-tools {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-        .shape-btn-group { display: flex; gap: 6px; width: 100%; }
+        /* BÜYÜTÜLMÜŞ ÖNİZLEME ALANI */
+        .studio-preview {
+            width: 250px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* PREVIEW İÇİNDE NET GÖRÜNEN BÜYÜK POST-IT */
+        .studio-preview #previewPostitBox.size-square { width: 175px; height: 175px; }
+        .studio-preview #previewPostitBox.size-portrait { width: 160px; height: 215px; }
+        .studio-preview #previewPostitBox.size-landscape { width: 220px; height: 160px; }
+
+        .shape-btn-group { display: flex; gap: 8px; width: 100%; }
         .shape-btn {
             flex: 1;
             background: #ffffff;
-            border: 1.5px solid #7ea863;
-            border-radius: 8px;
-            padding: 5px 2px;
+            border: 1px solid #bddbb0;
+            border-radius: 14px;
+            padding: 6px 4px;
             font-family: 'Unkempt', cursive;
-            font-size: 12px;
+            font-size: 13px;
             font-weight: bold;
-            color: #1a3c11;
+            color: #355726;
             cursor: pointer;
+            transition: all 0.15s ease;
         }
-        .shape-btn.active { background: #2d5a27; color: #ffffff; border-color: #2d5a27; }
+        .shape-btn.active {
+            background: #3e682e;
+            color: #ffffff;
+            border-color: #3e682e;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
 
-        .color-selector { display: flex; gap: 6px; }
-        .color-ball { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); cursor: pointer; }
-        .color-ball.selected { border: 2px solid #1a3c11; transform: scale(1.15); }
+        .color-selector { display: flex; gap: 8px; }
+        .color-ball {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(0,0,0,0.12);
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        .color-ball.selected {
+            border: 2px solid #2d5a27;
+            transform: scale(1.15);
+        }
 
-        /* YAZI KUTUSU ARTIK KELİME KADAR DARALABİLİR */
+        .studio-input-box {
+            width: 100%;
+            height: 54px;
+            font-family: 'Unkempt';
+            padding: 8px 10px;
+            resize: none;
+            border: 1px solid #c8debf;
+            border-radius: 12px;
+            outline: none;
+            background: #ffffff;
+            font-size: 13px;
+        }
+        .studio-input-box:focus {
+            border-color: #5a7d3b;
+        }
+
+        .btn-gentle-upload {
+            background: #f1f7ed;
+            border: 1px dashed #7ea863;
+            padding: 7px;
+            text-align: center;
+            border-radius: 12px;
+            font-size: 13px;
+            cursor: pointer;
+            color: #2d5a27;
+            transition: background 0.15s;
+        }
+        .btn-gentle-upload:hover { background: #e5f1df; }
+
+        /* KELİME KADAR DARALAN ESNEK KUTU */
         .transform-box {
             position: absolute;
             cursor: move;
-            border: 1.5px dashed transparent;
+            border: 1px dashed transparent;
             touch-action: none;
             display: inline-block;
             width: fit-content;
@@ -433,14 +518,19 @@
             height: 18px;
             border-radius: 50%;
             border: 1.5px solid #ffffff;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.25);
             z-index: 30;
         }
-        .transform-box.is-selected .handle-btn { display: flex; align-items: center; justify-content: center; }
+        .transform-box.is-selected .handle-btn,
+        .free-sticker-wrapper.is-selected .handle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-        .handle-delete { top: -8px; left: -8px; background: #e74c3c; color: white; font-size: 10px; cursor: pointer; }
-        .handle-rotate { top: -14px; left: 50%; transform: translateX(-50%); background: #f39c12; color: white; font-size: 10px; cursor: grab; }
-        .handle-resize { bottom: -8px; right: -8px; background: #3498db; color: white; font-size: 10px; cursor: nwse-resize; }
+        .handle-delete { top: -8px; left: -8px; background: #ff7675; color: white; font-size: 10px; cursor: pointer; }
+        .handle-rotate { top: -14px; left: 50%; transform: translateX(-50%); background: #fab1a0; color: #2d3436; font-size: 10px; cursor: grab; }
+        .handle-resize { bottom: -8px; right: -8px; background: #74b9ff; color: white; font-size: 10px; cursor: nwse-resize; }
 
         @media (max-width: 1024px) {
             .corkboard-main-wrapper { flex-direction: column; align-items: center; gap: 16px; }
@@ -451,6 +541,7 @@
             .keychain-collection-drawer { width: 92%; max-height: 70vh; }
             .drawer-body { grid-template-columns: repeat(3, 1fr); }
             .desktop-only-action { display: none !important; }
+            .studio-columns { flex-direction: column; }
         }
     </style>
 </head>
@@ -485,7 +576,7 @@
         </div>
     </div>
 
-    <!-- ALT BUTON BARI -->
+    <!-- ALT BUTON BARI (NAZİK TASARIM) -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
@@ -509,16 +600,16 @@
 
 </div>
 
-<!-- POST-IT MİNİ STÜDYO MODAL -->
+<!-- POST-IT MİNİ STÜDYO MODAL (DAHA BÜYÜK PREVIEW) -->
 <div class="modal-overlay" id="postitStudioModal">
     <div class="studio-modal-box">
-        <h3 style="margin: 0; font-size: 17px;">✨ Create Your Note</h3>
+        <h3 style="margin: 0; font-size: 16px; color: #1e4215;">✨ Create Your Note</h3>
         
         <div class="studio-columns">
             <div class="studio-tools">
                 <div>
-                    <label style="font-size: 13px;">Color:</label>
-                    <div class="color-selector">
+                    <label style="font-size: 13px; color: #2c441b;">Color:</label>
+                    <div class="color-selector" style="margin-top: 4px;">
                         <div class="color-ball selected" style="background:#fdf5a6;" data-c="#fdf5a6"></div>
                         <div class="color-ball" style="background:#ffd1dc;" data-c="#ffd1dc"></div>
                         <div class="color-ball" style="background:#c6e085;" data-c="#c6e085"></div>
@@ -528,34 +619,34 @@
                 </div>
 
                 <div>
-                    <label style="font-size: 13px;">Shape:</label>
-                    <div class="shape-btn-group">
+                    <label style="font-size: 13px; color: #2c441b;">Shape:</label>
+                    <div class="shape-btn-group" style="margin-top: 4px;">
                         <button type="button" class="shape-btn active" data-shape="size-square">Square</button>
                         <button type="button" class="shape-btn" data-shape="size-portrait">Portrait</button>
                         <button type="button" class="shape-btn" data-shape="size-landscape">Landscape</button>
                     </div>
                 </div>
 
-                <textarea id="studioTextInput" placeholder="Write something cozy..." maxlength="120" style="width:100%; height:50px; font-family:'Unkempt'; padding:6px; resize:none;"></textarea>
+                <textarea id="studioTextInput" class="studio-input-box" placeholder="Write something cozy..." maxlength="120"></textarea>
 
-                <label style="background:#eef6ea; border:1px solid #5a7d3b; padding:6px; text-align:center; border-radius:6px; font-size:12px; cursor:pointer;">
+                <label class="btn-gentle-upload">
                     PNG Sticker Ekle
                     <input type="file" id="studioFileInput" accept="image/png" style="display:none;">
                 </label>
             </div>
 
+            <!-- BÜYÜTÜLMÜŞ ÖNİZLEME -->
             <div class="studio-preview">
                 <div class="cork-postit size-square" id="previewPostitBox" style="position:relative; background:#fdf5a6; overflow:hidden;">
                     <span class="postit-pin"></span>
                     
-                    <!-- KELİME KADAR DARALAN ESNEK METİN KAPSAYICISI -->
-                    <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:12px;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:14px; white-space:nowrap;">selam</div>
+                    <div id="textTransformBox" class="transform-box is-selected" style="top:32px; left:16px;">
+                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:16px; white-space:nowrap;">selam</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <div id="stickerTransformBox" class="transform-box" style="display:none; top:45px; left:35px; width:50px; height:50px;">
+                    <div id="stickerTransformBox" class="transform-box" style="display:none; top:60px; left:40px; width:65px; height:65px;">
                         <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:100%; position:relative;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
@@ -564,13 +655,13 @@
 
                     <div class="postit-author" id="previewAuthorLabel"></div>
                 </div>
-                <span style="font-size:10px; color:#666;">*Köşelerden tutup döndür / boyutlandır</span>
+                <span style="font-size:10px; color:#777;">*Köşelerden tutup döndür / boyutlandır</span>
             </div>
         </div>
 
-        <div style="display:flex; justify-content:flex-end; gap:10px;">
-            <button type="button" class="btn-action" style="background:#ddd; padding:6px 16px; font-size:14px;" onclick="closePostitModal()">Cancel</button>
-            <button type="button" class="btn-action" style="padding:6px 18px; font-size:14px;" onclick="pinNoteToBoard()">OK!</button>
+        <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 4px;">
+            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closePostitModal()">Cancel</button>
+            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinNoteToBoard()">OK!</button>
         </div>
     </div>
 </div>
@@ -608,7 +699,7 @@ function getAllAchievementsList() {
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     let isEditing = false;
 
-    // --- LOCALSTORAGE KALICILIK (POST-IT + FREE STICKERS + KEYCHAINS) ---
+    // --- LOCALSTORAGE KALICILIK ---
     const STORAGE_KEY_BOARD = `bookie_full_board_${PROFILE_USER_ID}`;
     const STORAGE_KEY_KEYCHAINS = `bookie_board_keychains_${PROFILE_USER_ID}`;
 
@@ -634,16 +725,17 @@ function getAllAchievementsList() {
             });
         });
 
-        // Serbest yüklenen sticker'ları topla
-        document.querySelectorAll('#corkboardArea .cork-free-sticker').forEach(st => {
+        // Serbest PNG'leri topla
+        document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
+            const img = wrap.querySelector('img');
             boardItems.push({
                 type: 'free_sticker',
-                src: st.src,
-                top: st.style.top,
-                left: st.style.left,
-                width: st.style.width,
-                height: st.style.height,
-                transform: st.style.transform
+                src: img ? img.src : '',
+                top: wrap.style.top,
+                left: wrap.style.left,
+                width: wrap.style.width,
+                height: wrap.style.height,
+                transform: wrap.style.transform
             });
         });
 
@@ -694,27 +786,7 @@ function getAllAchievementsList() {
                     makeItemDraggable(noteDiv, isAuthor);
                     corkboard.appendChild(noteDiv);
                 } else if (item.type === 'free_sticker') {
-                    const img = document.createElement('img');
-                    img.src = item.src;
-                    img.className = 'cork-free-sticker';
-                    img.style.top = item.top;
-                    img.style.left = item.left;
-                    img.style.width = item.width || '75px';
-                    img.style.height = item.height || '75px';
-                    img.style.transform = item.transform || 'none';
-
-                    if (IS_OWN_PROFILE) {
-                        img.title = 'Çift tıkla ve sil';
-                        img.ondblclick = function() {
-                            if (confirm('Bu sticker panodan silinsin mi?')) {
-                                img.remove();
-                                saveBoardToStorage();
-                            }
-                        };
-                    }
-
-                    makeItemDraggable(img, IS_OWN_PROFILE);
-                    corkboard.appendChild(img);
+                    createFreeStickerElement(item.src, item.top, item.left, item.width, item.height, item.transform);
                 }
             });
         } else {
@@ -754,7 +826,109 @@ function getAllAchievementsList() {
         }
     }
 
-    // --- KULLANICININ PANOSUNA DİREKT ŞEFFAF PNG/STICKER YÜKLEMESİ ---
+    // --- PANODAKİ SERBEST PNG İÇİN STORY BOYUTLANDIRICI & SÜRÜKLEME ---
+    function createFreeStickerElement(src, top = '30%', left = '40%', width = '75px', height = '75px', transform = 'rotate(0deg)') {
+        const wrap = document.createElement('div');
+        wrap.className = 'free-sticker-wrapper';
+        wrap.style.top = top;
+        wrap.style.left = left;
+        wrap.style.width = width || '75px';
+        wrap.style.height = height || '75px';
+        wrap.style.transform = transform || 'rotate(0deg)';
+
+        wrap.innerHTML = `
+            <img src="${src}">
+            ${IS_OWN_PROFILE ? `
+                <div class="handle-btn handle-delete" title="Sil">✕</div>
+                <div class="handle-btn handle-rotate" title="Döndür">↻</div>
+                <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
+            ` : ''}
+        `;
+
+        if (IS_OWN_PROFILE) {
+            setupFreeStickerControls(wrap);
+            makeItemDraggable(wrap, true);
+        }
+
+        corkboard.appendChild(wrap);
+        return wrap;
+    }
+
+    function setupFreeStickerControls(wrap) {
+        const delBtn = wrap.querySelector('.handle-delete');
+        const rotBtn = wrap.querySelector('.handle-rotate');
+        const resBtn = wrap.querySelector('.handle-resize');
+        let rotation = 0;
+
+        wrap.addEventListener('mousedown', (e) => {
+            if (e.target.classList.contains('handle-btn')) return;
+            document.querySelectorAll('.free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
+            wrap.classList.add('is-selected');
+        });
+
+        if (delBtn) {
+            delBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                wrap.remove();
+                saveBoardToStorage();
+            });
+        }
+
+        if (resBtn) {
+            resBtn.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                let startX = e.clientX;
+                let startWidth = wrap.offsetWidth;
+
+                function resize(ev) {
+                    let delta = ev.clientX - startX;
+                    let newW = Math.max(30, startWidth + delta);
+                    wrap.style.width = newW + 'px';
+                    wrap.style.height = newW + 'px';
+                }
+                function stop() {
+                    window.removeEventListener('mousemove', resize);
+                    window.removeEventListener('mouseup', stop);
+                    saveBoardToStorage();
+                }
+                window.addEventListener('mousemove', resize);
+                window.addEventListener('mouseup', stop);
+            });
+        }
+
+        if (rotBtn) {
+            rotBtn.addEventListener('mousedown', (e) => {
+                e.stopPropagation();
+                e.preventDefault();
+
+                function rotate(ev) {
+                    const rect = wrap.getBoundingClientRect();
+                    const centerX = rect.left + rect.width / 2;
+                    const centerY = rect.top + rect.height / 2;
+                    const rad = Math.atan2(ev.clientX - centerX, -(ev.clientY - centerY));
+                    rotation = rad * (180 / Math.PI);
+                    wrap.style.transform = `rotate(${rotation}deg)`;
+                }
+                function stop() {
+                    window.removeEventListener('mousemove', rotate);
+                    window.removeEventListener('mouseup', stop);
+                    saveBoardToStorage();
+                }
+                window.addEventListener('mousemove', rotate);
+                window.addEventListener('mouseup', stop);
+            });
+        }
+    }
+
+    // Panonun boş yerine tıklayınca serbest sticker seçimini kaldır
+    corkboard.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.free-sticker-wrapper')) {
+            document.querySelectorAll('.free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
+        }
+    });
+
+    // --- KULLANICI PANOSUNA DİREKT PNG EKLEME ---
     const freeStickerInput = document.getElementById('freeStickerUploadInput');
     if (freeStickerInput) {
         freeStickerInput.addEventListener('change', function() {
@@ -762,23 +936,13 @@ function getAllAchievementsList() {
             if (file && file.type === 'image/png') {
                 const reader = new FileReader();
                 reader.onload = (e) => {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'cork-free-sticker';
-                    img.style.top = '30%';
-                    img.style.left = '40%';
-                    img.title = 'Çift tıkla ve sil';
-                    img.ondblclick = function() {
-                        if (confirm('Bu sticker panodan silinsin mi?')) {
-                            img.remove();
-                            saveBoardToStorage();
-                        }
-                    };
-                    makeItemDraggable(img, true);
-                    corkboard.appendChild(img);
+                    const newElem = createFreeStickerElement(e.target.result, '30%', '40%');
+                    document.querySelectorAll('.free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
+                    newElem.classList.add('is-selected');
                     saveBoardToStorage();
                 };
                 reader.readAsDataURL(file);
+                this.value = '';
             }
         });
     }
@@ -822,7 +986,7 @@ function getAllAchievementsList() {
         }
     }
 
-    // --- STORY TUTAMAÇLARI (KISALIP DARALABİLEN BOYUTLANDIRMA) ---
+    // --- MODAL İÇİ STORY TUTAMAÇLARI ---
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         const rotateBtn = box.querySelector('.handle-rotate');
@@ -830,7 +994,7 @@ function getAllAchievementsList() {
         let rotation = 0;
 
         box.addEventListener('mousedown', (e) => {
-            document.querySelectorAll('.transform-box').forEach(b => b.classList.remove('is-selected'));
+            document.querySelectorAll('#postitStudioModal .transform-box').forEach(b => b.classList.remove('is-selected'));
             box.classList.add('is-selected');
         });
 
@@ -852,7 +1016,6 @@ function getAllAchievementsList() {
             window.addEventListener('mouseup', stop);
         });
 
-        // Büyütme/Küçültme: 15px sınırına kadar serbestçe daralabilir
         if (resizeBtn) {
             resizeBtn.addEventListener('mousedown', (e) => {
                 e.stopPropagation();
@@ -860,7 +1023,7 @@ function getAllAchievementsList() {
                 let startX = e.clientX;
                 let startWidth = box.offsetWidth;
                 const textElement = box.querySelector('.postit-text-content');
-                let initialFontSize = textElement ? parseFloat(window.getComputedStyle(textElement).fontSize) : 14;
+                let initialFontSize = textElement ? parseFloat(window.getComputedStyle(textElement).fontSize) : 16;
 
                 function resize(ev) {
                     let delta = ev.clientX - startX;
@@ -873,7 +1036,7 @@ function getAllAchievementsList() {
 
                     if (textElement) {
                         let scaleRatio = newWidth / Math.max(startWidth, 20);
-                        let newFontSize = Math.max(8, Math.min(48, initialFontSize * scaleRatio));
+                        let newFontSize = Math.max(8, Math.min(52, initialFontSize * scaleRatio));
                         textElement.style.fontSize = newFontSize + 'px';
                     }
                 }
@@ -961,7 +1124,6 @@ function getAllAchievementsList() {
         });
     });
 
-    // Yazı değiştikçe kutu genişliğini sıfırlayıp kelime kadar olmasını sağlar
     textInput.addEventListener('input', () => {
         previewText.innerText = textInput.value || 'selam';
         textTransformBox.style.width = 'fit-content';
@@ -974,7 +1136,7 @@ function getAllAchievementsList() {
             reader.onload = (e) => {
                 previewSticker.src = e.target.result;
                 stickerBox.style.display = 'block';
-                document.querySelectorAll('.transform-box').forEach(b => b.classList.remove('is-selected'));
+                document.querySelectorAll('#postitStudioModal .transform-box').forEach(b => b.classList.remove('is-selected'));
                 stickerBox.classList.add('is-selected');
             };
             reader.readAsDataURL(file);
@@ -992,17 +1154,20 @@ function getAllAchievementsList() {
 
         const tBox = document.getElementById('textTransformBox');
         const sBox = document.getElementById('stickerTransformBox');
-        const currentFontSize = window.getComputedStyle(previewText).fontSize;
+        
+        // Preview daha büyük olduğu için panoya asarken hafif orantılıyoruz (~0.75x)
+        const computedFs = parseFloat(window.getComputedStyle(previewText).fontSize);
+        const scaledFontSize = Math.max(9, Math.round(computedFs * 0.75)) + 'px';
 
         let stickerHtml = (sBox.style.display !== 'none' && previewSticker.src) ? `
             <img src="${previewSticker.src}" class="postit-sticker-img" 
-                 style="top:${sBox.style.top}; left:${sBox.style.left}; width:${sBox.style.width}; height:${sBox.style.height}; transform:${sBox.style.transform};">
+                 style="top:${sBox.style.top}; left:${sBox.style.left}; width:${sBox.offsetWidth * 0.75}px; height:${sBox.offsetHeight * 0.75}px; transform:${sBox.style.transform};">
         ` : '';
 
         newNote.innerHTML = `
             <span class="postit-pin"></span>
             <button class="postit-delete-btn" onclick="this.parentElement.remove(); saveBoardToStorage();">✕</button>
-            <div class="postit-text-content" style="top:${tBox.style.top}; left:${tBox.style.left}; width:${tBox.style.width || 'auto'}; font-size:${currentFontSize}; transform:${tBox.style.transform};">
+            <div class="postit-text-content" style="top:${tBox.style.top}; left:${tBox.style.left}; width:${tBox.style.width || 'auto'}; font-size:${scaledFontSize}; transform:${tBox.style.transform};">
                 ${text}
             </div>
             ${stickerHtml}
@@ -1021,12 +1186,12 @@ function getAllAchievementsList() {
         saveBoardToStorage();
     }
 
-    // --- EVRENSEL SÜRÜKLEME (POST-IT & SERBEST STICKER) ---
+    // --- EVRENSEL SÜRÜKLEME ---
     function makeItemDraggable(element, isMyItem = false) {
         element.ondragstart = () => false;
 
         element.onmousedown = function(e) {
-            if (e.target.classList.contains('postit-delete-btn')) return;
+            if (e.target.classList.contains('postit-delete-btn') || e.target.classList.contains('handle-btn')) return;
 
             if (!IS_OWN_PROFILE && !isMyItem) return;
             if (IS_OWN_PROFILE && !isEditing && !isMyItem) return;
