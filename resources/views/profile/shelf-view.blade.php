@@ -556,24 +556,24 @@
 </div>
 
 @php
-// GÖRSELE GÖRE GÜNCELLENEN 15 ANAHTARLIK LİSTESİ
+// TEST İÇİN TÜM 15 ANAHTARLIK AÇIK HALE GETİRİLDİ (unlocked => true)
 function getAllAchievementsList() {
     return [
         'ask'       => ['title' => 'Aşk',       'icon' => asset('images/badges/aşk.png'),       'unlocked' => true],
         'ayicik'    => ['title' => 'Ayıcık',    'icon' => asset('images/badges/ayıcık.png'),    'unlocked' => true],
         'burger'    => ['title' => 'Burger',    'icon' => asset('images/badges/burger.png'),    'unlocked' => true],
         'cilek'     => ['title' => 'Çilek',     'icon' => asset('images/badges/çilek.png'),     'unlocked' => true],
-        'elma'      => ['title' => 'Elma',      'icon' => asset('images/badges/elma.png'),      'unlocked' => false],
-        'geyik'     => ['title' => 'Geyik',     'icon' => asset('images/badges/geyik.png'),     'unlocked' => false],
+        'elma'      => ['title' => 'Elma',      'icon' => asset('images/badges/elma.png'),      'unlocked' => true],
+        'geyik'     => ['title' => 'Geyik',     'icon' => asset('images/badges/geyik.png'),     'unlocked' => true],
         'jake'      => ['title' => 'Jake',      'icon' => asset('images/badges/jake.png'),      'unlocked' => true],
-        'kedi'      => ['title' => 'Kedi',      'icon' => asset('images/badges/kedi.png'),      'unlocked' => false],
+        'kedi'      => ['title' => 'Kedi',      'icon' => asset('images/badges/kedi.png'),      'unlocked' => true],
         'kitap'     => ['title' => 'Kitap',     'icon' => asset('images/badges/kitap.png'),     'unlocked' => true],
-        'kruvasan'  => ['title' => 'Kruvasan',  'icon' => asset('images/badges/kruvasan.png'),  'unlocked' => false],
+        'kruvasan'  => ['title' => 'Kruvasan',  'icon' => asset('images/badges/kruvasan.png'),  'unlocked' => true],
         'maymun'    => ['title' => 'Maymun',    'icon' => asset('images/badges/maymun.png'),    'unlocked' => true],
-        'tama'      => ['title' => 'Tama',      'icon' => asset('images/badges/tama.png'),      'unlocked' => false],
+        'tama'      => ['title' => 'Tama',      'icon' => asset('images/badges/tama.png'),      'unlocked' => true],
         'usagi'     => ['title' => 'Usagi',     'icon' => asset('images/badges/usagi.png'),     'unlocked' => true],
-        'yengec'    => ['title' => 'Yengeç',    'icon' => asset('images/badges/yengeç.png'),    'unlocked' => false],
-        'yonca'     => ['title' => 'Yonca',     'icon' => asset('images/badges/yonca.png'),     'unlocked' => false],
+        'yengec'    => ['title' => 'Yengeç',    'icon' => asset('images/badges/yengeç.png'),    'unlocked' => true],
+        'yonca'     => ['title' => 'Yonca',     'icon' => asset('images/badges/yonca.png'),     'unlocked' => true],
     ];
 }
 @endphp
