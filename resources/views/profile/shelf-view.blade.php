@@ -65,7 +65,6 @@
             overflow: hidden;
         }
 
-        /* DAHA BELİRGİN VE BÜYÜK KİLİT BUTONU */
         .board-lock-badge {
             position: absolute;
             top: 14px;
@@ -564,7 +563,6 @@
     $boardItems = (isset($board) && is_array($board->board_items)) ? $board->board_items : [];
     $isBoardLocked = $board->is_locked ?? false;
 
-    // GERÇEK AÇILMA / KİLİTLİ DURUMLARI (Test modu bitti)
     $achievements = $achievements ?? [
         'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
         'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
@@ -588,7 +586,6 @@
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
-            <!-- PANO KİLİT BUTONU -->
             <div class="board-lock-badge" id="boardLockBtn" 
                  title="{{ $isOwnProfile ? 'Kilitle / Kilidi Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
@@ -664,7 +661,6 @@
         </div>
     </div>
 
-    <!-- ALT BUTON BARI -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
@@ -690,7 +686,6 @@
 
 </div>
 
-<!-- POST-IT MİNİ STÜDYO MODAL -->
 <div class="modal-overlay" id="postitStudioModal">
     <div class="studio-modal-box">
         <h3 style="margin: 0; font-size: 16px; color: #1e4215;">✨ Create Your Note</h3>
@@ -764,7 +759,6 @@
     const LOCK_ICON_PATH = '{{ asset("images/lock.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
-    // Rota kontrolü ve fallback URL
     const SAVE_URL = PROFILE_USERNAME ? `/u/${PROFILE_USERNAME}/board/save` : '';
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
@@ -785,7 +779,6 @@
         element.style.zIndex = globalMaxZIndex;
     }
 
-    // --- PANO KİLİTLEME DÜĞMESİ (BÜYÜK BOYUT & DİNAMİK GEÇİŞ) ---
     if (boardLockBtn && IS_OWN_PROFILE) {
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
@@ -801,7 +794,6 @@
         });
     }
 
-    // --- VERİTABANINA ASYNC KAYIT VE LOCALSTORAGE GÜVENLİK YEDEĞİ ---
     async function saveBoardToDatabase() {
         const boardItems = [];
         
@@ -842,12 +834,11 @@
             hookSlots.push(img ? img.dataset.key : null);
         });
 
-        // Çift taraflı güvence: Hem LocalStorage'a hem DB'ye anında yaz
         localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots, isBoardLocked }));
 
         if (SAVE_URL) {
             try {
-                const response = await fetch(SAVE_URL, {
+                await fetch(SAVE_URL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -860,22 +851,19 @@
                         is_locked: isBoardLocked
                     })
                 });
-                const resData = await response.json();
-                console.log('Pano veritabanına başarıyla kaydedildi:', resData);
             } catch (error) {
-                console.error('Veritabanına kaydedilirken hata oluştu (LocalStorage devrede):', error);
+                console.error('Kayıt hatası:', error);
             }
         }
     }
 
-    // Sayfa açıldığında panodaki mevcut elemanları aktifleştir
     document.addEventListener('DOMContentLoaded', () => {
-        // Eğer DB boşsa fakat localStorage yedeği varsa geri yükle
         const localBackup = localStorage.getItem(`bookie_board_backup_${@json($user->id ?? 0)}`);
-        if (localBackup && (!document.querySelector('.cork-postit') && !document.querySelector('.free-sticker-wrapper'))) {
+        if (localBackup) {
             try {
                 const parsed = JSON.parse(localBackup);
-                if (parsed.boardItems && parsed.boardItems.length > 0) {
+
+                if (parsed.boardItems && parsed.boardItems.length > 0 && !document.querySelector('.cork-postit') && !document.querySelector('.free-sticker-wrapper')) {
                     parsed.boardItems.forEach(item => {
                         if (item.type === 'postit') {
                             const postitWrapper = document.createElement('div');
@@ -901,8 +889,41 @@
                         }
                     });
                 }
+
+                if (parsed.hookSlots && Array.isArray(parsed.hookSlots)) {
+                    parsed.hookSlots.forEach((key, index) => {
+                        const slotUnit = document.querySelector(`.keychain-hook-unit[data-slot="${index + 1}"]`);
+                        if (slotUnit) {
+                            slotUnit.innerHTML = '<div class="hook-nail"></div>';
+                            if (key && ACHIEVEMENTS_DATA[key]) {
+                                const img = document.createElement('img');
+                                img.src = `/images/badges/${ACHIEVEMENTS_DATA[key].file}`;
+                                img.className = 'keychain-plush-img';
+                                img.dataset.key = key;
+                                img.title = ACHIEVEMENTS_DATA[key].title;
+                                img.onerror = function() { this.src = FALLBACK_BADGE_SVG; };
+                                slotUnit.appendChild(img);
+                            } else {
+                                const emptyBox = document.createElement('div');
+                                emptyBox.className = 'empty-hook-slot';
+                                slotUnit.appendChild(emptyBox);
+                            }
+                        }
+                    });
+                }
+
+                if (typeof parsed.isBoardLocked !== 'undefined') {
+                    isBoardLocked = parsed.isBoardLocked;
+                    if (boardLockImg) {
+                        boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
+                    }
+                    if (openPostitModalBtn) {
+                        openPostitModalBtn.disabled = isBoardLocked;
+                        openPostitModalBtn.innerText = isBoardLocked ? '🔒 BOARD LOCKED' : '📌 ADD POST-IT';
+                    }
+                }
             } catch (e) {
-                console.error('Yedek yüklenemedi:', e);
+                console.error('Yedek yükleme hatası:', e);
             }
         }
 
@@ -921,7 +942,6 @@
         });
     });
 
-    // --- PANODAKİ POST-IT'İN DÖNDÜRME, BOYUTLANDIRMA VE SİLME KONTROLLERİ ---
     function setupPostitControls(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             if (isBoardLocked) return;
@@ -945,7 +965,6 @@
             };
         }
 
-        // POST-IT BÜYÜTME (SCALE)
         if (resizeBtn) {
             resizeBtn.addEventListener('mousedown', (e) => {
                 if (isBoardLocked) return;
@@ -975,7 +994,6 @@
             });
         }
 
-        // POST-IT DÖNDÜRME (ROTATE)
         if (rotateBtn) {
             rotateBtn.addEventListener('mousedown', (e) => {
                 if (isBoardLocked) return;
@@ -1007,7 +1025,6 @@
         }
     }
 
-    // --- PANODAKİ SERBEST STICKER OLUŞTURMA & KONTROLLERİ ---
     function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
@@ -1329,7 +1346,6 @@
         }
     });
 
-    // --- YENİ POST-IT'İ KLONLAYIP PANODA DÖNDÜRME VE BÜYÜTME KONTROLLERİYLE OLUŞTURMA ---
     function pinNoteToBoard() {
         if (isBoardLocked) return;
         const postitWrapper = document.createElement('div');
@@ -1356,7 +1372,6 @@
 
         postitWrapper.appendChild(clonedCard);
 
-        // Hem silme, hem döndürme, hem ölçek tutamaçlarını ekle
         postitWrapper.innerHTML += `
             <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
             <div class="handle-btn handle-rotate" title="Döndür">↻</div>
@@ -1382,7 +1397,7 @@
 
         element.onmousedown = function(e) {
             if (isBoardLocked) return;
-            if (e.target.classList.contains('handle-btn')) return;
+            if (e.target.classList.contains('postit-delete-btn') || e.target.classList.contains('handle-btn')) return;
 
             if (!IS_OWN_PROFILE && !isMyItem) return;
             if (IS_OWN_PROFILE && !isEditing && !isMyItem) return;
