@@ -224,7 +224,6 @@
             margin-bottom: -5px;
         }
 
-        /* HERKES İÇİN SALLANMA HOVER EFEKTİ */
         .keychain-plush-img {
             width: 100%;
             height: 100%;
@@ -355,7 +354,7 @@
         .status-unlocked { background: #e1f5d6; color: #235c15; }
         .status-locked { background: #e0e0e0; color: #666; }
 
-        /* POST-IT OLUŞTURUCU MODAL & STORY KONTROLLERİ */
+        /* POST-IT OLUŞTURUCU MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -404,7 +403,7 @@
         .color-ball { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); cursor: pointer; }
         .color-ball.selected { border: 2px solid #1a3c11; transform: scale(1.15); }
 
-        /* MODAL İÇİ DÜZENLEME KUTUSU */
+        /* MODAL İÇİ KÖŞE VE SEÇİM TUTAMAÇLARI */
         .transform-box {
             position: absolute;
             cursor: move;
@@ -535,7 +534,7 @@
                     
                     <!-- Metin Kapsayıcısı -->
                     <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:12px; width:100px; height:auto;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; width:100%;">Hello!</div>
+                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; width:100%; font-size:14px;">Hello!</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
                     </div>
@@ -636,7 +635,6 @@ function getAllAchievementsList() {
                 noteDiv.style.transform = n.transform;
                 noteDiv.innerHTML = n.html;
                 
-                // Kendi notuysa veya profil sahibiyse silme butonunu yetkilendir
                 const isAuthor = n.author.includes(`@${CURRENT_USERNAME}`);
                 if (IS_OWN_PROFILE || isAuthor) {
                     noteDiv.classList.add('can-delete');
@@ -692,7 +690,6 @@ function getAllAchievementsList() {
         }
     }
 
-    // --- DÜZENLEME BUTONU (Sadece Pano Sahibi Genel Düzeni Kaydeder) ---
     if (toggleEditBtn) {
         toggleEditBtn.addEventListener('click', function() {
             isEditing = !isEditing;
@@ -709,7 +706,7 @@ function getAllAchievementsList() {
         });
     }
 
-    // --- STORY TUTAMAÇLARI ---
+    // --- STORY TUTAMAÇLARI (HEM KUTUYU HEM PUNTOYU BÜYÜTÜR) ---
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         const rotateBtn = box.querySelector('.handle-rotate');
@@ -739,17 +736,30 @@ function getAllAchievementsList() {
             window.addEventListener('mouseup', stop);
         });
 
+        // Büyütme (Resize): Hem genişliği hem font-size'ı orantılı büyütür
         if (resizeBtn) {
             resizeBtn.addEventListener('mousedown', (e) => {
                 e.stopPropagation();
                 e.preventDefault();
                 let startX = e.clientX;
                 let startWidth = box.offsetWidth;
+                const textElement = box.querySelector('.postit-text-content');
+                let initialFontSize = textElement ? parseFloat(window.getComputedStyle(textElement).fontSize) : 14;
 
                 function resize(ev) {
-                    let w = Math.max(30, startWidth + (ev.clientX - startX));
-                    box.style.width = w + 'px';
-                    if (boxId === 'stickerTransformBox') box.style.height = w + 'px';
+                    let delta = ev.clientX - startX;
+                    let newWidth = Math.max(35, startWidth + delta);
+                    box.style.width = newWidth + 'px';
+
+                    if (boxId === 'stickerTransformBox') {
+                        box.style.height = newWidth + 'px';
+                    }
+
+                    if (textElement) {
+                        let scaleRatio = newWidth / startWidth;
+                        let newFontSize = Math.max(10, Math.min(50, initialFontSize * scaleRatio));
+                        textElement.style.fontSize = newFontSize + 'px';
+                    }
                 }
                 function stop() {
                     window.removeEventListener('mousemove', resize);
@@ -760,6 +770,7 @@ function getAllAchievementsList() {
             });
         }
 
+        // Döndürme (Rotate)
         if (rotateBtn) {
             rotateBtn.addEventListener('mousedown', (e) => {
                 e.stopPropagation();
@@ -852,7 +863,6 @@ function getAllAchievementsList() {
         }
     });
 
-    // --- BAŞKASININ VEYA KENDİ PROFİLİNDE YENİ NOT OLUŞTURMA ---
     function pinNoteToBoard() {
         const text = textInput.value.trim() || 'Cozy note!';
         const newNote = document.createElement('div');
@@ -864,6 +874,7 @@ function getAllAchievementsList() {
 
         const tBox = document.getElementById('textTransformBox');
         const sBox = document.getElementById('stickerTransformBox');
+        const currentFontSize = window.getComputedStyle(previewText).fontSize;
 
         let stickerHtml = (sBox.style.display !== 'none' && previewSticker.src) ? `
             <img src="${previewSticker.src}" class="postit-sticker-img" 
@@ -873,20 +884,18 @@ function getAllAchievementsList() {
         newNote.innerHTML = `
             <span class="postit-pin"></span>
             <button class="postit-delete-btn" onclick="this.parentElement.remove(); saveBoardToStorage();">✕</button>
-            <div class="postit-text-content" style="top:${tBox.style.top}; left:${tBox.style.left}; width:${tBox.style.width}; transform:${tBox.style.transform};">
+            <div class="postit-text-content" style="top:${tBox.style.top}; left:${tBox.style.left}; width:${tBox.style.width}; font-size:${currentFontSize}; transform:${tBox.style.transform};">
                 ${text}
             </div>
             ${stickerHtml}
             <div class="postit-author">@${CURRENT_USERNAME}</div>
         `;
 
-        // Yeni eklenen not, kimin profili olursa olsun DOĞRUDAN sürüklenebilir!
         makePostitDraggable(newNote, true);
 
         corkboard.appendChild(newNote);
         closePostitModal();
 
-        // Formu temizle
         textInput.value = '';
         stickerBox.style.display = 'none';
         previewSticker.src = '';
@@ -895,18 +904,13 @@ function getAllAchievementsList() {
         saveBoardToStorage();
     }
 
-    // --- SERBEST VE PÜRÜZSÜZ SÜRÜKLEME MANTIĞI ---
+    // --- SERBEST SÜRÜKLEME ---
     function makePostitDraggable(element, isMyNote = false) {
         element.ondragstart = () => false;
 
         element.onmousedown = function(e) {
-            // Çarpıya basıldıysa taşıma
             if (e.target.classList.contains('postit-delete-btn')) return;
 
-            // Yetki Kontrolü:
-            // 1. Profil sahibi 'Edit' modundaysa tüm notları taşır.
-            // 2. Ziyaretçi ise SADECE kendi yazdığı notu taşır (isMyNote = true).
-            // İkisi de değilse başkasının notuna dokunamaz.
             if (!IS_OWN_PROFILE && !isMyNote) return;
             if (IS_OWN_PROFILE && !isEditing && !isMyNote) return;
 
