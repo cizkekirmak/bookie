@@ -321,7 +321,7 @@
         .status-unlocked { background: #e1f5d6; color: #235c15; }
         .status-locked { background: #e0e0e0; color: #666; }
 
-        /* POST-IT OLUŞTURUCU MODAL & KONTROLLER */
+        /* POST-IT OLUŞTURUCU MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -393,6 +393,76 @@
         .handle-delete { top: -8px; left: -8px; background: #e74c3c; color: white; font-size: 10px; cursor: pointer; }
         .handle-rotate { top: -14px; left: 50%; transform: translateX(-50%); background: #f39c12; color: white; font-size: 10px; cursor: grab; }
         .handle-resize { bottom: -8px; right: -8px; background: #3498db; color: white; font-size: 10px; cursor: nwse-resize; }
+
+        /* ÖZEL COZY ONAY MODALI (Tarayıcı confirm yerine) */
+        .cozy-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            backdrop-filter: blur(2px);
+            z-index: 200000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .cozy-modal-overlay.active { display: flex; }
+
+        .cozy-confirm-card {
+            background: #fdfaf3;
+            border: 3px solid #5a7d3b;
+            border-radius: 18px;
+            padding: 22px 24px;
+            width: 90%;
+            max-width: 380px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            animation: popInModal 0.2s ease-out;
+        }
+
+        .cozy-confirm-title {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            color: #1f5117;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .cozy-confirm-text {
+            margin: 0 0 18px 0;
+            font-size: 14px;
+            color: #355726;
+            line-height: 1.35;
+        }
+
+        .cozy-confirm-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .cozy-btn-cancel {
+            background: #eaeaea;
+            border: 1.5px solid #aaa;
+            color: #444;
+            padding: 6px 18px;
+            font-size: 14px;
+        }
+
+        .cozy-btn-confirm {
+            background: #ff7675;
+            border: 1.5px solid #d63031;
+            color: #ffffff;
+            padding: 6px 20px;
+            font-size: 14px;
+        }
+        .cozy-btn-confirm:hover { background: #d63031; }
+
+        @keyframes popInModal {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
 
         @media (max-width: 1024px) {
             .corkboard-main-wrapper { flex-direction: column; align-items: center; gap: 16px; }
@@ -514,6 +584,18 @@
         <div style="display:flex; justify-content:flex-end; gap:10px;">
             <button type="button" class="btn-action" style="background:#ddd; padding:6px 16px; font-size:14px;" onclick="closePostitModal()">Cancel</button>
             <button type="button" class="btn-action" style="padding:6px 18px; font-size:14px;" onclick="pinNoteToBoard()">OK!</button>
+        </div>
+    </div>
+</div>
+
+<!-- ÖZEL COZY ONAY MODALI (Kancadan çıkarma bildirimi) -->
+<div class="cozy-modal-overlay" id="cozyConfirmModal">
+    <div class="cozy-confirm-card">
+        <h3 class="cozy-confirm-title">🎒 Anahtarlık Çantası</h3>
+        <p class="cozy-confirm-text">Bu anahtarlığı kancadan çıkarıp çantana geri koymak istiyor musun?</p>
+        <div class="cozy-confirm-actions">
+            <button type="button" class="btn-action cozy-btn-cancel" id="btnCancelRemove">Vazgeç</button>
+            <button type="button" class="btn-action cozy-btn-confirm" id="btnConfirmRemove">Çıkar</button>
         </div>
     </div>
 </div>
@@ -858,6 +940,7 @@ function getAllAchievementsList() {
         `;
 
         makePostitDraggable(newNote, true);
+
         corkboard.appendChild(newNote);
         closePostitModal();
 
@@ -962,13 +1045,22 @@ function getAllAchievementsList() {
         alert('Tüm 9 kanca dolu! Birini kaldırmak için üzerine tıkla.');
     }
 
-    function handleHookSlotClick(slotNum) {
-        if (!IS_OWN_PROFILE) return;
-        const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${slotNum}"]`);
-        const existingImg = slotElem.querySelector('.keychain-plush-img');
+    // --- COZY ONAY MODALI ETKİLEŞİMİ (KANCADAN ÇIKARMA) ---
+    const confirmModal = document.getElementById('cozyConfirmModal');
+    const btnCancelRemove = document.getElementById('btnCancelRemove');
+    const btnConfirmRemove = document.getElementById('btnConfirmRemove');
+    let pendingSlotToRemove = null;
 
-        if (existingImg) {
-            if (confirm('Bu anahtarlığı kancadan çıkarıp çantana geri koymak istiyor musun?')) {
+    btnCancelRemove.addEventListener('click', () => {
+        confirmModal.classList.remove('active');
+        pendingSlotToRemove = null;
+    });
+
+    btnConfirmRemove.addEventListener('click', () => {
+        if (pendingSlotToRemove) {
+            const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${pendingSlotToRemove}"]`);
+            const existingImg = slotElem.querySelector('.keychain-plush-img');
+            if (existingImg) {
                 existingImg.remove();
                 const emptyBox = document.createElement('div');
                 emptyBox.className = 'empty-hook-slot';
@@ -976,6 +1068,19 @@ function getAllAchievementsList() {
                 slotElem.appendChild(emptyBox);
                 saveBoardToStorage();
             }
+        }
+        confirmModal.classList.remove('active');
+        pendingSlotToRemove = null;
+    });
+
+    function handleHookSlotClick(slotNum) {
+        if (!IS_OWN_PROFILE) return;
+        const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${slotNum}"]`);
+        const existingImg = slotElem.querySelector('.keychain-plush-img');
+
+        if (existingImg) {
+            pendingSlotToRemove = slotNum;
+            confirmModal.classList.add('active');
         } else {
             if (drawer && !drawer.classList.contains('active')) toggleCollectionDrawer();
         }
