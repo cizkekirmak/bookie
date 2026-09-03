@@ -349,3 +349,8 @@ Route::get('/lang/{locale}', function (Request $request, $locale) {
 
     return redirect()->to($referer);
 })->name('lang.switch');
+
+use App\Http\Controllers\BoardController;
+
+Route::get('/u/{user:username}/board', [BoardController::class, 'show'])->name('board.show');
+Route::post('/u/{user:username}/board/save', [BoardController::class, 'save'])->middleware('auth')->name('board.save');

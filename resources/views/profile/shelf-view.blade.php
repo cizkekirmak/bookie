@@ -73,6 +73,7 @@
             width: 100%;
         }
 
+        /* NAZİK BUTONLAR */
         .btn-action {
             background: #fdfaf0;
             border: 1px solid #7ea863;
@@ -98,7 +99,7 @@
             color: #1e4215;
         }
 
-        /* POST-IT DIŞ KAPSAYICISI (SCALE BURAYA UYGULANIR) */
+        /* POST-IT DIŞ KAPSAYICI (SCALE) */
         .cork-postit {
             position: absolute;
             cursor: grab;
@@ -108,7 +109,7 @@
         }
         .cork-postit:active { cursor: grabbing; }
 
-        /* POST-IT GÖVDESİ (PREVIEW İLE BİREBİR AYNI ELEMAN DÜZENİ) */
+        /* POST-IT GÖVDE */
         .postit-inner-card {
             position: relative;
             box-shadow: 2px 5px 14px rgba(0,0,0,0.2);
@@ -140,7 +141,6 @@
             pointer-events: none;
         }
 
-        /* PANODAKİ YAZI VE STICKER ELEMANLARI */
         #corkboardArea .postit-inner-card .transform-box {
             border-color: transparent !important;
             cursor: default !important;
@@ -535,19 +535,66 @@
 
 @php
     $isOwnProfile = auth()->check() && (auth()->id() === ($user->id ?? 0));
+    $hookSlots = $board->hook_slots ?? array_fill(0, 9, null);
+    $boardItems = $board->board_items ?? [];
 @endphp
 
 <div class="board-page-container">
 
     <div class="corkboard-main-wrapper">
-        <div class="corkboard-frame" id="corkboardArea"></div>
+        <div class="corkboard-frame" id="corkboardArea">
+            {{-- VERİTABANINDAN GELEN POST-IT VE STICKER'LAR --}}
+            @foreach($boardItems as $item)
+                @if(($item['type'] ?? '') === 'postit')
+                    @php
+                        $isAuthor = str_contains($item['author'] ?? '', '@' . (auth()->user()->username ?? ''));
+                        $canManage = $isOwnProfile || $isAuthor;
+                        $scale = $item['scale'] ?? 0.65;
+                        $rot = $item['rotation'] ?? 0;
+                    @endphp
+                    <div class="cork-postit {{ $canManage ? 'can-delete' : '' }}" 
+                         style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; z-index: {{ $item['zIndex'] ?? 10 }}; transform: scale({{ $scale }}) rotate({{ $rot }}deg);"
+                         data-scale="{{ $scale }}"
+                         data-rotation="{{ $rot }}">
+                        <div class="postit-inner-card {{ $item['shapeClass'] ?? 'size-square' }}" style="background-color: {{ $item['bg'] }};">
+                            {!! $item['html'] !!}
+                        </div>
+                        @if($canManage)
+                            <div class="handle-btn handle-resize" title="Post-it'i Büyüt / Küçült">⤡</div>
+                        @endif
+                    </div>
+                @elseif(($item['type'] ?? '') === 'free_sticker')
+                    <div class="free-sticker-wrapper" 
+                         style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; width: {{ $item['width'] ?? '80px' }}; height: {{ $item['height'] ?? '80px' }}; transform: {{ $item['transform'] ?? 'rotate(0deg)' }}; z-index: {{ $item['zIndex'] ?? 10 }};">
+                        <img src="{{ $item['src'] }}">
+                        @if($isOwnProfile)
+                            <div class="handle-btn handle-delete" title="Sil">✕</div>
+                            <div class="handle-btn handle-rotate" title="Döndür">↻</div>
+                            <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
+                        @endif
+                    </div>
+                @endif
+            @endforeach
+        </div>
 
         <div class="keychain-area-wrapper">
             <div class="keychain-grid-9" id="keychainHooksGrid">
                 @for($slot = 1; $slot <= 9; $slot++)
+                    @php
+                        $key = $hookSlots[$slot - 1] ?? null;
+                        $badge = ($key && isset($achievements[$key])) ? $achievements[$key] : null;
+                    @endphp
                     <div class="keychain-hook-unit" data-slot="{{ $slot }}" onclick="handleHookSlotClick({{ $slot }})">
                         <div class="hook-nail"></div>
-                        <div class="empty-hook-slot" title="{{ $isOwnProfile ? 'Boş kanca' : '' }}"></div>
+                        @if($badge)
+                            <img src="{{ asset('images/badges/' . $badge['file']) }}" 
+                                 class="keychain-plush-img" 
+                                 data-key="{{ $key }}" 
+                                 title="{{ $badge['title'] }}"
+                                 onerror="this.src='{{ asset('images/badges/maymun.png') }}';">
+                        @else
+                            <div class="empty-hook-slot" title="{{ $isOwnProfile ? 'Boş kanca' : '' }}"></div>
+                        @endif
                     </div>
                 @endfor
             </div>
@@ -561,6 +608,7 @@
         </div>
     </div>
 
+    <!-- ALT BUTON BARI -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
@@ -649,33 +697,14 @@
     </div>
 </div>
 
-@php
-function getAllAchievementsList() {
-    return [
-        'ask'       => ['title' => 'Aşk',       'icon' => asset('images/badges/aşk.png'),       'unlocked' => true],
-        'ayicik'    => ['title' => 'Ayıcık',    'icon' => asset('images/badges/ayıcık.png'),    'unlocked' => true],
-        'burger'    => ['title' => 'Burger',    'icon' => asset('images/badges/burger.png'),    'unlocked' => true],
-        'cilek'     => ['title' => 'Çilek',     'icon' => asset('images/badges/çilek.png'),     'unlocked' => true],
-        'elma'      => ['title' => 'Elma',      'icon' => asset('images/badges/elma.png'),      'unlocked' => true],
-        'geyik'     => ['title' => 'Geyik',     'icon' => asset('images/badges/geyik.png'),     'unlocked' => true],
-        'jake'      => ['title' => 'Jake',      'icon' => asset('images/badges/jake.png'),      'unlocked' => true],
-        'kedi'      => ['title' => 'Kedi',      'icon' => asset('images/badges/kedi.png'),      'unlocked' => true],
-        'kitap'     => ['title' => 'Kitap',     'icon' => asset('images/badges/kitap.png'),     'unlocked' => true],
-        'kruvasan'  => ['title' => 'Kruvasan',  'icon' => asset('images/badges/kruvasan.png'),  'unlocked' => true],
-        'maymun'    => ['title' => 'Maymun',    'icon' => asset('images/badges/maymun.png'),    'unlocked' => true],
-        'tama'      => ['title' => 'Tama',      'icon' => asset('images/badges/tama.png'),      'unlocked' => true],
-        'usagi'     => ['title' => 'Usagi',     'icon' => asset('images/badges/usagi.png'),     'unlocked' => true],
-        'yengec'    => ['title' => 'Yengeç',    'icon' => asset('images/badges/yengeç.png'),    'unlocked' => true],
-        'yonca'     => ['title' => 'Yonca',     'icon' => asset('images/badges/yonca.png'),     'unlocked' => true],
-    ];
-}
-@endphp
-
 <script>
     const CURRENT_USERNAME = @json(auth()->user()->username ?? (auth()->user()->name ?? 'reader'));
     const IS_OWN_PROFILE = @json($isOwnProfile);
-    const PROFILE_USER_ID = @json($user->id ?? 0);
-    const ACHIEVEMENTS_DATA = @json(getAllAchievementsList());
+    const SAVE_URL = @json(route('board.save', $user->username ?? ''));
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    
+    // PHP'den gelen temiz anahtarlık listesi
+    const ACHIEVEMENTS_DATA = @json($achievements);
     const FALLBACK_BADGE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="none" stroke="%23888" stroke-width="4"/><rect x="25" y="32" width="50" height="56" rx="14" fill="%23badfa0" stroke="%234b813b" stroke-width="3"/><circle cx="42" cy="54" r="4" fill="%232d5a27"/><circle cx="58" cy="54" r="4" fill="%232d5a27"/><path d="M 45 64 Q 50 68 55 64" fill="none" stroke="%232d5a27" stroke-width="3" stroke-linecap="round"/></svg>`;
 
     const corkboard = document.getElementById('corkboardArea');
@@ -688,12 +717,11 @@ function getAllAchievementsList() {
         element.style.zIndex = globalMaxZIndex;
     }
 
-    const STORAGE_KEY_BOARD = `bookie_full_board_${PROFILE_USER_ID}`;
-    const STORAGE_KEY_KEYCHAINS = `bookie_board_keychains_${PROFILE_USER_ID}`;
-
-    function saveBoardToStorage() {
+    // --- VERİTABANINA KAYDETME FONKSİYONU (BACKEND FETCH) ---
+    async function saveBoardToDatabase() {
         const boardItems = [];
         
+        // Post-it'leri topla
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
             const authorText = item.querySelector('.postit-author') ? item.querySelector('.postit-author').innerText : '';
             const inner = item.querySelector('.postit-inner-card');
@@ -711,6 +739,7 @@ function getAllAchievementsList() {
             });
         });
 
+        // Serbest PNG'leri topla
         document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
             const img = wrap.querySelector('img');
             boardItems.push({
@@ -725,95 +754,59 @@ function getAllAchievementsList() {
             });
         });
 
-        localStorage.setItem(STORAGE_KEY_BOARD, JSON.stringify(boardItems));
-
-        const keychains = [];
+        // 9 Kancadaki key'leri topla
+        const hookSlots = [];
         document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
             const img = hook.querySelector('.keychain-plush-img');
-            keychains.push(img ? img.dataset.key : null);
+            hookSlots.push(img ? img.dataset.key : null);
         });
-        localStorage.setItem(STORAGE_KEY_KEYCHAINS, JSON.stringify(keychains));
-    }
 
-    function loadBoardFromStorage() {
-        const savedBoard = localStorage.getItem(STORAGE_KEY_BOARD);
-        if (savedBoard) {
-            const items = JSON.parse(savedBoard);
-            corkboard.innerHTML = '';
-            items.forEach(item => {
-                const zIndexVal = parseInt(item.zIndex) || 10;
-                if (zIndexVal > globalMaxZIndex) globalMaxZIndex = zIndexVal;
-
-                if (item.type === 'postit') {
-                    const postitWrapper = document.createElement('div');
-                    postitWrapper.className = 'cork-postit';
-                    postitWrapper.style.top = item.top;
-                    postitWrapper.style.left = item.left;
-                    postitWrapper.style.zIndex = zIndexVal;
-                    
-                    const scale = parseFloat(item.scale) || 0.65;
-                    const rot = parseFloat(item.rotation) || 0;
-                    postitWrapper.dataset.scale = scale;
-                    postitWrapper.dataset.rotation = rot;
-                    postitWrapper.style.transform = `scale(${scale}) rotate(${rot}deg)`;
-
-                    const isAuthor = item.author.includes(`@${CURRENT_USERNAME}`);
-
-                    postitWrapper.innerHTML = `
-                        <div class="postit-inner-card ${item.shapeClass}" style="background-color: ${item.bg};">
-                            ${item.html}
-                        </div>
-                        ${(IS_OWN_PROFILE || isAuthor) ? `
-                            <div class="handle-btn handle-resize" title="Post-it'i Büyüt / Küçült">⤡</div>
-                        ` : ''}
-                    `;
-
-                    if (IS_OWN_PROFILE || isAuthor) {
-                        postitWrapper.classList.add('can-delete');
-                    }
-
-                    const delBtn = postitWrapper.querySelector('.postit-delete-btn');
-                    if (delBtn) {
-                        delBtn.onclick = function(e) {
-                            e.stopPropagation();
-                            postitWrapper.remove();
-                            saveBoardToStorage();
-                        };
-                    }
-
-                    setupPostitScaling(postitWrapper, isAuthor);
-                    makeItemDraggable(postitWrapper, isAuthor);
-                    corkboard.appendChild(postitWrapper);
-                } else if (item.type === 'free_sticker') {
-                    createFreeStickerElement(item.src, item.top, item.left, item.width, item.height, item.transform, zIndexVal);
-                }
+        try {
+            await fetch(SAVE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    board_items: boardItems,
+                    hook_slots: hookSlots
+                })
             });
-        }
-
-        const savedHooks = localStorage.getItem(STORAGE_KEY_KEYCHAINS);
-        if (savedHooks) {
-            const hookKeys = JSON.parse(savedHooks);
-            hookKeys.forEach((key, index) => {
-                const slot = document.querySelector(`.keychain-hook-unit[data-slot="${index + 1}"]`);
-                if (!slot) return;
-                slot.innerHTML = '<div class="hook-nail"></div>';
-                if (key && ACHIEVEMENTS_DATA[key]) {
-                    const img = document.createElement('img');
-                    img.src = ACHIEVEMENTS_DATA[key].icon;
-                    img.className = 'keychain-plush-img';
-                    img.dataset.key = key;
-                    img.title = ACHIEVEMENTS_DATA[key].title;
-                    img.onerror = function() { this.src = FALLBACK_BADGE_SVG; };
-                    slot.appendChild(img);
-                } else {
-                    const empty = document.createElement('div');
-                    empty.className = 'empty-hook-slot';
-                    slot.appendChild(empty);
-                }
-            });
+        } catch (error) {
+            console.error('Veritabanına kaydedilirken hata oluştu:', error);
         }
     }
 
+    // Sayfa açıldığında DOM'daki elemanlara dinleyicileri bağla
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
+            const isAuthor = wrapper.querySelector('.postit-author')?.innerText.includes(`@${CURRENT_USERNAME}`);
+            const canManage = IS_OWN_PROFILE || isAuthor;
+
+            const delBtn = wrapper.querySelector('.postit-delete-btn');
+            if (delBtn) {
+                delBtn.onclick = function(e) {
+                    e.stopPropagation();
+                    wrapper.remove();
+                    saveBoardToDatabase();
+                };
+            }
+
+            setupPostitScaling(wrapper, canManage);
+            makeItemDraggable(wrapper, canManage);
+        });
+
+        document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
+            if (IS_OWN_PROFILE) {
+                setupFreeStickerControls(wrap);
+                makeItemDraggable(wrap, true);
+            }
+        });
+    });
+
+    // --- SCALE KONTROLÜ ---
     function setupPostitScaling(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
@@ -844,7 +837,7 @@ function getAllAchievementsList() {
                 function onStop() {
                     window.removeEventListener('mousemove', onResize);
                     window.removeEventListener('mouseup', onStop);
-                    saveBoardToStorage();
+                    saveBoardToDatabase();
                 }
 
                 window.addEventListener('mousemove', onResize);
@@ -853,7 +846,8 @@ function getAllAchievementsList() {
         }
     }
 
-    function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)', zIndex = null) {
+    // --- SERBEST STICKER YÖNETİMİ ---
+    function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
         wrap.style.top = top;
@@ -861,12 +855,7 @@ function getAllAchievementsList() {
         wrap.style.width = width || '80px';
         wrap.style.height = height || '80px';
         wrap.style.transform = transform || 'rotate(0deg)';
-
-        if (zIndex) {
-            wrap.style.zIndex = zIndex;
-        } else {
-            bringToFront(wrap);
-        }
+        bringToFront(wrap);
 
         wrap.innerHTML = `
             <img src="${src}">
@@ -902,7 +891,7 @@ function getAllAchievementsList() {
             delBtn.addEventListener('click', (e) => {
                 e.stopPropagation();
                 wrap.remove();
-                saveBoardToStorage();
+                saveBoardToDatabase();
             });
         }
 
@@ -923,7 +912,7 @@ function getAllAchievementsList() {
                 function stop() {
                     window.removeEventListener('mousemove', resize);
                     window.removeEventListener('mouseup', stop);
-                    saveBoardToStorage();
+                    saveBoardToDatabase();
                 }
                 window.addEventListener('mousemove', resize);
                 window.addEventListener('mouseup', stop);
@@ -947,7 +936,7 @@ function getAllAchievementsList() {
                 function stop() {
                     window.removeEventListener('mousemove', rotate);
                     window.removeEventListener('mouseup', stop);
-                    saveBoardToStorage();
+                    saveBoardToDatabase();
                 }
                 window.addEventListener('mousemove', rotate);
                 window.addEventListener('mouseup', stop);
@@ -971,7 +960,7 @@ function getAllAchievementsList() {
                     const newElem = createFreeStickerElement(e.target.result, '30%', '40%');
                     document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
                     newElem.classList.add('is-selected');
-                    saveBoardToStorage();
+                    saveBoardToDatabase();
                 };
                 reader.readAsDataURL(file);
                 this.value = '';
@@ -979,6 +968,7 @@ function getAllAchievementsList() {
         });
     }
 
+    // --- DÜZENLEME MODU ---
     if (toggleEditBtn) {
         toggleEditBtn.addEventListener('click', function() {
             isEditing = !isEditing;
@@ -993,7 +983,7 @@ function getAllAchievementsList() {
                 this.classList.remove('saving');
                 corkboard.classList.remove('is-editing');
                 if (grid) grid.classList.remove('is-editing-mode');
-                saveBoardToStorage();
+                saveBoardToDatabase();
             }
         });
     }
@@ -1008,7 +998,7 @@ function getAllAchievementsList() {
             const emptyBox = document.createElement('div');
             emptyBox.className = 'empty-hook-slot';
             slotElem.appendChild(emptyBox);
-            saveBoardToStorage();
+            saveBoardToDatabase();
             return;
         }
 
@@ -1017,6 +1007,7 @@ function getAllAchievementsList() {
         }
     }
 
+    // --- MODAL İÇİ TRANSFORMER ---
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         const rotateBtn = box.querySelector('.handle-rotate');
@@ -1171,7 +1162,7 @@ function getAllAchievementsList() {
         }
     });
 
-    // --- KLONLAMA YÖNTEMİ İLE PİKSELİ PİKSELİNE BİREBİR AKTARMA ---
+    // --- KLONLAMA YÖNTEMİ VE VERİTABANINA KAYIT ---
     function pinNoteToBoard() {
         const postitWrapper = document.createElement('div');
         postitWrapper.className = 'cork-postit can-delete';
@@ -1185,11 +1176,9 @@ function getAllAchievementsList() {
         postitWrapper.style.transform = `scale(${initialScale}) rotate(${rot}deg)`;
         bringToFront(postitWrapper);
 
-        // Preview kutusunu doğrudan DOM klonlama yöntemiyle kopyala (oran asla bozulmaz!)
         const clonedCard = previewBox.cloneNode(true);
         clonedCard.removeAttribute('id');
 
-        // Klonlanan kartın içindeki düzenleme butonlarını ve seçim çerçevelerini kaldır
         clonedCard.querySelectorAll('.handle-btn').forEach(btn => btn.remove());
         clonedCard.querySelectorAll('.transform-box').forEach(box => {
             box.removeAttribute('id');
@@ -1197,18 +1186,16 @@ function getAllAchievementsList() {
             box.style.border = 'none';
         });
 
-        // Silme butonunu ekle
         const delBtn = document.createElement('button');
         delBtn.className = 'postit-delete-btn';
         delBtn.innerText = '✕';
         delBtn.onclick = function(e) {
             e.stopPropagation();
             postitWrapper.remove();
-            saveBoardToStorage();
+            saveBoardToDatabase();
         };
         clonedCard.appendChild(delBtn);
 
-        // Resize tutamacını ekle
         const resBtn = document.createElement('div');
         resBtn.className = 'handle-btn handle-resize';
         resBtn.title = "Post-it'i Büyüt / Küçült";
@@ -1222,14 +1209,13 @@ function getAllAchievementsList() {
         corkboard.appendChild(postitWrapper);
         closePostitModal();
 
-        // Modal sıfırla
         textInput.value = '';
         previewText.innerText = 'selam';
         stickerBox.style.display = 'none';
         previewSticker.src = '';
         fileInput.value = '';
 
-        saveBoardToStorage();
+        saveBoardToDatabase();
     }
 
     function makeItemDraggable(element, isMyItem = false) {
@@ -1264,7 +1250,7 @@ function getAllAchievementsList() {
             function onMouseUp() {
                 window.removeEventListener('mousemove', onMouseMove);
                 window.removeEventListener('mouseup', onMouseUp);
-                saveBoardToStorage();
+                saveBoardToDatabase();
             }
 
             window.addEventListener('mousemove', onMouseMove);
@@ -1272,6 +1258,7 @@ function getAllAchievementsList() {
         };
     }
 
+    // --- ÇANTA & SÜRÜKLE-BIRAK (DRAG & DROP) ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
@@ -1293,7 +1280,7 @@ function getAllAchievementsList() {
             wrap.title = isUnlocked ? 'Tıkla veya kancaya sürükle' : 'Kilitli';
 
             wrap.innerHTML = `
-                <img src="${item.icon}" class="bag-badge-img" alt="${item.title}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
+                <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${item.title}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
                 <span class="bag-badge-title">${item.title}</span>
             `;
 
@@ -1320,7 +1307,7 @@ function getAllAchievementsList() {
         for (let slot of slots) {
             const emptySlot = slot.querySelector('.empty-hook-slot');
             if (emptySlot) {
-                hangBadgeToSlot(slot, key, item.icon, item.title);
+                hangBadgeToSlot(slot, key, `/images/badges/${item.file}`, item.title);
                 return;
             }
         }
@@ -1342,7 +1329,7 @@ function getAllAchievementsList() {
         img.onerror = function() { this.src = FALLBACK_BADGE_SVG; };
         slotElem.appendChild(img);
 
-        saveBoardToStorage();
+        saveBoardToDatabase();
     }
 
     document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
@@ -1358,12 +1345,10 @@ function getAllAchievementsList() {
             hook.classList.remove('drag-over');
             const key = e.dataTransfer.getData('text/plain');
             if (key && ACHIEVEMENTS_DATA[key] && ACHIEVEMENTS_DATA[key].unlocked) {
-                hangBadgeToSlot(hook, key, ACHIEVEMENTS_DATA[key].icon, ACHIEVEMENTS_DATA[key].title);
+                hangBadgeToSlot(hook, key, `/images/badges/${ACHIEVEMENTS_DATA[key].file}`, ACHIEVEMENTS_DATA[key].title);
             }
         };
     });
-
-    document.addEventListener('DOMContentLoaded', loadBoardFromStorage);
 </script>
 
 </body>
