@@ -98,7 +98,7 @@
             background: #badfa0;
         }
 
-        /* POST-IT KUTUCUKLARI */
+        /* POST-IT BOYUTLARI (3 FARKLI SEÇENEK) */
         .cork-postit {
             position: absolute;
             box-shadow: 2px 5px 12px rgba(0,0,0,0.22);
@@ -112,8 +112,9 @@
             cursor: grabbing;
             box-shadow: 4px 8px 18px rgba(0,0,0,0.35);
         }
-        .cork-postit.square { width: 125px; height: 125px; }
-        .cork-postit.rect { width: 125px; height: 165px; }
+        .cork-postit.size-square { width: 130px; height: 130px; }
+        .cork-postit.size-portrait { width: 120px; height: 165px; }
+        .cork-postit.size-landscape { width: 165px; height: 120px; }
 
         .postit-pin {
             position: absolute;
@@ -235,11 +236,12 @@
             border: 1.5px dashed rgba(44, 68, 27, 0.22);
             border-radius: 12px;
             margin-top: 14px;
-            cursor: pointer;
             transition: background 0.15s;
         }
-        .empty-hook-slot:hover {
-            background: rgba(255,255,255,0.2);
+
+        /* Ziyaretçi başkasının anahtarlıklarına dokunamaz */
+        .visitor-view .keychain-area-wrapper {
+            pointer-events: none !important;
         }
 
         /* DOSYA (FOLDER) ALANI */
@@ -270,7 +272,7 @@
             text-shadow: 0 1px 2px rgba(255,255,255,0.7);
         }
 
-        /* AKILLI KOLEKSİYON ÇEKMECESİ (Kancaları kapatmayan sol alt popup) */
+        /* AKILLI KOLEKSİYON ÇEKMECESİ */
         .keychain-collection-drawer {
             position: absolute;
             bottom: 40px;
@@ -327,7 +329,6 @@
             gap: 10px;
         }
 
-        /* Çanta İçindeki Tekil Kart */
         .bag-badge-card {
             background: #ffffff;
             border: 1.5px solid #bddbb0;
@@ -411,7 +412,7 @@
             border-radius: 20px;
             padding: 20px;
             width: 95%;
-            max-width: 560px;
+            max-width: 580px;
             display: flex;
             flex-direction: column;
             gap: 14px;
@@ -429,12 +430,37 @@
             gap: 10px;
         }
         .studio-preview {
-            width: 180px;
+            width: 190px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 6px;
+        }
+
+        /* BOYUT SEÇİM BUTONLARI (Shape Selector) */
+        .shape-btn-group {
+            display: flex;
+            gap: 6px;
+            width: 100%;
+        }
+        .shape-btn {
+            flex: 1;
+            background: #ffffff;
+            border: 1.5px solid #7ea863;
+            border-radius: 8px;
+            padding: 5px 2px;
+            font-family: 'Unkempt', cursive;
+            font-size: 12px;
+            font-weight: bold;
+            color: #1a3c11;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        .shape-btn.active {
+            background: #2d5a27;
+            color: #ffffff;
+            border-color: #2d5a27;
         }
 
         .color-selector {
@@ -507,14 +533,18 @@
 </head>
 <body>
 
-<div class="board-page-container">
+@php
+    $isOwnProfile = auth()->check() && (auth()->id() === ($user->id ?? 0));
+@endphp
+
+<div class="board-page-container {{ !$isOwnProfile ? 'visitor-view' : '' }}">
 
     <!-- 1. ORTADA PANO & SAĞDA ŞEFFAF 3x3 ASKI ALANI -->
     <div class="corkboard-main-wrapper">
         
         <!-- MANTAR PANO (pano.jpg) -->
         <div class="corkboard-frame" id="corkboardArea">
-            <div class="cork-postit square" style="top: 20%; left: 12%; background: #fdf5a6; transform: rotate(-2deg);">
+            <div class="cork-postit size-square" style="top: 20%; left: 12%; background: #fdf5a6; transform: rotate(-2deg);">
                 <span class="postit-pin"></span>
                 <button class="postit-delete-btn" onclick="this.parentElement.remove()">✕</button>
                 <div class="postit-text-content" style="top: 30px; left: 12px; font-size: 14px; transform: rotate(0deg);">
@@ -532,22 +562,21 @@
                         <div class="hook-nail"></div>
                         
                         @if($slot === 1)
-                            {{-- Örnek başlangıçta asılı olan maymun --}}
                             <img src="{{ asset('images/badges/maymun.png') }}" 
                                  alt="Monkey Keychain" 
                                  class="keychain-plush-img" 
                                  data-key="maymun"
-                                 title="Tıkla ve kaldır/değiştir"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/badges/tavsan.png') }}';">
+                                 title="{{ $isOwnProfile ? 'Tıkla ve kaldır' : '' }}"
+                                 onerror="this.onerror=null; this.src='{{ asset('images/badges/maymun.png') }}';">
                         @else
-                            <div class="empty-hook-slot" title="Boş kanca - Çantadan as"></div>
+                            <div class="empty-hook-slot" title="{{ $isOwnProfile ? 'Boş kanca - Çantadan as' : '' }}"></div>
                         @endif
                     </div>
                 @endfor
             </div>
 
-            <!-- DOSYA PNG VE ALT YAZISI (images/dosya.png) -->
-            <div class="folder-container" onclick="toggleCollectionDrawer()" title="Open Keychain Bag">
+            <!-- DOSYA PNG VE ALT YAZISI (Sadece profil sahibinde tıklanabilir) -->
+            <div class="folder-container" @if($isOwnProfile) onclick="toggleCollectionDrawer()" @endif title="{{ $isOwnProfile ? 'Open Keychain Bag' : 'Achievements' }}">
                 <img src="{{ asset('images/dosya.png') }}" 
                      alt="All Keychains" 
                      class="folder-img"
@@ -560,7 +589,7 @@
 
     <!-- 2. PANONUN TAM ALTINDAKİ MERKEZİ BUTON -->
     <div class="board-bottom-bar">
-        @if(auth()->check() && auth()->id() === ($user->id ?? 0))
+        @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
         @elseif(auth()->check())
             <button id="openPostitModalBtn" class="btn-action">📌 ADD POST-IT</button>
@@ -568,6 +597,7 @@
     </div>
 
     <!-- 3. KANCALARI GİZLEMEYEN AKILLI KOLEKSİYON ÇEKMECESİ -->
+    @if($isOwnProfile)
     <div class="keychain-collection-drawer" id="collectionDrawer">
         <div class="drawer-header">
             <h4>🎒 Keychain Bag & Badges</h4>
@@ -575,9 +605,10 @@
         </div>
 
         <div class="drawer-body" id="drawerBadgesList">
-            {{-- JavaScript dinamik olarak açık ve kilitli 15 başarımı buraya basar --}}
+            {{-- JavaScript açık ve kilitli 15 başarımı buraya basar --}}
         </div>
     </div>
+    @endif
 
 </div>
 
@@ -599,12 +630,14 @@
                     </div>
                 </div>
 
+                <!-- BOYUT SEÇİM BUTONLARI (KARE, DİKEY, YATAY) -->
                 <div>
                     <label style="font-size: 13px;">Shape:</label>
-                    <select id="studioShapeSelect" style="width: 100%; padding: 4px; font-family: 'Unkempt';">
-                        <option value="square">Square</option>
-                        <option value="rect">Rectangle</option>
-                    </select>
+                    <div class="shape-btn-group">
+                        <button type="button" class="shape-btn active" data-shape="size-square">Square</button>
+                        <button type="button" class="shape-btn" data-shape="size-portrait">Portrait</button>
+                        <button type="button" class="shape-btn" data-shape="size-landscape">Landscape</button>
+                    </div>
                 </div>
 
                 <textarea id="studioTextInput" placeholder="Write something cozy..." maxlength="120" style="width:100%; height:50px; font-family:'Unkempt'; padding:6px; resize:none;"></textarea>
@@ -625,8 +658,9 @@
                 </div>
             </div>
 
+            <!-- CANLI ÖNİZLEME (Şekil butonuna tıklandığında anında boyutu değişir) -->
             <div class="studio-preview">
-                <div class="cork-postit square" id="previewPostitBox" style="position:relative; background:#fdf5a6; width:135px; height:135px; overflow:hidden;">
+                <div class="cork-postit size-square" id="previewPostitBox" style="position:relative; background:#fdf5a6; overflow:hidden;">
                     <span class="postit-pin"></span>
                     
                     <div id="previewTextLayer" class="postit-text-content studio-interactive-elem is-selected" style="top:25px; left:10px; font-size:14px; transform:rotate(0deg);">
@@ -649,38 +683,39 @@
 </div>
 
 @php
-// 15 BAŞARIM VE KAZANILMA KOŞULLARI
 function getAllAchievementsList() {
     return [
-        'maymun' => ['title' => 'Monkey Reader', 'req' => 'İlk kitap incelemeni yazdığında açılır.', 'icon' => 'badges/maymun.png', 'unlocked' => true],
-        'tavsan' => ['title' => '10+ Friends!', 'req' => '10 arkadaş edindiğinde açılır.', 'icon' => 'badges/tavsan.png', 'unlocked' => true],
-        'kalp'   => ['title' => 'Top Reviewer', 'req' => 'Yorumların 20+ beğeni aldığında açılır.', 'icon' => 'badges/kalp.png', 'unlocked' => false],
-        'kaset'  => ['title' => 'Sci-Fi Explorer', 'req' => '5 bilim kurgu kitabı bitirdiğinde açılır.', 'icon' => 'badges/kaset.png', 'unlocked' => false],
-        'kahve'  => ['title' => 'Classic Reader', 'req' => '3 klasik roman bitirdiğinde açılır.', 'icon' => 'badges/kahve.png', 'unlocked' => true],
-        'kedi'   => ['title' => 'Night Owl', 'req' => 'Gece 00:00 - 05:00 arası kitap kaydettiğinde açılır.', 'icon' => 'badges/kedi.png', 'unlocked' => false],
-        'yildiz' => ['title' => 'Book Worm', 'req' => 'Tek oturuşta 100 sayfa okuduğunda açılır.', 'icon' => 'badges/yildiz.png', 'unlocked' => false],
-        'kupa'   => ['title' => 'Speed Reader', 'req' => 'Aynı haftada 2 kitap bitirdiğinde açılır.', 'icon' => 'badges/kupa.png', 'unlocked' => false],
-        'kitap'  => ['title' => 'First Step', 'req' => 'İlk kitabını panoya eklediğinde açılır.', 'icon' => 'badges/kitap.png', 'unlocked' => true],
-        'mektup' => ['title' => 'Postman', 'req' => 'Arkadaşlarının panolarına 5 post-it astığında açılır.', 'icon' => 'badges/mektup.png', 'unlocked' => false],
-        'ayicik' => ['title' => 'Warm Home', 'req' => 'Panona 10 post-it iliştirildiğinde açılır.', 'icon' => 'badges/ayicik.png', 'unlocked' => false],
-        'cicek'  => ['title' => 'Spring Blossom', 'req' => 'Profil bilgilerini ve bionu eksiksiz doldur.', 'icon' => 'badges/cicek.png', 'unlocked' => true],
-        'mantar' => ['title' => 'Fantasy Lover', 'req' => '5 fantastik kurgu eseri bitir.', 'icon' => 'badges/mantar.png', 'unlocked' => false],
-        'kamera' => ['title' => 'Aesthetic Soul', 'req' => 'Özel profil avatarı yüklediğinde açılır.', 'icon' => 'badges/kamera.png', 'unlocked' => false],
-        'pasta'  => ['title' => 'Book Birthday', 'req' => 'Bookie üyeliğinde 1. ayını doldur.', 'icon' => 'badges/pasta.png', 'unlocked' => false],
+        'maymun' => ['title' => 'Monkey Reader', 'req' => 'İlk kitap incelemeni yazdığında açılır.', 'icon' => asset('images/badges/maymun.png'), 'unlocked' => true],
+        'tavsan' => ['title' => '10+ Friends!', 'req' => '10 arkadaş edindiğinde açılır.', 'icon' => asset('images/badges/tavsan.png'), 'unlocked' => true],
+        'kalp'   => ['title' => 'Top Reviewer', 'req' => 'Yorumların 20+ beğeni aldığında açılır.', 'icon' => asset('images/badges/kalp.png'), 'unlocked' => false],
+        'kaset'  => ['title' => 'Sci-Fi Explorer', 'req' => '5 bilim kurgu kitabı bitirdiğinde açılır.', 'icon' => asset('images/badges/kaset.png'), 'unlocked' => false],
+        'kahve'  => ['title' => 'Classic Reader', 'req' => '3 klasik roman bitirdiğinde açılır.', 'icon' => asset('images/badges/kahve.png'), 'unlocked' => true],
+        'kedi'   => ['title' => 'Night Owl', 'req' => 'Gece 00:00 - 05:00 arası kitap kaydettiğinde açılır.', 'icon' => asset('images/badges/kedi.png'), 'unlocked' => false],
+        'yildiz' => ['title' => 'Book Worm', 'req' => 'Tek oturuşta 100 sayfa okuduğunda açılır.', 'icon' => asset('images/badges/yildiz.png'), 'unlocked' => false],
+        'kupa'   => ['title' => 'Speed Reader', 'req' => 'Aynı haftada 2 kitap bitirdiğinde açılır.', 'icon' => asset('images/badges/kupa.png'), 'unlocked' => false],
+        'kitap'  => ['title' => 'First Step', 'req' => 'İlk kitabını panoya eklediğinde açılır.', 'icon' => asset('images/badges/kitap.png'), 'unlocked' => true],
+        'mektup' => ['title' => 'Postman', 'req' => 'Arkadaşlarının panolarına 5 post-it astığında açılır.', 'icon' => asset('images/badges/mektup.png'), 'unlocked' => false],
+        'ayicik' => ['title' => 'Warm Home', 'req' => 'Panona 10 post-it iliştirildiğinde açılır.', 'icon' => asset('images/badges/ayicik.png'), 'unlocked' => false],
+        'cicek'  => ['title' => 'Spring Blossom', 'req' => 'Profil bilgilerini ve bionu eksiksiz doldur.', 'icon' => asset('images/badges/cicek.png'), 'unlocked' => true],
+        'mantar' => ['title' => 'Fantasy Lover', 'req' => '5 fantastik kurgu eseri bitir.', 'icon' => asset('images/badges/mantar.png'), 'unlocked' => false],
+        'kamera' => ['title' => 'Aesthetic Soul', 'req' => 'Özel profil avatarı yüklediğinde açılır.', 'icon' => asset('images/badges/kamera.png'), 'unlocked' => false],
+        'pasta'  => ['title' => 'Book Birthday', 'req' => 'Bookie üyeliğinde 1. ayını doldur.', 'icon' => asset('images/badges/pasta.png'), 'unlocked' => false],
     ];
 }
 @endphp
 
 <script>
     const CURRENT_USERNAME = @json(auth()->user()->username ?? (auth()->user()->name ?? 'reader'));
+    const IS_OWN_PROFILE = @json($isOwnProfile);
     const ACHIEVEMENTS_DATA = @json(getAllAchievementsList());
+    const FALLBACK_BADGE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="none" stroke="%23888" stroke-width="4"/><rect x="25" y="32" width="50" height="56" rx="14" fill="%23badfa0" stroke="%234b813b" stroke-width="3"/><circle cx="42" cy="54" r="4" fill="%232d5a27"/><circle cx="58" cy="54" r="4" fill="%232d5a27"/><path d="M 45 64 Q 50 68 55 64" fill="none" stroke="%232d5a27" stroke-width="3" stroke-linecap="round"/></svg>`;
 
-    // --- KOLEKSİYON ÇEKMECESİ (DOSYA) VE ASKI ETKİLEŞİMİ ---
+    // --- KOLEKSİYON ÇEKMECESİ (DOSYA) ETKİLEŞİMİ ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
-    let selectedBadgeToHang = null;
 
     function toggleCollectionDrawer() {
+        if (!IS_OWN_PROFILE || !drawer) return;
         drawer.classList.toggle('active');
         if (drawer.classList.contains('active')) {
             renderDrawerAchievements();
@@ -688,6 +723,7 @@ function getAllAchievementsList() {
     }
 
     function renderDrawerAchievements() {
+        if (!drawerList) return;
         drawerList.innerHTML = '';
         Object.keys(ACHIEVEMENTS_DATA).forEach(key => {
             const item = ACHIEVEMENTS_DATA[key];
@@ -697,7 +733,10 @@ function getAllAchievementsList() {
             card.className = `bag-badge-card ${isUnlocked ? 'unlocked' : 'locked'}`;
 
             card.innerHTML = `
-                <img src="/images/${item.icon}" class="bag-badge-img" onerror="this.src='{{ asset('images/badges/maymun.png') }}';">
+                <img src="${item.icon}" 
+                     class="bag-badge-img" 
+                     alt="${item.title}"
+                     onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
                 <p class="bag-badge-title">${item.title}</p>
                 <p class="bag-badge-desc">${item.req}</p>
                 <span class="bag-badge-status ${isUnlocked ? 'status-unlocked' : 'status-locked'}">
@@ -713,9 +752,8 @@ function getAllAchievementsList() {
         });
     }
 
-    // Çantadan anahtarlık seçip kancaya asma akışı
     function selectBadgeFromBag(key, item) {
-        // Boş ilk kancayı bul ve tak
+        if (!IS_OWN_PROFILE) return;
         const slots = document.querySelectorAll('.keychain-hook-unit');
         let placed = false;
 
@@ -724,11 +762,11 @@ function getAllAchievementsList() {
             if (emptySlot) {
                 emptySlot.remove();
                 const img = document.createElement('img');
-                img.src = `/images/${item.icon}`;
+                img.src = item.icon;
                 img.className = 'keychain-plush-img';
                 img.dataset.key = key;
                 img.title = 'Tıkla ve kaldır';
-                img.onerror = function() { this.src = '{{ asset('images/badges/maymun.png') }}'; };
+                img.onerror = function() { this.src = FALLBACK_BADGE_SVG; };
                 slot.appendChild(img);
                 placed = true;
                 break;
@@ -740,8 +778,8 @@ function getAllAchievementsList() {
         }
     }
 
-    // Kancadaki anahtarlığa tıklandığında kaldırma
     function handleHookSlotClick(slotNum) {
+        if (!IS_OWN_PROFILE) return; // Ziyaretçi başkasının anahtarlıklarını düzenleyemez
         const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${slotNum}"]`);
         const existingImg = slotElem.querySelector('.keychain-plush-img');
 
@@ -754,14 +792,13 @@ function getAllAchievementsList() {
                 slotElem.appendChild(emptyBox);
             }
         } else {
-            // Boş kancaya tıklandıysa çantayı aç
-            if (!drawer.classList.contains('active')) {
+            if (drawer && !drawer.classList.contains('active')) {
                 toggleCollectionDrawer();
             }
         }
     }
 
-    // --- DÜZENLEME MODU (PANO DRAG & DROP) ---
+    // --- PANO GENELİ DÜZENLEME MODU (PROFİL SAHİBİ) ---
     let isEditing = false;
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     const corkboard = document.getElementById('corkboardArea');
@@ -773,67 +810,64 @@ function getAllAchievementsList() {
                 this.innerText = '💾 SAVE';
                 this.classList.add('saving');
                 corkboard.classList.add('is-editing');
-                enableDragging();
+                enableBoardDragging();
             } else {
                 this.innerText = '✏️ Edit Board';
                 this.classList.remove('saving');
                 corkboard.classList.remove('is-editing');
-                disableDragging();
+                disableBoardDragging();
             }
         });
     }
 
-    let activeDragItem = null;
-    let dragOffsetX = 0, dragOffsetY = 0;
-
-    function enableDragging() {
+    function enableBoardDragging() {
         document.querySelectorAll('.cork-postit').forEach(item => {
-            item.onmousedown = startBoardDrag;
+            makePostitDraggable(item);
         });
     }
 
-    function disableDragging() {
+    function disableBoardDragging() {
         document.querySelectorAll('.cork-postit').forEach(item => {
             item.onmousedown = null;
         });
     }
 
-    function startBoardDrag(e) {
-        if (!isEditing) return;
-        activeDragItem = this;
-        const rect = activeDragItem.getBoundingClientRect();
-        dragOffsetX = e.clientX - rect.left;
-        dragOffsetY = e.clientY - rect.top;
-        document.onmousemove = doBoardDrag;
-        document.onmouseup = stopBoardDrag;
+    // Ortak Post-it Sürükleme Mantığı (Panoda serbest yerleştirme)
+    function makePostitDraggable(element) {
+        element.onmousedown = function(e) {
+            let activeDragItem = element;
+            const rect = activeDragItem.getBoundingClientRect();
+            let dragOffsetX = e.clientX - rect.left;
+            let dragOffsetY = e.clientY - rect.top;
+
+            function onMouseMove(event) {
+                const boardRect = corkboard.getBoundingClientRect();
+                let left = event.clientX - boardRect.left - dragOffsetX;
+                let top = event.clientY - boardRect.top - dragOffsetY;
+
+                left = Math.max(0, Math.min(boardRect.width - activeDragItem.offsetWidth, left));
+                top = Math.max(0, Math.min(boardRect.height - activeDragItem.offsetHeight, top));
+
+                activeDragItem.style.left = (left / boardRect.width * 100) + '%';
+                activeDragItem.style.top = (top / boardRect.height * 100) + '%';
+            }
+
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        };
     }
 
-    function doBoardDrag(e) {
-        if (!activeDragItem) return;
-        const boardRect = corkboard.getBoundingClientRect();
-        let left = e.clientX - boardRect.left - dragOffsetX;
-        let top = e.clientY - boardRect.top - dragOffsetY;
-
-        left = Math.max(0, Math.min(boardRect.width - activeDragItem.offsetWidth, left));
-        top = Math.max(0, Math.min(boardRect.height - activeDragItem.offsetHeight, top));
-
-        activeDragItem.style.left = (left / boardRect.width * 100) + '%';
-        activeDragItem.style.top = (top / boardRect.height * 100) + '%';
-    }
-
-    function stopBoardDrag() {
-        activeDragItem = null;
-        document.onmousemove = null;
-        document.onmouseup = null;
-    }
-
-    // --- POST-IT STÜDYO ETKİLEŞİMİ ---
+    // --- POST-IT STÜDYO ETKİLEŞİMİ & BOYUT BUTONLARI ---
     const modal = document.getElementById('postitStudioModal');
     const openModalBtn = document.getElementById('openPostitModalBtn');
     const textInput = document.getElementById('studioTextInput');
     const sizeRange = document.getElementById('studioSizeRange');
     const rotateRange = document.getElementById('studioRotateRange');
-    const shapeSelect = document.getElementById('studioShapeSelect');
     const fileInput = document.getElementById('studioFileInput');
     const activeControlLabel = document.getElementById('activeControlLabel');
 
@@ -843,6 +877,7 @@ function getAllAchievementsList() {
     const previewAuthor = document.getElementById('previewAuthorLabel');
 
     let selectedColor = '#fdf5a6';
+    let selectedShape = 'size-square';
     let loadedStickerSrc = null;
     let activeTarget = 'text';
 
@@ -860,6 +895,7 @@ function getAllAchievementsList() {
         modal.classList.remove('active');
     }
 
+    // Renk Seçimi
     document.querySelectorAll('.color-ball').forEach(ball => {
         ball.addEventListener('click', function() {
             document.querySelectorAll('.color-ball').forEach(b => b.classList.remove('selected'));
@@ -869,8 +905,16 @@ function getAllAchievementsList() {
         });
     });
 
-    shapeSelect.addEventListener('change', () => {
-        previewBox.className = 'cork-postit ' + shapeSelect.value;
+    // 3'LÜ ŞEKİL BUTONU ETKİLEŞİMİ (Kare, Dikey, Yatay Canlı Değişim)
+    document.querySelectorAll('.shape-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.shape-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            selectedShape = this.dataset.shape;
+            
+            // Önizleme kutusunun sınıfını hemen güncelle
+            previewBox.className = 'cork-postit ' + selectedShape;
+        });
     });
 
     textInput.addEventListener('input', () => {
@@ -967,14 +1011,14 @@ function getAllAchievementsList() {
         }
     });
 
+    // PANODA POST-IT OLUŞTURMA & DOĞRUDAN SÜRÜKLENEBİLİR YAPMA (OK Butonu)
     function pinNoteToBoard() {
-        const shape = shapeSelect.value;
         const text = textInput.value.trim() || 'Cozy note!';
 
         const newNote = document.createElement('div');
-        newNote.className = `cork-postit ${shape}`;
+        newNote.className = `cork-postit ${selectedShape}`;
         newNote.style.backgroundColor = selectedColor;
-        newNote.style.top = '25%';
+        newNote.style.top = '30%';
         newNote.style.left = '35%';
         newNote.style.transform = `rotate(${Math.floor(Math.random() * 8 - 4)}deg)`;
 
@@ -993,9 +1037,13 @@ function getAllAchievementsList() {
             <div class="postit-author">@${CURRENT_USERNAME}</div>
         `;
 
+        // Kendi oluşturduğun post-it'i anında taşınabilir kıl
+        makePostitDraggable(newNote);
+
         corkboard.appendChild(newNote);
         closePostitModal();
 
+        // Formu temizle
         textInput.value = '';
         loadedStickerSrc = null;
         previewSticker.style.display = 'none';
