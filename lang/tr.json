@@ -185,5 +185,7 @@
     "username or email is required": "kullanıcı adı veya e-posta gerekli",
     "are u sure these are correct?": "bu bilgilerin doğru olduğuna emin misin?",
     "Profile updated successfully!": "Profil başarıyla güncellendi!",
-    ":count books removed from your bookshelf! 🗑️": ":count kitap kitaplığından kaldırıldı! 🗑️"
+    ":count books removed from your bookshelf! 🗑️": ":count kitap kitaplığından kaldırıldı! 🗑️",
+    "about bookie": "bookie hakkında",
+    "Bookie is an independent project made by a solo developer. Thank you so much for being part of it and using it! For any bugs, ideas, or feedback, feel free to reach out anytime:": "Bookie, tek bir kişi tarafından geliştirilmiş bağımsız bir projedir. Burada olduğunuz ve kitaplığınıza kattığınız her an için çok teşekkür ederim! Herhangi bir hata bildirimi, fikir veya öneriniz için bana dilediğiniz zaman ulaşabilirsiniz:"
 }

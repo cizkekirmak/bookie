@@ -12,10 +12,10 @@
         <div class="postit-content">
             <span class="postit-tape"></span>
             
-            <h4 class="postit-title">merhaba! ✨</h4>
+            <h4 class="postit-title">merhaba !!</h4>
 
             <p class="postit-desc">
-                {{ __('Bookie, tek bir kişi tarafından geliştirilmiş bağımsız bir projedir. Burada olduğunuz ve kitaplığınıza kattığınız her an için çok teşekkür ederim! Herhangi bir hata bildirimi, fikir veya öneriniz için bana dilediğiniz zaman ulaşabilirsiniz:') }}
+                {{ __('Bookie is an independent project made by a solo developer. Thank you so much for being part of it and using it! For any bugs, ideas, or feedback, feel free to reach out anytime:') }}
             </p>
 
             <!-- Sosyal / İletişim Butonları -->
