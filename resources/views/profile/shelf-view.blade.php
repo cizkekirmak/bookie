@@ -73,7 +73,6 @@
             width: 100%;
         }
 
-        /* NAZİK BUTONLAR */
         .btn-action {
             background: #fdfaf0;
             border: 1px solid #7ea863;
@@ -535,15 +534,33 @@
 
 @php
     $isOwnProfile = auth()->check() && (auth()->id() === ($user->id ?? 0));
-    $hookSlots = $board->hook_slots ?? array_fill(0, 9, null);
-    $boardItems = $board->board_items ?? [];
+    $hookSlots = (isset($board) && is_array($board->hook_slots)) ? $board->hook_slots : array_fill(0, 9, null);
+    $boardItems = (isset($board) && is_array($board->board_items)) ? $board->board_items : [];
+
+    // Controller'dan $achievements gönderilmediyse otomatik devreye giren tam liste:
+    $achievements = $achievements ?? [
+        'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
+        'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
+        'burger'    => ['title' => 'Burger',    'file' => 'burger.png',    'unlocked' => true],
+        'cilek'     => ['title' => 'Çilek',     'file' => 'çilek.png',     'unlocked' => true],
+        'elma'      => ['title' => 'Elma',      'file' => 'elma.png',      'unlocked' => true],
+        'geyik'     => ['title' => 'Geyik',     'file' => 'geyik.png',     'unlocked' => true],
+        'jake'      => ['title' => 'Jake',      'file' => 'jake.png',      'unlocked' => true],
+        'kedi'      => ['title' => 'Kedi',      'file' => 'kedi.png',      'unlocked' => true],
+        'kitap'     => ['title' => 'Kitap',     'file' => 'kitap.png',     'unlocked' => true],
+        'kruvasan'  => ['title' => 'Kruvasan',  'file' => 'kruvasan.png',  'unlocked' => true],
+        'maymun'    => ['title' => 'Maymun',    'file' => 'maymun.png',    'unlocked' => true],
+        'tama'      => ['title' => 'Tama',      'file' => 'tama.png',      'unlocked' => true],
+        'usagi'     => ['title' => 'Usagi',     'file' => 'usagi.png',     'unlocked' => true],
+        'yengec'    => ['title' => 'Yengeç',    'file' => 'yengeç.png',    'unlocked' => true],
+        'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => true],
+    ];
 @endphp
 
 <div class="board-page-container">
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
-            {{-- VERİTABANINDAN GELEN POST-IT VE STICKER'LAR --}}
             @foreach($boardItems as $item)
                 @if(($item['type'] ?? '') === 'postit')
                     @php
@@ -700,11 +717,13 @@
 <script>
     const CURRENT_USERNAME = @json(auth()->user()->username ?? (auth()->user()->name ?? 'reader'));
     const IS_OWN_PROFILE = @json($isOwnProfile);
-    const SAVE_URL = @json(route('board.save', $user->username ?? ''));
-    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     
-    // PHP'den gelen temiz anahtarlık listesi
-    const ACHIEVEMENTS_DATA = @json($achievements);
+    // Rota tanımlı değilse boş stringe fallback yapar
+    const SAVE_URL = @json(Route::has('board.save') ? route('board.save', $user->username ?? '') : '');
+    const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
+    
+    // Hata veren satır güvene alındı:
+    const ACHIEVEMENTS_DATA = @json($achievements ?? []);
     const FALLBACK_BADGE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="none" stroke="%23888" stroke-width="4"/><rect x="25" y="32" width="50" height="56" rx="14" fill="%23badfa0" stroke="%234b813b" stroke-width="3"/><circle cx="42" cy="54" r="4" fill="%232d5a27"/><circle cx="58" cy="54" r="4" fill="%232d5a27"/><path d="M 45 64 Q 50 68 55 64" fill="none" stroke="%232d5a27" stroke-width="3" stroke-linecap="round"/></svg>`;
 
     const corkboard = document.getElementById('corkboardArea');
@@ -717,11 +736,10 @@
         element.style.zIndex = globalMaxZIndex;
     }
 
-    // --- VERİTABANINA KAYDETME FONKSİYONU (BACKEND FETCH) ---
+    // --- VERİTABANINA KAYDETME (VE LOCALSTORAGE YEDEĞİ) ---
     async function saveBoardToDatabase() {
         const boardItems = [];
         
-        // Post-it'leri topla
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
             const authorText = item.querySelector('.postit-author') ? item.querySelector('.postit-author').innerText : '';
             const inner = item.querySelector('.postit-inner-card');
@@ -739,7 +757,6 @@
             });
         });
 
-        // Serbest PNG'leri topla
         document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
             const img = wrap.querySelector('img');
             boardItems.push({
@@ -754,32 +771,35 @@
             });
         });
 
-        // 9 Kancadaki key'leri topla
         const hookSlots = [];
         document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
             const img = hook.querySelector('.keychain-plush-img');
             hookSlots.push(img ? img.dataset.key : null);
         });
 
-        try {
-            await fetch(SAVE_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    board_items: boardItems,
-                    hook_slots: hookSlots
-                })
-            });
-        } catch (error) {
-            console.error('Veritabanına kaydedilirken hata oluştu:', error);
+        // Localstorage yedeği (Backend olmadan da çalışması için)
+        localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots }));
+
+        if (SAVE_URL) {
+            try {
+                await fetch(SAVE_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': CSRF_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        board_items: boardItems,
+                        hook_slots: hookSlots
+                    })
+                });
+            } catch (error) {
+                console.error('Kayıt hatası:', error);
+            }
         }
     }
 
-    // Sayfa açıldığında DOM'daki elemanlara dinleyicileri bağla
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const isAuthor = wrapper.querySelector('.postit-author')?.innerText.includes(`@${CURRENT_USERNAME}`);
@@ -806,7 +826,6 @@
         });
     });
 
-    // --- SCALE KONTROLÜ ---
     function setupPostitScaling(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
@@ -846,7 +865,6 @@
         }
     }
 
-    // --- SERBEST STICKER YÖNETİMİ ---
     function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
@@ -968,7 +986,6 @@
         });
     }
 
-    // --- DÜZENLEME MODU ---
     if (toggleEditBtn) {
         toggleEditBtn.addEventListener('click', function() {
             isEditing = !isEditing;
@@ -1007,7 +1024,6 @@
         }
     }
 
-    // --- MODAL İÇİ TRANSFORMER ---
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         const rotateBtn = box.querySelector('.handle-rotate');
@@ -1162,7 +1178,6 @@
         }
     });
 
-    // --- KLONLAMA YÖNTEMİ VE VERİTABANINA KAYIT ---
     function pinNoteToBoard() {
         const postitWrapper = document.createElement('div');
         postitWrapper.className = 'cork-postit can-delete';
@@ -1258,7 +1273,6 @@
         };
     }
 
-    // --- ÇANTA & SÜRÜKLE-BIRAK (DRAG & DROP) ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
