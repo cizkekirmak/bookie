@@ -445,13 +445,13 @@
                 display: none !important;
             }
 
-            /* SAĞ ALT: FRIENDS BUTONU */
+            /* SAĞ ALT: FRIENDS BUTONU (Görsel denge için yukarı çekildi) */
             .mobile-friends-tab {
                 display: flex !important;
                 align-items: center;
                 gap: 6px;
                 position: fixed !important;
-                bottom: 12px !important;
+                bottom: 20px !important;
                 right: 0 !important;
                 background: #fdf5a6;
                 color: #2c441b;
@@ -468,20 +468,20 @@
                 transform: none !important;
             }
 
-            /* SOL ALT: CHAT PATİ BUTONU (Friends ile tam aynı alt çizgi) */
+            /* SOL ALT: CHAT PATİ BUTONU (Görsel alt çizgiyi yakalamak için aşağı indirildi) */
             #chat-draggable-btn,
             .chat-bubble-btn,
             .chat-toggle-btn {
                 position: fixed !important;
                 left: 14px !important;
-                bottom: 12px !important;
+                bottom: 4px !important;
                 top: auto !important;
                 right: auto !important;
                 z-index: 9999 !important;
                 margin: 0 !important;
             }
 
-            /* ORTA ALT: PARTIAL İÇİNDEN GELEN ABOUT BUTONU */
+            /* ORTA ALT: PARTIAL İÇİNDEKİ ABOUT BUTONU */
             #aboutMeBtn,
             .about-me-tab,
             .about-bookie-btn,
@@ -494,11 +494,11 @@
                 margin: 0 !important;
             }
 
-            /* ORTA ÜST: DİL SEÇİCİ (About butonunun hemen üstünde) */
+            /* ORTA: DİL SEÇİCİ (About butonunun tam üstüne oturtuldu) */
             .mobile-bottom-lang-bar {
                 display: flex !important;
                 position: fixed !important;
-                bottom: 56px !important;
+                bottom: 44px !important;
                 left: 50% !important;
                 transform: translateX(-50%) !important;
                 z-index: 9999 !important;
@@ -565,7 +565,7 @@
         </div>
     </header>
 
-    {{-- MOBİL EKRANDA EN ALTA ORTALANMIŞ DİL SEÇİCİ (ABOUT BUTONUNUN ÜSTÜNDE) --}}
+    {{-- MOBİL EKRANDA EN ALTA ORTALANMIŞ DİL SEÇİCİ --}}
     <div class="mobile-bottom-lang-bar">
         @include('partials.lang-switch')
     </div>
