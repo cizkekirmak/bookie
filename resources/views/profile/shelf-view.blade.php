@@ -96,14 +96,14 @@
             background: #badfa0;
         }
 
-        /* POST-IT BOYUTLARI (3 SEÇENEK) */
+        /* POST-IT BOYUTLARI */
         .cork-postit {
             position: absolute;
             box-shadow: 2px 5px 12px rgba(0,0,0,0.22);
             padding: 8px;
             cursor: grab;
             user-select: none;
-            overflow: hidden; /* Dışarı taşmayı engeller */
+            overflow: hidden;
             transition: box-shadow 0.15s;
         }
         .cork-postit:active {
@@ -129,6 +129,7 @@
             pointer-events: none;
         }
 
+        /* PANODAKİ METİN VE STICKER SÜRÜKLEMEYİ ENGELLEMEZ */
         .postit-text-content {
             font-size: 14px;
             line-height: 1.2;
@@ -136,6 +137,7 @@
             word-wrap: break-word;
             position: absolute;
             user-select: none;
+            pointer-events: none;
             transform-origin: center center;
         }
 
@@ -143,6 +145,8 @@
             position: absolute;
             object-fit: contain;
             user-select: none;
+            -webkit-user-drag: none;
+            pointer-events: none;
             transform-origin: center center;
         }
 
@@ -217,7 +221,6 @@
             margin-bottom: -5px;
         }
 
-        /* BAŞKALARININ PROFİLİNDE DE HER ZAMAN SALLANAN PELUŞ */
         .keychain-plush-img {
             width: 100%;
             height: 100%;
@@ -227,6 +230,7 @@
             cursor: pointer;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
             pointer-events: auto !important;
+            -webkit-user-drag: none;
         }
         .keychain-plush-img:hover {
             transform: rotate(8deg) scale(1.08);
@@ -261,6 +265,7 @@
             height: 52px;
             object-fit: contain;
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+            -webkit-user-drag: none;
         }
         .folder-label {
             font-size: 11px;
@@ -341,14 +346,14 @@
         .bag-badge-card.unlocked { cursor: pointer; }
         .bag-badge-card.locked { opacity: 0.55; filter: grayscale(85%); background: #f3f3f3; cursor: not-allowed; }
 
-        .bag-badge-img { width: 46px; height: 46px; object-fit: contain; }
+        .bag-badge-img { width: 46px; height: 46px; object-fit: contain; -webkit-user-drag: none; }
         .bag-badge-title { font-size: 12px; font-weight: bold; color: #1a3c11; margin: 0; }
         .bag-badge-desc { font-size: 10px; color: #555; margin: 0; }
         .bag-badge-status { font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 8px; }
         .status-unlocked { background: #e1f5d6; color: #235c15; }
         .status-locked { background: #e0e0e0; color: #666; }
 
-        /* POST-IT OLUŞTURUCU MODAL & STORY TARZI KONTROLLER */
+        /* POST-IT OLUŞTURUCU MODAL & STORY KONTROLLERİ */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -397,7 +402,7 @@
         .color-ball { width: 24px; height: 24px; border-radius: 50%; border: 2px solid rgba(0,0,0,0.15); cursor: pointer; }
         .color-ball.selected { border: 2px solid #1a3c11; transform: scale(1.15); }
 
-        /* STORY SEÇİM ÇERÇEVESİ VE KÖŞE BUTONLARI */
+        /* STORY SEÇİM ÇERÇEVESİ (ÖNİZLEME MODU) */
         .transform-box {
             position: absolute;
             cursor: move;
@@ -528,14 +533,14 @@
                     
                     <!-- Metin Kapsayıcısı -->
                     <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:12px; width:100px; height:auto;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; width:100%;">Hello!</div>
+                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; width:100%; pointer-events:auto;">Hello!</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
                     </div>
 
                     <!-- Sticker Kapsayıcısı -->
                     <div id="stickerTransformBox" class="transform-box" style="display:none; top:45px; left:35px; width:55px; height:55px;">
-                        <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:100%; position:relative;">
+                        <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:100%; position:relative; pointer-events:auto;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
@@ -587,7 +592,7 @@ function getAllAchievementsList() {
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     let isEditing = false;
 
-    // --- LOCALSTORAGE KALICILIK YÖNETİMİ (DB ÖNCESİ SIFIR KAYIP) ---
+    // --- LOCALSTORAGE KALICILIK YÖNETİMİ ---
     const STORAGE_KEY_NOTES = `bookie_board_notes_${PROFILE_USER_ID}`;
     const STORAGE_KEY_KEYCHAINS = `bookie_board_keychains_${PROFILE_USER_ID}`;
 
@@ -614,7 +619,6 @@ function getAllAchievementsList() {
     }
 
     function loadBoardFromStorage() {
-        // Notları Yükle
         const savedNotes = localStorage.getItem(STORAGE_KEY_NOTES);
         if (savedNotes) {
             const notesArr = JSON.parse(savedNotes);
@@ -628,7 +632,6 @@ function getAllAchievementsList() {
                 noteDiv.style.transform = n.transform;
                 noteDiv.innerHTML = n.html;
                 
-                // Silme butonunun dinleyicisini bağla
                 const delBtn = noteDiv.querySelector('.postit-delete-btn');
                 if (delBtn) {
                     delBtn.onclick = function() {
@@ -641,7 +644,6 @@ function getAllAchievementsList() {
                 corkboard.appendChild(noteDiv);
             });
         } else {
-            // İlk açılış örnek notu
             corkboard.innerHTML = `
                 <div class="cork-postit size-square" style="top: 20%; left: 12%; background: #fdf5a6; transform: rotate(-2deg);">
                     <span class="postit-pin"></span>
@@ -654,7 +656,6 @@ function getAllAchievementsList() {
             if (defaultNote) makePostitDraggable(defaultNote);
         }
 
-        // Anahtarlıkları Yükle
         const savedHooks = localStorage.getItem(STORAGE_KEY_KEYCHAINS);
         if (savedHooks) {
             const hookKeys = JSON.parse(savedHooks);
@@ -680,7 +681,6 @@ function getAllAchievementsList() {
         }
     }
 
-    // --- DÜZENLEME BUTONU ---
     if (toggleEditBtn) {
         toggleEditBtn.addEventListener('click', function() {
             isEditing = !isEditing;
@@ -774,7 +774,6 @@ function getAllAchievementsList() {
     setupStoryTransformer('textTransformBox');
     setupStoryTransformer('stickerTransformBox');
 
-    // Sticker Silme Çarpısı
     document.getElementById('btnDeleteSticker').addEventListener('click', (e) => {
         e.stopPropagation();
         const sBox = document.getElementById('stickerTransformBox');
@@ -805,7 +804,6 @@ function getAllAchievementsList() {
 
     function closePostitModal() { modal.classList.remove('active'); }
 
-    // Renkler
     document.querySelectorAll('.color-ball').forEach(b => {
         b.addEventListener('click', function() {
             document.querySelectorAll('.color-ball').forEach(x => x.classList.remove('selected'));
@@ -815,7 +813,6 @@ function getAllAchievementsList() {
         });
     });
 
-    // Şekil Butonları (Kare, Dikey, Yatay Canlı Önizleme)
     document.querySelectorAll('.shape-btn').forEach(b => {
         b.addEventListener('click', function() {
             document.querySelectorAll('.shape-btn').forEach(x => x.classList.remove('active'));
@@ -843,7 +840,6 @@ function getAllAchievementsList() {
         }
     });
 
-    // OK Butonu (Panoya Asma)
     function pinNoteToBoard() {
         const text = textInput.value.trim() || 'Cozy note!';
         const newNote = document.createElement('div');
@@ -875,7 +871,6 @@ function getAllAchievementsList() {
         corkboard.appendChild(newNote);
         closePostitModal();
 
-        // Formu temizle
         textInput.value = '';
         stickerBox.style.display = 'none';
         previewSticker.src = '';
@@ -884,11 +879,15 @@ function getAllAchievementsList() {
         saveBoardToStorage();
     }
 
-    // Panoda Sürükleme Mantığı
+    // --- HATASIZ SÜRÜKLEME FONKSİYONU (RESİM KOPMASINI ENGELLER) ---
     function makePostitDraggable(element) {
+        element.ondragstart = function() { return false; };
+
         element.onmousedown = function(e) {
-            // Başkası ziyaret ederken düzenleme modu kapalıysa sadece kendi eklediği anda taşınabilir
+            if (e.target.classList.contains('postit-delete-btn')) return;
             if (!IS_OWN_PROFILE && !isEditing) return;
+
+            e.preventDefault();
 
             let activeDragItem = element;
             const rect = activeDragItem.getBoundingClientRect();
@@ -968,7 +967,7 @@ function getAllAchievementsList() {
                 return;
             }
         }
-        alert('Tüm 9 kanca dolu! Birini kaldırmak için üzerine tıkla.');
+        alert('Tüm 9 kanca dolu!');
     }
 
     function handleHookSlotClick(slotNum) {
@@ -990,7 +989,6 @@ function getAllAchievementsList() {
         }
     }
 
-    // Sayfa açıldığında hafızadaki durumu yükle
     document.addEventListener('DOMContentLoaded', loadBoardFromStorage);
 </script>
 
