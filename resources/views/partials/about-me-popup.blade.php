@@ -12,7 +12,7 @@
         <div class="postit-content">
             <span class="postit-tape"></span>
             
-            <h4 class="postit-title">haiiii !!</h4>
+            <h4 class="postit-title">{{ __('haiiii !!') }}</h4>
 
             <p class="postit-desc">
                 {{ __('Bookie is an independent project made by a solo developer. Thank you so much for being part of it and using it! For any bugs, ideas, or feedback, feel free to reach out anytime:') }}
