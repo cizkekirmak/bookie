@@ -590,9 +590,9 @@
                  title="{{ $isOwnProfile ? 'Kilitle / Kilidi Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
                 <img id="boardLockImg" 
-                     src="{{ $isBoardLocked ? asset('images/lock.png') : asset('images/unlocked.png') }}" 
+                     src="{{ $isBoardLocked ? asset('images/locek.png') : asset('images/unlocked.png') }}" 
                      alt="Lock Status" 
-                     onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
+                     onerror="this.onerror=null; this.src='{{ asset('images/locke.png') }}';">
             </div>
 
             @foreach($boardItems as $item)
@@ -756,7 +756,7 @@
     const IS_OWN_PROFILE = @json($isOwnProfile);
     let isBoardLocked = @json($isBoardLocked);
 
-    const LOCK_ICON_PATH = '{{ asset("images/lock.png") }}';
+    const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
     const SAVE_URL = PROFILE_USERNAME ? `/u/${PROFILE_USERNAME}/board/save` : '';
