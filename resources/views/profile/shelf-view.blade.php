@@ -37,20 +37,19 @@
 
         .board-page-container {
             width: 100%;
-            max-width: 1100px;
-            margin: 20px auto;
+            max-width: 1150px;
+            margin: 15px auto;
             padding: 0 16px 80px 16px;
         }
 
-        /* ÇİZİMDEKİ GİBİ: PANO ORTADA, SAĞINDA ASKILIK */
+        /* ÇİZİMDEKİ GİBİ: PANO VE YANINDA ŞEFFAF 3x3 ASKI ALANI */
         .corkboard-main-wrapper {
             display: flex;
             flex-direction: row;
             align-items: center;
             justify-content: center;
-            gap: 24px;
+            gap: 28px;
             width: 100%;
-            margin-top: 10px;
         }
 
         /* YATAY ORANINI ASLA BOZMAYAN VE EZİLMEYEN PANO */
@@ -58,7 +57,7 @@
             flex: 1;
             max-width: 780px;
             width: 100%;
-            aspect-ratio: 16 / 10; /* Yatay oranı kilitler, dikeyde sünmeyi engeller */
+            aspect-ratio: 16 / 10;
             background-color: transparent;
             background-image: url('{{ asset('images/pano.jpg') }}');
             background-size: 100% 100%;
@@ -82,7 +81,7 @@
             background: #fdf5a6;
             border: 2px solid #5a7d3b;
             border-radius: 14px;
-            padding: 8px 24px;
+            padding: 8px 26px;
             font-family: 'Unkempt', cursive;
             font-size: 16px;
             font-weight: bold;
@@ -177,77 +176,89 @@
             display: flex;
         }
 
-        /* SAĞDAKİ DİKEY AHŞAP ASKI ÇITASI */
-        .keychain-rack {
-            width: 78px;
-            background: #8b5a2b;
-            border: 3px solid #5c3a1e;
-            border-radius: 14px;
-            padding: 12px 6px;
-            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        /* SAĞDAKİ DÜZ ARKA PLANLI 3x3 ASKI ALANI */
+        .keychain-area-wrapper {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
             flex-shrink: 0;
+            background: transparent;
         }
 
-        .hook-slot {
-            width: 58px;
-            height: 58px;
-            background: rgba(0,0,0,0.18);
-            border: 1.5px dashed #f5deb3;
-            border-radius: 10px;
+        .keychain-grid-9 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(3, 1fr);
+            gap: 14px 12px;
+            padding: 4px;
+            background: transparent;
+        }
+
+        .keychain-hook-unit {
+            width: 66px;
+            height: 92px;
             position: relative;
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
         }
-        .hook-pin {
-            position: absolute;
-            top: -5px;
-            width: 7px;
-            height: 7px;
-            background: linear-gradient(135deg, #eee, #999);
+
+        /* KÜÇÜCÜK METALİK ASKI ÇİVİSİ / PİNİ */
+        .hook-nail {
+            width: 8px;
+            height: 8px;
+            background: radial-gradient(circle, #ffffff 25%, #888888 75%, #333333 100%);
             border-radius: 50%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            z-index: 2;
+            margin-bottom: -5px; /* Peluşun zincir halkasının içine denk gelsin */
         }
 
-        .keychain-item {
-            width: 46px;
-            height: 46px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .keychain-item:hover {
-            transform: scale(1.12) rotate(6deg);
-        }
-        .keychain-item svg {
+        /* ASILAN ANAHTARLIK GÖRSELİ (Peluş) */
+        .keychain-plush-img {
             width: 100%;
             height: 100%;
-            filter: drop-shadow(2px 3px 3px rgba(0,0,0,0.25));
+            object-fit: contain;
+            transform-origin: top center; /* Tam zincir tepesinden sallanır */
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
+        }
+        .keychain-plush-img:hover {
+            transform: rotate(8deg) scale(1.06);
         }
 
-        .btn-open-bag {
-            width: 48px;
+        /* BOŞ ASKI SİLÜETİ */
+        .empty-hook-slot {
+            width: 42px;
+            height: 42px;
+            border: 1.5px dashed rgba(44, 68, 27, 0.22);
+            border-radius: 12px;
+            margin-top: 14px;
+        }
+
+        /* EN ALTTAKİ FOLDER (KLASÖR) BUTONU */
+        .folder-btn-wrap {
+            width: 58px;
             height: 48px;
-            background: #fdf5a6;
-            border: 2px solid #5a7d3b;
-            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.15s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-            margin-top: 4px;
+        }
+        .folder-btn-wrap:hover {
+            transform: scale(1.1);
+        }
+        .folder-btn-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
         }
 
-        /* MODAL: POST-IT OLUŞTURUCU (Çizimdeki Sol Pop-up) */
+        /* MODAL: POST-IT OLUŞTURUCU (MİNİ STÜDYO) */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -326,7 +337,7 @@
         }
         .badge-popup.active { display: block; }
 
-        /* MOBİL UYARLAMA (Masaüstü düzeni bozulmadan kanca alta kayar) */
+        /* MOBİL UYARLAMA (SADECE İZLEME + ASKI ALTA KAYAR) */
         @media (max-width: 1024px) {
             .corkboard-main-wrapper {
                 flex-direction: column;
@@ -337,28 +348,23 @@
                 max-width: 100%;
                 border-radius: 10px;
             }
-            .keychain-rack {
+            .keychain-area-wrapper {
                 width: 100%;
-                max-width: 100%;
+                margin-top: 6px;
+            }
+            .keychain-grid-9 {
+                display: flex;
                 flex-direction: row;
-                justify-content: flex-start;
                 overflow-x: auto;
-                padding: 8px 12px;
+                width: 100%;
+                justify-content: flex-start;
+                padding: 10px 6px;
+                gap: 12px;
             }
-            .hook-slot {
-                width: 50px;
-                height: 50px;
+            .keychain-hook-unit {
+                width: 56px;
+                height: 78px;
                 flex-shrink: 0;
-            }
-            .keychain-item {
-                width: 40px;
-                height: 40px;
-            }
-            .btn-open-bag {
-                flex-shrink: 0;
-                width: 42px;
-                height: 42px;
-                margin-top: 0;
             }
             .cork-postit {
                 pointer-events: auto !important;
@@ -374,9 +380,12 @@
 
 <div class="board-page-container">
 
+    <!-- 1. ORTADA PANO & SAĞDA ŞEFFAF 3x3 ASKI ALANI -->
     <div class="corkboard-main-wrapper">
         
+        <!-- MANTAR PANO (pano.jpg) -->
         <div class="corkboard-frame" id="corkboardArea">
+            <!-- Örnek Post-it 1 -->
             <div class="cork-postit square" style="top: 20%; left: 10%; background: #fdf5a6; transform: rotate(-3deg);">
                 <span class="postit-pin"></span>
                 <button class="postit-delete-btn" onclick="this.parentElement.remove()">✕</button>
@@ -386,6 +395,7 @@
                 <div class="postit-author">@catlover</div>
             </div>
 
+            <!-- Örnek Post-it 2 -->
             <div class="cork-postit rect" style="top: 25%; left: 55%; background: #ffd1dc; transform: rotate(4deg);">
                 <span class="postit-pin"></span>
                 <button class="postit-delete-btn" onclick="this.parentElement.remove()">✕</button>
@@ -396,19 +406,39 @@
             </div>
         </div>
 
-        <div class="keychain-rack">
-            <div class="hook-slot"><span class="hook-pin"></span><div class="keychain-item" data-badge="tavsan" onclick="showBadgeDetails('tavsan')">{!! getBadgeSvg('tavsan') !!}</div></div>
-            <div class="hook-slot"><span class="hook-pin"></span><div class="keychain-item" data-badge="kalp" onclick="showBadgeDetails('kalp')">{!! getBadgeSvg('kalp') !!}</div></div>
-            <div class="hook-slot"><span class="hook-pin"></span><div class="keychain-item" data-badge="kaset" onclick="showBadgeDetails('kaset')">{!! getBadgeSvg('kaset') !!}</div></div>
-            <div class="hook-slot"><span class="hook-pin"></span><div class="keychain-item" data-badge="kahve" onclick="showBadgeDetails('kahve')">{!! getBadgeSvg('kahve') !!}</div></div>
-            <div class="hook-slot"><span class="hook-pin"></span><div class="keychain-item" data-badge="kedi" onclick="showBadgeDetails('kedi')">{!! getBadgeSvg('kedi') !!}</div></div>
-            <div class="hook-slot"><span class="hook-pin"></span><div class="keychain-item" data-badge="yildiz" onclick="showBadgeDetails('yildiz')">{!! getBadgeSvg('yildiz') !!}</div></div>
-            
-            <button class="btn-open-bag" title="All Achievements" onclick="openAllBadgesModal()">📁</button>
+        <!-- SAĞDAKİ DÜZ ARKA PLANLI 9'LU (3x3) ASKI VE FOLDER -->
+        <div class="keychain-area-wrapper">
+            <div class="keychain-grid-9">
+                {{-- Slot 1: Örnek Maymun Peluş Anahtarlığın --}}
+                <div class="keychain-hook-unit">
+                    <div class="hook-nail"></div>
+                    <img src="{{ asset('images/badges/maymun.png') }}" 
+                         alt="Monkey Keychain" 
+                         class="keychain-plush-img" 
+                         onclick="showBadgeDetails('maymun')"
+                         onerror="this.onerror=null; this.src='{{ asset('images/badges/tavsan.png') }}';">
+                </div>
+
+                {{-- Slot 2'den 9'a kadar diğer kancalar (Şimdilik boş / çivi görünümlü) --}}
+                @for($slot = 2; $slot <= 9; $slot++)
+                    <div class="keychain-hook-unit">
+                        <div class="hook-nail"></div>
+                        <div class="empty-hook-slot"></div>
+                    </div>
+                @endfor
+            </div>
+
+            <!-- EN ALTTAKİ FOLDER (KLASÖR) GÖRSELİ (public/images/folder.png) -->
+            <div class="folder-btn-wrap" onclick="openAllBadgesModal()" title="All Keychains Bag">
+                <img src="{{ asset('images/folder.png') }}" 
+                     alt="Folder" 
+                     onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%23d4a373\'><path d=\'M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z\'/></svg>';">
+            </div>
         </div>
 
     </div>
 
+    <!-- 2. PANONUN TAM ALTINDAKİ MERKEZİ BUTON -->
     <div class="board-bottom-bar">
         @if(auth()->check() && auth()->id() === ($user->id ?? 0))
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
@@ -419,6 +449,7 @@
 
 </div>
 
+<!-- 3. POST-IT MİNİ STÜDYO MODAL -->
 <div class="modal-overlay" id="postitStudioModal">
     <div class="studio-modal-box">
         <h3 style="margin: 0; font-size: 17px;">✨ Create Your Note</h3>
@@ -473,6 +504,7 @@
     </div>
 </div>
 
+<!-- 4. BAŞARIM DETAY POPUP -->
 <div class="badge-popup" id="badgePopupBox">
     <div id="badgePopupIcon" style="width:50px; height:50px; margin:0 auto 8px auto;"></div>
     <h4 id="badgePopupTitle" style="margin: 0 0 6px 0; font-size:15px;"></h4>
@@ -483,36 +515,23 @@
 @php
 function getBadgesList() {
     return [
-        'tavsan' => ['title' => '10+ Friends!', 'desc' => '10 arkadaş edinerek peluş tavşan anahtarlığı kazandın.', 'color' => '#b5e2fa'],
-        'kalp'   => ['title' => 'Top Reviewer', 'desc' => 'İncelemelerine 20+ beğeni geldiği için örgü kalp kazandın.', 'color' => '#ffd1dc'],
-        'kaset'  => ['title' => 'Sci-Fi Explorer', 'desc' => '5 bilim kurgu kitabı bitirdiğin için nostaljik kaset verildi.', 'color' => '#dfccf1'],
-        'kahve'  => ['title' => 'Classic Reader', 'desc' => 'Klasik eserleri tüketenlere özel sıcak kahve fincanı.', 'color' => '#fdf5a6'],
-        'kedi'   => ['title' => 'Night Owl', 'desc' => 'Gece yarısı kitap kaydeden sevimli gece kedisi.', 'color' => '#badfa0'],
-        'yildiz' => ['title' => 'Book Worm', 'desc' => 'Tek oturuşta 100 sayfa deviren parlayan yıldız.', 'color' => '#fee16c'],
-        'kupa'   => ['title' => 'Speed Reader', 'desc' => 'Aynı haftada 2 kitap bitiren şampiyonlara özel mini kupa.', 'color' => '#ffd1dc'],
-        'kitap'  => ['title' => 'First Step', 'desc' => 'İlk kitabını rafa eklediğin için aldığın ahşap kitaplık.', 'color' => '#c6e085'],
-        'mektup' => ['title' => 'Friendly Postman', 'desc' => 'Arkadaşlarının panolarına 5 post-it bırakan usta postacı.', 'color' => '#b5e2fa'],
-        'ayicik' => ['title' => 'Warm Home', 'desc' => 'Panosuna 10 not iliştirilen sıcak yuva sahibi.', 'color' => '#fdf5a6'],
-        'cicek'  => ['title' => 'Spring Blossom', 'desc' => 'Profilini ve bio alanını eksiksiz dolduran çiçek gibi okur.', 'color' => '#ffd1dc'],
-        'mantar' => ['title' => 'Fantasy Lover', 'desc' => 'Büyülü dünyalara dalan fantastik edebiyat hayranı.', 'color' => '#dfccf1'],
-        'kamera' => ['title' => 'Aesthetic Soul', 'desc' => 'Kendi özel avatarını yükleyen görsel ruha polaroid kamera.', 'color' => '#badfa0'],
-        'pasta'  => ['title' => 'Book Birthday', 'desc' => 'Bookie’de 1. ayını dolduranlara leziz çilekli pasta.', 'color' => '#fee16c'],
-        'anahtar'=> ['title' => 'Secret Keeper', 'desc' => 'Gizli easter egg’leri bulan meraklı dedektif anahtarı.', 'color' => '#c29b62']
+        'maymun' => ['title' => 'Monkey Reader', 'desc' => 'Bu sevimli kırmızı peluş maymun anahtarlık!', 'icon' => 'badges/maymun.png'],
+        'tavsan' => ['title' => '10+ Friends!', 'desc' => '10 arkadaş edinerek peluş tavşan anahtarlığı kazandın.', 'icon' => 'badges/tavsan.png'],
+        'kalp'   => ['title' => 'Top Reviewer', 'desc' => 'İncelemelerine 20+ beğeni geldiği için örgü kalp kazandın.', 'icon' => 'badges/kalp.png'],
+        'kaset'  => ['title' => 'Sci-Fi Explorer', 'desc' => '5 bilim kurgu kitabı bitirdiğin için nostaljik kaset verildi.', 'icon' => 'badges/kaset.png'],
+        'kahve'  => ['title' => 'Classic Reader', 'desc' => 'Klasik eserleri tüketenlere özel sıcak kahve fincanı.', 'icon' => 'badges/kahve.png'],
+        'kedi'   => ['title' => 'Night Owl', 'desc' => 'Gece yarısı kitap kaydeden sevimli gece kedisi.', 'icon' => 'badges/kedi.png'],
+        'yildiz' => ['title' => 'Book Worm', 'desc' => 'Tek oturuşta 100 sayfa deviren parlayan yıldız.', 'icon' => 'badges/yildiz.png'],
+        'kupa'   => ['title' => 'Speed Reader', 'desc' => 'Aynı haftada 2 kitap bitiren şampiyonlara özel mini kupa.', 'icon' => 'badges/kupa.png'],
+        'kitap'  => ['title' => 'First Step', 'desc' => 'İlk kitabını rafa eklediğin için aldığın ahşap kitaplık.', 'icon' => 'badges/kitap.png'],
+        'mektup' => ['title' => 'Friendly Postman', 'desc' => 'Arkadaşlarının panolarına 5 post-it bırakan usta postacı.', 'icon' => 'badges/mektup.png'],
+        'ayicik' => ['title' => 'Warm Home', 'desc' => 'Panosuna 10 not iliştirilen sıcak yuva sahibi.', 'icon' => 'badges/ayicik.png'],
+        'cicek'  => ['title' => 'Spring Blossom', 'desc' => 'Profilini ve bio alanını eksiksiz dolduran çiçek gibi okur.', 'icon' => 'badges/cicek.png'],
+        'mantar' => ['title' => 'Fantasy Lover', 'desc' => 'Büyülü dünyalara dalan fantastik edebiyat hayranı.', 'icon' => 'badges/mantar.png'],
+        'kamera' => ['title' => 'Aesthetic Soul', 'desc' => 'Kendi özel avatarını yükleyen görsel ruha polaroid kamera.', 'icon' => 'badges/kamera.png'],
+        'pasta'  => ['title' => 'Book Birthday', 'desc' => 'Bookie’de 1. ayını dolduranlara leziz çilekli pasta.', 'icon' => 'badges/pasta.png'],
+        'anahtar'=> ['title' => 'Secret Keeper', 'desc' => 'Gizli easter egg’leri bulan meraklı dedektif anahtarı.', 'icon' => 'badges/anahtar.png']
     ];
-}
-
-function getBadgeSvg($key) {
-    $badges = getBadgesList();
-    $badge = $badges[$key] ?? ['color' => '#badfa0'];
-    $c = $badge['color'];
-    return '
-    <svg viewBox="0 0 100 100">
-        <circle cx="50" cy="18" r="9" fill="none" stroke="#666" stroke-width="5"/>
-        <rect x="25" y="30" width="50" height="58" rx="14" fill="'.$c.'" stroke="#4b813b" stroke-width="4"/>
-        <circle cx="42" cy="54" r="4" fill="#2d5a27"/>
-        <circle cx="58" cy="54" r="4" fill="#2d5a27"/>
-        <path d="M 46 62 Q 50 66 54 62" fill="none" stroke="#2d5a27" stroke-width="3" stroke-linecap="round"/>
-    </svg>';
 }
 @endphp
 
@@ -690,8 +709,7 @@ function getBadgeSvg($key) {
 
         badgeTitle.innerText = badge.title;
         badgeDesc.innerText = badge.desc;
-        const item = document.querySelector(`[data-badge="${key}"]`);
-        badgeIcon.innerHTML = item ? item.innerHTML : '';
+        badgeIcon.innerHTML = `<img src="/images/${badge.icon}" style="width:100%; height:100%; object-fit:contain;">`;
         badgePopup.classList.add('active');
     }
 
@@ -700,7 +718,7 @@ function getBadgeSvg($key) {
     }
 
     function openAllBadgesModal() {
-        alert('Tüm başarımlar çantası: Açık olan başarımlarını kancalara sürükleyebilirsin!');
+        alert('Tüm başarımlar klasörü: Kazandığın anahtarlıkları buradan seçip 9 kancaya dizebilirsin!');
     }
 </script>
 
