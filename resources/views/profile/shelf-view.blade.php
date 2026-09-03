@@ -65,12 +65,13 @@
             overflow: hidden;
         }
 
+        /* BÜYÜTÜLMÜŞ VE BELİRGİN KİLİT SİMGESİ */
         .board-lock-badge {
             position: absolute;
             top: 14px;
             right: 16px;
-            width: 48px;
-            height: 48px;
+            width: 50px;
+            height: 50px;
             z-index: 10000;
             cursor: pointer;
             filter: drop-shadow(0 4px 10px rgba(0,0,0,0.3));
@@ -79,9 +80,7 @@
             align-items: center;
             justify-content: center;
         }
-        .board-lock-badge:hover {
-            transform: scale(1.15);
-        }
+        .board-lock-badge:hover { transform: scale(1.15); }
         .board-lock-badge img {
             width: 100%;
             height: 100%;
@@ -128,6 +127,7 @@
             filter: grayscale(60%);
         }
 
+        /* POST-IT DIŞ KAPSAYICI */
         .cork-postit {
             position: absolute;
             cursor: grab;
@@ -190,27 +190,6 @@
             z-index: 10;
         }
 
-        .postit-delete-btn {
-            display: none;
-            position: absolute;
-            top: -10px;
-            left: -10px;
-            background: #ff7675;
-            color: white;
-            border: 1.5px solid #fff;
-            border-radius: 50%;
-            width: 22px;
-            height: 22px;
-            font-size: 12px;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            z-index: 60;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-        }
-        .is-editing .postit-delete-btn,
-        .can-delete.is-selected .postit-delete-btn { display: flex; }
-
         .free-sticker-wrapper {
             position: absolute;
             cursor: grab;
@@ -236,6 +215,30 @@
             filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
         }
 
+        /* TUTAMAÇLAR */
+        .handle-btn {
+            display: none;
+            position: absolute;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1.5px solid #ffffff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
+            z-index: 60;
+        }
+        .transform-box.is-selected .handle-btn,
+        .free-sticker-wrapper.is-selected .handle-btn,
+        .cork-postit.is-selected .handle-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .handle-delete { top: -10px; left: -10px; background: #ff7675; color: white; font-size: 11px; cursor: pointer; }
+        .handle-rotate { top: -16px; left: 50%; transform: translateX(-50%); background: #fab1a0; color: #2d3436; font-size: 11px; cursor: grab; }
+        .handle-resize { bottom: -10px; right: -10px; background: #74b9ff; color: white; font-size: 11px; cursor: nwse-resize; }
+
+        /* ASKI VE ÇANTA ALANI */
         .keychain-area-wrapper {
             display: flex;
             flex-direction: column;
@@ -410,6 +413,7 @@
             word-break: break-word;
         }
 
+        /* MODAL */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -520,28 +524,6 @@
         }
         .transform-box.is-selected { border-color: #2d5a27; }
 
-        .handle-btn {
-            display: none;
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            border-radius: 50%;
-            border: 1.5px solid #ffffff;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.25);
-            z-index: 60;
-        }
-        .transform-box.is-selected .handle-btn,
-        .free-sticker-wrapper.is-selected .handle-btn,
-        .cork-postit.is-selected .handle-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .handle-delete { top: -10px; left: -10px; background: #ff7675; color: white; font-size: 11px; cursor: pointer; }
-        .handle-rotate { top: -16px; left: 50%; transform: translateX(-50%); background: #fab1a0; color: #2d3436; font-size: 11px; cursor: grab; }
-        .handle-resize { bottom: -10px; right: -10px; background: #74b9ff; color: white; font-size: 11px; cursor: nwse-resize; }
-
         @media (max-width: 1024px) {
             .corkboard-main-wrapper { flex-direction: column; align-items: center; gap: 16px; }
             .corkboard-frame { max-width: 100%; border-radius: 10px; }
@@ -559,6 +541,9 @@
 
 @php
     $isOwnProfile = auth()->check() && (auth()->id() === ($user->id ?? 0));
+    $isFriendUser = $isFriend ?? false; // Controller'dan gelen arkadaşlık yetkisi
+    $canAddPostit = ($isOwnProfile || $isFriendUser) && !($board->is_locked ?? false);
+
     $hookSlots = (isset($board) && is_array($board->hook_slots)) ? $board->hook_slots : array_fill(0, 9, null);
     $boardItems = (isset($board) && is_array($board->board_items)) ? $board->board_items : [];
     $isBoardLocked = $board->is_locked ?? false;
@@ -586,19 +571,21 @@
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
+            <!-- PANO KİLİT SİMGESİ -->
             <div class="board-lock-badge" id="boardLockBtn" 
                  title="{{ $isOwnProfile ? 'Kilitle / Kilidi Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
                 <img id="boardLockImg" 
-                     src="{{ $isBoardLocked ? asset('images/locek.png') : asset('images/unlocked.png') }}" 
+                     src="{{ $isBoardLocked ? asset('images/lock.png') : asset('images/unlocked.png') }}" 
                      alt="Lock Status" 
-                     onerror="this.onerror=null; this.src='{{ asset('images/locke.png') }}';">
+                     onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
             </div>
 
             @foreach($boardItems as $item)
                 @if(($item['type'] ?? '') === 'postit')
                     @php
                         $isAuthor = str_contains($item['author'] ?? '', '@' . (auth()->user()->username ?? ''));
+                        // Pano sahibi herkesin notunu silebilir/taşıyabilir; yazar da kendi notunu silebilir
                         $canManage = ($isOwnProfile || $isAuthor) && !$isBoardLocked;
                         $scale = $item['scale'] ?? 0.65;
                         $rot = $item['rotation'] ?? 0;
@@ -661,16 +648,21 @@
         </div>
     </div>
 
+    <!-- ALT BUTON BARI -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
             <button type="button" class="btn-action" onclick="document.getElementById('freeStickerUploadInput').click()">🖼️ ADD STICKER</button>
             <input type="file" id="freeStickerUploadInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;">
         @endif
-        @if(auth()->check())
-            <button id="openPostitModalBtn" class="btn-action" {{ $isBoardLocked ? 'disabled' : '' }}>
-                {{ $isBoardLocked ? '🔒 BOARD LOCKED' : '📌 ADD POST-IT' }}
-            </button>
+
+        {{-- SADECE ARKADAŞLAR VE PROFİL SAHİBİ POST-IT BUTONUNU GÖRÜR/KULLANIR --}}
+        @if($canAddPostit)
+            <button id="openPostitModalBtn" class="btn-action">📌 ADD POST-IT</button>
+        @elseif($isBoardLocked)
+            <button class="btn-action" disabled>🔒 BOARD LOCKED</button>
+        @elseif(auth()->check() && !$isOwnProfile && !$isFriendUser)
+            <button class="btn-action" disabled title="Yalnızca arkadaşlar not bırakabilir">👥 SADECE ARKADAŞLAR</button>
         @endif
     </div>
 
@@ -686,6 +678,7 @@
 
 </div>
 
+<!-- POST-IT MİNİ STÜDYO MODAL -->
 <div class="modal-overlay" id="postitStudioModal">
     <div class="studio-modal-box">
         <h3 style="margin: 0; font-size: 16px; color: #1e4215;">✨ Create Your Note</h3>
@@ -756,9 +749,10 @@
     const IS_OWN_PROFILE = @json($isOwnProfile);
     let isBoardLocked = @json($isBoardLocked);
 
-    const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
+    const LOCK_ICON_PATH = '{{ asset("images/lock.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
+    // Dinamik Rota
     const SAVE_URL = PROFILE_USERNAME ? `/u/${PROFILE_USERNAME}/board/save` : '';
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
@@ -779,6 +773,7 @@
         element.style.zIndex = globalMaxZIndex;
     }
 
+    // --- PANO KİLİTLEME DÜĞMESİ ---
     if (boardLockBtn && IS_OWN_PROFILE) {
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
@@ -794,6 +789,7 @@
         });
     }
 
+    // --- VERİTABANINA ASYNC KAYIT VE GÜVENLİK YEDEĞİ ---
     async function saveBoardToDatabase() {
         const boardItems = [];
         
@@ -834,6 +830,7 @@
             hookSlots.push(img ? img.dataset.key : null);
         });
 
+        // LocalStorage Güvenlik Yedeği
         localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots, isBoardLocked }));
 
         if (SAVE_URL) {
@@ -857,12 +854,14 @@
         }
     }
 
+    // --- SAYFA YÜKLENDİĞİNDE GERİ YÜKLEME ---
     document.addEventListener('DOMContentLoaded', () => {
         const localBackup = localStorage.getItem(`bookie_board_backup_${@json($user->id ?? 0)}`);
         if (localBackup) {
             try {
                 const parsed = JSON.parse(localBackup);
 
+                // 1. Post-it ve serbest sticker kurtarma (Eğer Blade boş geldiyse)
                 if (parsed.boardItems && parsed.boardItems.length > 0 && !document.querySelector('.cork-postit') && !document.querySelector('.free-sticker-wrapper')) {
                     parsed.boardItems.forEach(item => {
                         if (item.type === 'postit') {
@@ -890,6 +889,7 @@
                     });
                 }
 
+                // 2. Kancadaki anahtarlıkları geri yükle
                 if (parsed.hookSlots && Array.isArray(parsed.hookSlots)) {
                     parsed.hookSlots.forEach((key, index) => {
                         const slotUnit = document.querySelector(`.keychain-hook-unit[data-slot="${index + 1}"]`);
@@ -912,6 +912,7 @@
                     });
                 }
 
+                // 3. Kilit durumu geri yükle
                 if (typeof parsed.isBoardLocked !== 'undefined') {
                     isBoardLocked = parsed.isBoardLocked;
                     if (boardLockImg) {
@@ -927,6 +928,7 @@
             }
         }
 
+        // Dinleyicileri bağla
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const isAuthor = wrapper.querySelector('.postit-author')?.innerText.includes(`@${CURRENT_USERNAME}`);
             const canManage = (IS_OWN_PROFILE || isAuthor) && !isBoardLocked;
@@ -942,6 +944,7 @@
         });
     });
 
+    // --- KONTROLLER (DÖNDÜR / BOYUTLANDIR / SİL) ---
     function setupPostitControls(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             if (isBoardLocked) return;
@@ -1025,6 +1028,7 @@
         }
     }
 
+    // --- SERBEST STICKER OLUŞTURMA & KONTROLLERİ ---
     function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
@@ -1190,6 +1194,7 @@
         }
     }
 
+    // --- MODAL İÇİ KONTROLLER ---
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         const rotateBtn = box.querySelector('.handle-rotate');
@@ -1392,12 +1397,13 @@
         saveBoardToDatabase();
     }
 
+    // --- KUSURSUZ VE SCALE DOSTU SÜRÜKLEME (DELTA HESAPLAMASI) ---
     function makeItemDraggable(element, isMyItem = false) {
         element.ondragstart = () => false;
 
         element.onmousedown = function(e) {
             if (isBoardLocked) return;
-            if (e.target.classList.contains('postit-delete-btn') || e.target.classList.contains('handle-btn')) return;
+            if (e.target.classList.contains('handle-btn')) return;
 
             if (!IS_OWN_PROFILE && !isMyItem) return;
             if (IS_OWN_PROFILE && !isEditing && !isMyItem) return;
@@ -1405,21 +1411,34 @@
             e.preventDefault();
             bringToFront(element);
 
-            let activeDragItem = element;
-            const rect = activeDragItem.getBoundingClientRect();
-            let dragOffsetX = e.clientX - rect.left;
-            let dragOffsetY = e.clientY - rect.top;
+            // Başlangıç fare koordinatları
+            let prevMouseX = e.clientX;
+            let prevMouseY = e.clientY;
+
+            // Panonun piksel sınırları
+            const boardRect = corkboard.getBoundingClientRect();
+
+            // Yüzde cinsinden mevcut konumu al
+            let curLeftPct = parseFloat(element.style.left) || 20;
+            let curTopPct = parseFloat(element.style.top) || 20;
 
             function onMouseMove(event) {
-                const boardRect = corkboard.getBoundingClientRect();
-                let left = event.clientX - boardRect.left - dragOffsetX;
-                let top = event.clientY - boardRect.top - dragOffsetY;
+                // Farenin anlık kat ettiği yol (delta)
+                let dx = event.clientX - prevMouseX;
+                let dy = event.clientY - prevMouseY;
 
-                left = Math.max(0, Math.min(boardRect.width - activeDragItem.offsetWidth * 0.5, left));
-                top = Math.max(0, Math.min(boardRect.height - activeDragItem.offsetHeight * 0.5, top));
+                prevMouseX = event.clientX;
+                prevMouseY = event.clientY;
 
-                activeDragItem.style.left = (left / boardRect.width * 100) + '%';
-                activeDragItem.style.top = (top / boardRect.height * 100) + '%';
+                // Piksel farkını panonun boyutuna göre yüzdeye çevir
+                let dLeftPct = (dx / boardRect.width) * 100;
+                let dTopPct = (dy / boardRect.height) * 100;
+
+                curLeftPct = Math.max(0, Math.min(88, curLeftPct + dLeftPct));
+                curTopPct = Math.max(0, Math.min(88, curTopPct + dTopPct));
+
+                element.style.left = curLeftPct + '%';
+                element.style.top = curTopPct + '%';
             }
 
             function onMouseUp() {
@@ -1433,6 +1452,7 @@
         };
     }
 
+    // --- ÇANTA & SÜRÜKLE-BIRAK (DRAG & DROP) ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
