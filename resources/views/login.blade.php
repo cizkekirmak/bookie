@@ -81,6 +81,7 @@
             box-shadow: 0 4px 6px rgba(44, 159, 76, 0.64);
             font-family: "Henny Penny", cursive;
             width: 280px;
+            box-sizing: border-box;
         }
 
         .kutucuk label {
@@ -144,6 +145,29 @@
         }
 
         /* ---- İNDİRME ÇEKMECESİ ---- */
+        /* Sekme (.cekmece-tab), çekmecenin (.cekmece) bir PARÇASI:
+           kapalıyken kutunun arkasına gizlenir, sadece sekme kenardan
+           taşar; çekildiğinde ikisi birlikte hareket eder. */
+
+        .cekmece {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            width: 190px;
+            box-sizing: border-box;
+            background: #ebf8e2;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 4px 4px 8px rgba(44, 159, 76, 0.5);
+            padding: 22px 20px;
+            z-index: 1;
+            text-align: center;
+            transform: translateY(-50%) translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+
+        .kutucuk-sarmalayici.acik .cekmece {
+            transform: translateY(-50%) translateX(0);
+        }
 
         .cekmece-tab {
             position: absolute;
@@ -159,9 +183,9 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            z-index: 3;
             border: none;
             padding: 0;
+            z-index: 3;
             transition: background-color 0.2s ease;
         }
 
@@ -180,38 +204,25 @@
             transform: rotate(180deg);
         }
 
-        .cekmece {
-            position: absolute;
-            top: 50%;
-            left: 100%;
-            transform: translateY(-50%) translateX(-100%);
-            background: #ebf8e2;
-            border-radius: 0 12px 12px 0;
-            box-shadow: 4px 4px 8px rgba(44, 159, 76, 0.5);
-            padding: 22px 20px;
-            width: 190px;
-            box-sizing: border-box;
-            z-index: 1;
+        .cekmece-icerik {
             opacity: 0;
-            visibility: hidden;
-            text-align: center;
-            transition: transform 0.4s ease, opacity 0.35s ease, visibility 0.4s;
+            pointer-events: none;
+            transition: opacity 0.3s ease 0.1s;
         }
 
-        .kutucuk-sarmalayici.acik .cekmece {
-            transform: translateY(-50%) translateX(0);
+        .kutucuk-sarmalayici.acik .cekmece-icerik {
             opacity: 1;
-            visibility: visible;
+            pointer-events: auto;
         }
 
-        .cekmece p {
+        .cekmece-icerik p {
             font-family: "Henny Penny", cursive;
             color: #1a562b;
             font-size: 18px;
             margin: 0 0 14px 0;
         }
 
-        .cekmece button {
+        .cekmece-icerik button {
             width: 100%;
             padding: 10px;
             background-color: #2e6f40;
@@ -225,8 +236,42 @@
             transition: background-color 0.2s ease;
         }
 
-        .cekmece button:hover {
+        .cekmece-icerik button:hover {
             background-color: #235631;
+        }
+
+        /* ---- MOBİLDE: SAĞDAN DEĞİL, ALTTAN AÇILSIN ---- */
+        @media (max-width: 640px) {
+            .cekmece {
+                top: 100%;
+                left: 50%;
+                width: min(240px, 82vw);
+                border-radius: 0 0 12px 12px;
+                transform: translateX(-50%) translateY(-100%);
+            }
+
+            .kutucuk-sarmalayici.acik .cekmece {
+                transform: translateX(-50%) translateY(0);
+            }
+
+            .cekmece-tab {
+                top: auto;
+                right: auto;
+                bottom: -34px;
+                left: 50%;
+                transform: translateX(-50%);
+                width: 64px;
+                height: 34px;
+                border-radius: 0 0 10px 10px;
+            }
+
+            .cekmece-tab img {
+                transform: rotate(-90deg);
+            }
+
+            .kutucuk-sarmalayici.acik .cekmece-tab img {
+                transform: rotate(90deg);
+            }
         }
 
         .floating-lang-switch {
@@ -278,15 +323,16 @@
                 </form>
             </div>
 
-            {{-- KUTUDAN ÇIKAN İNDİRME SEKMESİ --}}
-            <button type="button" class="cekmece-tab" id="cekmeceTab" aria-label="{{ __('Download Bookie') }}">
-                <img src="{{ asset('images/indir-ikon.png') }}" alt="download">
-            </button>
-
-            {{-- ARKADAN AÇILAN ÇEKMECE --}}
+            {{-- ÇEKMECE: sekme (tab) ve içerik AYNI parçanın içinde, birlikte hareket ediyor --}}
             <div class="cekmece">
-                <p>{{ __('download bookie') }}</p>
-                <button type="button" id="indirButonu">{{ __('download') }}</button>
+                <button type="button" class="cekmece-tab" id="cekmeceTab" aria-label="{{ __('Download Bookie') }}">
+                    <img src="{{ asset('images/indir-ikon.png') }}" alt="{{ __('download') }}">
+                </button>
+
+                <div class="cekmece-icerik">
+                    <p>{{ __('download bookie') }}</p>
+                    <button type="button" id="indirButonu">{{ __('download') }}</button>
+                </div>
             </div>
         </div>
     </div>
