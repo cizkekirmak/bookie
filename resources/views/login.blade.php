@@ -385,24 +385,9 @@
             }
             deferredPrompt = null;
         } else {
-            // deferredPrompt yoksa ya zaten kuruludur ya da desteklenmiyordur
             alert("Bookie zaten bilgisayarında yüklü! Adres çubuğundaki 'Uygulamada aç' butonundan veya masaüstünden açabilirsin. ✨");
         }
     });
-
-    const loginForm = document.querySelector('form[action="/login"]');
-    if (loginForm) {
-        loginForm.addEventListener('submit', function () {
-            const submitBtn = loginForm.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                submitBtn.style.opacity = '0.75';
-                submitBtn.style.cursor = 'wait';
-                // Laravel dil çevirisinden anlık seçili dili alır
-                submitBtn.textContent = @json(__('logging in...'));
-            }
-        });
-    }
 </script>
 </body>
 </html>
