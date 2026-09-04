@@ -330,15 +330,18 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                overflow: hidden;
+                overflow: visible !important; /* Rozetin kesilmesini engeller */
                 text-decoration: none;
                 flex-shrink: 0;
+                position: relative !important; /* Rozetin buraya göre konumlanmasını sağlar */
             }
 
             .mobile-icon-box img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
+                border-radius: 8px !important; /* Kutunun taşmasını önlemek için köşeleri doğrudan resme verir */
+                display: block;
             }
 
             .equal-spacer {
@@ -498,15 +501,8 @@
                 margin: 0 !important;
             }
 
-            /* ORTA: DİL SEÇİCİ (About butonunun tam üstüne oturtuldu) */
             .mobile-bottom-lang-bar {
-                display: flex !important;
-                position: fixed !important;
-                bottom: 44px !important;
-                left: 50% !important;
-                transform: translateX(-50%) !important;
-                z-index: 9999 !important;
-                pointer-events: auto !important;
+                display: none !important;
             }
         }
     </style>
@@ -569,10 +565,6 @@
         </div>
     </header>
 
-    {{-- MOBİL EKRANDA EN ALTA ORTALANMIŞ DİL SEÇİCİ --}}
-    <div class="mobile-bottom-lang-bar">
-        @include('partials.lang-switch')
-    </div>
 
     @if(session('success'))
         <div id="bildiri-message" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: 'Unkempt', cursive;">

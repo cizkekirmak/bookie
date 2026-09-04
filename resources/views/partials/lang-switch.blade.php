@@ -36,10 +36,3 @@
         cursor: pointer;
     ">EN</a>
 </div>
-<style>
-@media (max-width: 1024px) {
-    .lang-switch-wrapper {
-        display: none !important;
-    }
-}
-</style>
