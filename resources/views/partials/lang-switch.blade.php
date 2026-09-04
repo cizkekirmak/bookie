@@ -36,3 +36,12 @@
         cursor: pointer;
     ">EN</a>
 </div>
+<style>
+@media (max-width: 1024px) {
+    .lang-switcher,
+    .lang-switch-container,
+    div:has(> a[href*="lang.switch"]) {
+        display: none !important;
+    }
+}
+</style>

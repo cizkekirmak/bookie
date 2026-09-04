@@ -327,13 +327,14 @@
 
             .profile-sidebar-panel {
                 position: fixed !important;
-                top: 0 !important;
+                top: 68px !important; /* Header'ın mobil yüksekliği kadar aşağıdan başlar */
                 right: 0 !important;
                 left: auto !important;
                 width: 82vw !important;
                 max-width: 320px !important;
-                height: 100vh !important;
-                max-height: 100vh !important;
+                height: calc(100vh - 68px) !important; /* Kalan ekran kadar uzanır */
+                height: calc(100dvh - 68px) !important; /* Mobil tarayıcı çubukları için dinamik yükseklik */
+                max-height: calc(100vh - 68px) !important;
                 border-radius: 16px 0 0 16px !important;
                 border-left: 2px solid #2d5a27 !important;
                 border-right: none !important;
@@ -365,7 +366,10 @@
             .mobile-profile-overlay {
                 display: block !important;
                 position: fixed;
-                inset: 0;
+                top: 68px !important;
+                left: 0;
+                right: 0;
+                bottom: 0;
                 background: rgba(0, 0, 0, 0.45);
                 z-index: 100000;
                 backdrop-filter: blur(2px);

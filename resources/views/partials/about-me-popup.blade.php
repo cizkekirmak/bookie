@@ -173,13 +173,9 @@
     transform: translateY(-1px);
 }
 
-/* MOBİL & TABLET UYARLAMA */
 @media (max-width: 1024px) {
-    .postit-wrapper {
-        left: 105px;
-    }
-    .postit-body {
-        width: 250px;
+    about-bookie-card {
+        display: none !important;
     }
 }
 </style>
