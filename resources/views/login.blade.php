@@ -344,27 +344,40 @@
         @include('partials.lang-switch')
     </div>
 
-    <script>
+   <script>
+    // Uygulama zaten kuruluysa çekmeceyi sayfada hiç gösterme
+    window.addEventListener('DOMContentLoaded', () => {
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+        
+        // Zaten masaüstü uygulaması içindeyse çekmeceyi gizle
+        if (isStandalone) {
+            const cekmece = document.querySelector('.cekmece');
+            if (cekmece) cekmece.style.display = 'none';
+        }
+    });
+
     document.getElementById('cekmeceTab').addEventListener('click', function () {
         document.getElementById('kutucukSarmalayici').classList.toggle('acik');
     });
 
-    // Service Worker Kaydı
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('/sw.js');
     }
 
-    // PWA İndirme Olayını Yakala
     let deferredPrompt;
     window.addEventListener('beforeinstallprompt', (e) => {
         e.preventDefault();
         deferredPrompt = e;
     });
 
-    // Download Butonuna Tıklanınca
+    // Kullanıcı uygulamayı kurduğu an çekmeceyi kapat
+    window.addEventListener('appinstalled', () => {
+        document.getElementById('kutucukSarmalayici').classList.remove('acik');
+        deferredPrompt = null;
+    });
+
     document.getElementById('indirButonu').addEventListener('click', async () => {
         if (deferredPrompt) {
-            // Chrome/Edge kurulum penceresini fırlatır
             deferredPrompt.prompt();
             const { outcome } = await deferredPrompt.userChoice;
             if (outcome === 'accepted') {
@@ -372,8 +385,8 @@
             }
             deferredPrompt = null;
         } else {
-            // Henüz tetiklenmediyse veya desteklenmiyorsa yönlendirme
-            alert("Uygulamayı yüklemek için Chrome adres çubuğunun sağındaki 'Yükle' simgesine basabilirsin! ✨");
+            // deferredPrompt yoksa ya zaten kuruludur ya da desteklenmiyordur
+            alert("Bookie zaten bilgisayarında yüklü! Adres çubuğundaki 'Uygulamada aç' butonundan veya masaüstünden açabilirsin. ✨");
         }
     });
 </script>
