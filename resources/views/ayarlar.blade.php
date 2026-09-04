@@ -60,7 +60,6 @@
             flex-direction: column;
         }
 
-        /* HEADER: Masaüstü (76px) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -119,7 +118,6 @@
             transform: scale(1.1);
         }
 
-        /* ORTA GÖVDE */
         .settings-main-area {
             flex: 1;
             display: flex;
@@ -263,7 +261,6 @@
             border: 1px solid #f5c6cb;
         }
 
-        /* MOBİL UYARLAMA */
         @media (max-width: 1024px) {
             .site-header-outer {
                 height: 68px !important;
@@ -422,7 +419,6 @@
     </div>
 
 <script>
-// Mobilden gelen devasa fotoğrafları (ve HEIC/PNG'leri) form gitmeden önce hafif JPEG'e çeviren sıkıştırıcı
 function compressAvatar(file, maxSize = 400, quality = 0.85) {
     return new Promise((resolve) => {
         const reader = new FileReader();
@@ -434,7 +430,6 @@ function compressAvatar(file, maxSize = 400, quality = 0.85) {
                 let width = img.width;
                 let height = img.height;
 
-                // En-boy oranını koruyarak 400px sınırına çek
                 if (width > height) {
                     if (width > maxSize) {
                         height = Math.round((height * maxSize) / width);
@@ -453,7 +448,6 @@ function compressAvatar(file, maxSize = 400, quality = 0.85) {
                 const ctx = canvas.getContext('2d');
                 ctx.drawImage(img, 0, 0, width, height);
 
-                // Her zaman standart JPEG Blob'a dönüştür (HEIC veya dev boyutları yok eder)
                 canvas.toBlob((blob) => {
                     resolve(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
                 }, 'image/jpeg', quality);
@@ -462,22 +456,18 @@ function compressAvatar(file, maxSize = 400, quality = 0.85) {
     });
 }
 
-// Dosya seçildiği anda çalışan önizleme ve anında sıkıştırma
 async function previewImage(event) {
     const input = event.target;
     if (!input.files || !input.files[0]) return;
 
     const originalFile = input.files[0];
     
-    // Tarayıcıda anında sıkıştır
     const compressedFile = await compressAvatar(originalFile, 400, 0.85);
 
-    // Sıkıştırılmış küçük JPEG'i doğrudan input'un içine yerleştir (Sunucuya bu gidecek!)
     const dataTransfer = new DataTransfer();
     dataTransfer.items.add(compressedFile);
     input.files = dataTransfer.files;
 
-    // Önizlemeyi güncelle
     const preview = document.getElementById('avatar-preview');
     if (preview) {
         preview.src = URL.createObjectURL(compressedFile);

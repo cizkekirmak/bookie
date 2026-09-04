@@ -44,7 +44,6 @@ class ProfileController extends Controller
             ->where("status", "pending")
             ->get();
 
-        // --- YILLIK OKUMA HEDEFİ HESAPLAMALARI ---
         $currentYear = (int) now()->format('Y');
         $targetUserId = $user->id;
         $username = $user->username ?? $user->name ?? '';
@@ -63,7 +62,6 @@ class ProfileController extends Controller
         $goalTarget = $readingGoal ? $readingGoal->target_books : null;
         $goalProgress = $goalTarget ? min(100, round(($readThisYear / $goalTarget) * 100)) : 0;
 
-        // --- PANO (BOARD) VE KANCA BİLGİLERİ ---
         $board = UserBoard::firstOrCreate(
             ['user_id' => $targetUserId],
             [
@@ -81,16 +79,12 @@ class ProfileController extends Controller
         while (is_string($hSlots)) { $hSlots = json_decode($hSlots, true); }
         $board->hook_slots = is_array($hSlots) ? $hSlots : array_fill(0, 9, null);
 
-        // --- DAHA ÖNCE KAZANILMIŞ KALICI BAŞARIMLARI YÜKLE ---
         $rawUnlocked = $user->unlocked_achievements ?? [];
         while (is_string($rawUnlocked)) {
             $rawUnlocked = json_decode($rawUnlocked, true);
         }
         $previouslyUnlocked = is_array($rawUnlocked) ? $rawUnlocked : [];
 
-        // --- 15 BAŞARIMIN DİNAMİK KONTROLLERİ ---
-
-        // 1. BURGER: Tek bir incelemeye 10+ beğeni
         $unlockedBurger = in_array('burger', $previouslyUnlocked) || DB::table('review_likes')
             ->join('user_books', 'review_likes.review_id', '=', 'user_books.id')
             ->where('user_books.user_id', $targetUserId)
@@ -99,14 +93,12 @@ class ProfileController extends Controller
             ->havingRaw('COUNT(*) >= 10')
             ->exists();
 
-        // 2. YONCA: 10+ kabul edilmiş arkadaş
         $unlockedYonca = in_array('yonca', $previouslyUnlocked) || (DB::table('friendships')
             ->where('status', 'accepted')
             ->where(function ($q) use ($targetUserId) {
                 $q->where('user_id', $targetUserId)->orWhere('friend_id', $targetUserId);
             })->count() >= 10);
 
-        // 3. MAYMUN: 5 farklı panoya post-it bırakmak
         if (in_array('maymun', $previouslyUnlocked)) {
             $unlockedMaymun = true;
         } else {
@@ -134,7 +126,6 @@ class ProfileController extends Controller
             $unlockedMaymun = ($distinctBoardsCount >= 5);
         }
 
-        // 4. AYICIK: Kendi panosuna 5 farklı kişiden not gelmesi
         if (in_array('ayicik', $previouslyUnlocked)) {
             $unlockedAyicik = true;
         } else {
@@ -151,13 +142,10 @@ class ProfileController extends Controller
             $unlockedAyicik = (count($uniqueAuthors) >= 5);
         }
 
-        // 5. ASK: 15 farklı incelemeyi beğenmek
         $unlockedAsk = in_array('ask', $previouslyUnlocked) || (DB::table('review_likes')->where('user_id', $targetUserId)->count() >= 15);
 
-        // 6. CILEK: 10 farklı kitaba 5 yıldız vermek
         $unlockedCilek = in_array('cilek', $previouslyUnlocked) || (DB::table('user_books')->where('user_id', $targetUserId)->where('rating', 5)->count() >= 10);
 
-        // 7. JAKE: 7 gün içinde 3 kitap bitirmek
         if (in_array('jake', $previouslyUnlocked)) {
             $unlockedJake = true;
         } else {
@@ -180,7 +168,6 @@ class ProfileController extends Controller
             }
         }
 
-        // 8. KITAP: Aktif admin önerilerinden en az 1 kitap eklemek (Google & Open Library tam uyumlu)
         if (in_array('kitap', $previouslyUnlocked)) {
             $unlockedKitap = true;
         } else {
@@ -220,10 +207,8 @@ class ProfileController extends Controller
             }
         }
 
-        // 9. ELMA: Yıllık hedefi tamamlama
         $unlockedElma = in_array('elma', $previouslyUnlocked) || ($goalTarget && $goalTarget > 0 && $readThisYear >= $goalTarget);
 
-        // 10. KRUVASAN: 400+ sayfa kitap bitirme
         $unlockedKruvasan = in_array('kruvasan', $previouslyUnlocked) || DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->where('user_books.user_id', $targetUserId)
@@ -231,7 +216,6 @@ class ProfileController extends Controller
             ->where('books.page_count', '>=', 400)
             ->exists();
 
-        // 11. KEDI (Çerezlik): 50 sayfa ve altı bir kitap bitirme
         $unlockedKedi = in_array('kedi', $previouslyUnlocked) || DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->where('user_books.user_id', $targetUserId)
@@ -240,26 +224,21 @@ class ProfileController extends Controller
             ->where('books.page_count', '>', 0)
             ->exists();
 
-        // 12. USAGI: Aynı anda 10 kitabı okunuyor (reading) tutma
         $unlockedUsagi = in_array('usagi', $previouslyUnlocked) || (DB::table('user_books')
             ->where('user_id', $targetUserId)
             ->where('status', 'reading')
             ->count() >= 10);
 
-        // 13. TAMA: Panodaki 9 kancanın hepsini doldurma
         $filledHooks = count(array_filter($board->hook_slots, fn($s) => !empty($s)));
         $unlockedTama = in_array('tama', $previouslyUnlocked) || ($filledHooks >= 9);
 
-        // 14. GEYIK: En az 30 gündür üye olma (müdavim)
         $unlockedGeyik = in_array('geyik', $previouslyUnlocked) || ($user->created_at && Carbon::parse($user->created_at)->diffInDays(now()) >= 30);
 
-        // 15. YENGEC: 5 farklı kitaba 1 yıldız verme
         $unlockedYengec = in_array('yengec', $previouslyUnlocked) || (DB::table('user_books')
             ->where('user_id', $targetUserId)
             ->where('rating', 1)
             ->count() >= 5);
 
-        // --- KAZANILANLARI GÜNCELLE VE KALICI OLARAK KAYDET ---
         $currentUnlocked = [];
         $conditionsMap = [
             'ask' => $unlockedAsk,
@@ -286,13 +265,11 @@ class ProfileController extends Controller
         }
         $currentUnlocked = array_values(array_unique($currentUnlocked));
 
-        // Eğer yeni açılan bir başarım varsa users tablosuna kalıcı olarak yaz
         if (count(array_diff($currentUnlocked, $previouslyUnlocked)) > 0) {
             $user->unlocked_achievements = $currentUnlocked;
             $user->save();
         }
 
-        // Çoklu dil destekli başarım listesi
         $keychains = [
             'ask'      => [
                 'name'     => __('Book Lover'),
@@ -386,7 +363,6 @@ class ProfileController extends Controller
             ],
         ];
 
-        // Geriye uyumluluk için achievements da gönderiyoruz
         $achievements = $keychains;
 
         return view("profile", compact(

@@ -10,7 +10,6 @@ use App\Models\User;
 
 class FriendshipController extends Controller
 {
-    // Arkadaşlık İsteği Gönder / İptal Et
     public function sendRequest($id)
     {
         $authId = auth()->id();
@@ -39,13 +38,11 @@ class FriendshipController extends Controller
         return back();
     }
 
-    // İsteği Kabul Et
     public function acceptRequest($id)
     {
         $authId = auth()->id();
         $targetId = (int)$id;
 
-        // Bize gelen bekleyen isteği bul ve onayla
         $friendship = friendship::where('user_id', $targetId)
             ->where('friend_id', $authId)
             ->where('status', 'pending')
@@ -67,7 +64,6 @@ class FriendshipController extends Controller
         return back();
     }
 
-    // İsteği Reddet
     public function rejectRequest($id)
     {
         $authId = auth()->id();
@@ -94,7 +90,6 @@ class FriendshipController extends Controller
         return back();
     }
 
-    // Arkadaşlıktan Çıkar
     public function removeFriend($id)
     {
         $authId = auth()->id();

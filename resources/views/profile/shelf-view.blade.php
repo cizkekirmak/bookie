@@ -41,7 +41,6 @@
         overflow: hidden;
     }
 
-    /* MASAÜSTÜ & MOBİL EŞLEŞTİRME SAHNESİ */
     .corkboard-stage {
         position: absolute;
         top: 0;
@@ -346,7 +345,6 @@
         text-transform: lowercase;
     }
 
-    /* ÇEKMECE / MODAL STİLLERİ */
     .keychain-collection-drawer {
         position: fixed;
         top: 50%;
@@ -460,7 +458,6 @@
         color: #888888;
     }
 
-    /* TOOLTIP / BİLGİ BALONU */
     .bag-badge-tooltip {
         visibility: hidden;
         opacity: 0;
@@ -664,7 +661,6 @@
         margin-top: 4px; 
     }
 
-    /* Kancaların parmakla akıcı yatay kayması için */
     .keychain-grid-9 { 
         display: flex; 
         flex-direction: row; 
@@ -684,13 +680,11 @@
         cursor: default !important;
     }
 
-    /* Kancaya tıklanıp popup açılmasını engeller, yatay kaydırmayı bozmaz */
     .empty-hook-slot,
     .keychain-plush-img {
         pointer-events: none !important;
     }
 
-    /* Mobilde dosya ikonunu ve popup çekmecesini tamamen kapat */
     .folder-container,
     .keychain-collection-drawer {
         display: none !important;
@@ -847,7 +841,6 @@
         </div>
     </div>
 
-    <!-- ALT BUTON BARI (Masaüstü) -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">{{ __('edit board') }}</button>
@@ -889,7 +882,6 @@
 
 </div>
 
-<!-- POST-IT MİNİ STÜDYO MODAL -->
 <div class="modal-overlay" id="postitStudioModalUnique">
     <div class="studio-modal-box">
         <h3 style="margin: 0; font-size: 16px; color: #1e4215; text-transform: lowercase;">{{ __('create your note !') }}</h3>
@@ -1024,7 +1016,6 @@
         }
     }
 
-    // --- İSTEMCİ TARAFI GÖRSEL SIKIŞTIRMA (CANVAS) ---
     function compressImageClientSide(file, maxWidth = 300, maxHeight = 300, quality = 0.75) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -1062,7 +1053,6 @@
         });
     }
 
-    // --- MOBİLDE PANODAKİ TÜM SAHNEYİ BİREBİR ORANTILI KÜÇÜLTME ---
     function rescaleBoardForMobile() {
         const frame = document.getElementById('corkboardArea');
         const stage = document.getElementById('boardStage');
@@ -1092,7 +1082,6 @@
         }
     };
 
-    // --- MODAL YÖNETİMİ ---
     window.handleStudioTextInput = function(val) {
         const modal = document.getElementById('postitStudioModalUnique');
         if (!modal) return;

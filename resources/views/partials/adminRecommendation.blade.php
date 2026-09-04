@@ -13,7 +13,6 @@
 @endphp
 
 <style>
-    /* MASAÜSTÜ: Birebir Orijinal Hali */
     .adminRecommendation-card {
         background: #cae28c;
         border: 2px solid #5a8c69; 
@@ -63,7 +62,6 @@
         transform: scale(1.05);
     }
 
-    /* MOBİL UYARLAMA */
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;

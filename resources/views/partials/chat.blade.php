@@ -46,7 +46,6 @@
 </div>
 
 <style>
-/* SÜRÜKLENEBİLİR BUTON */
 .chat-bubble-btn {
     position: fixed;
     bottom: 20px;
@@ -79,7 +78,6 @@
     border: 1px solid #27211f;
 }
 
-/* ARKADAŞ LİSTESİ */
 .chat-friend-item {
     position: relative;
     cursor: pointer;
@@ -108,7 +106,6 @@
     transform: scale(1.08);
 }
 
-/* POP-UP: MASAÜSTÜ */
 .chat-popup {
     position: fixed;
     bottom: 135px;
@@ -124,7 +121,6 @@
     border: 1px solid rgba(0,0,0,0.08);
 }
 
-/* POP-UP: MOBİL */
 @media (max-width: 1024px) {
     .chat-popup {
         width: 92vw !important;
@@ -139,7 +135,6 @@
     }
 }
 
-/* SOL PANEL */
 .chat-friends-sidebar {
     width: 62px;
     background-color: #f2feff;
@@ -152,7 +147,6 @@
     overflow-y: auto;
 }
 
-/* SAĞ PANEL */
 .chat-main-area {
     flex: 1;
     display: flex;
@@ -227,7 +221,6 @@
     font-family: 'Unkempt', cursive;
 }
 
-/* BALONCUKLAR */
 .chat-bubble {
     max-width: 80%;
     padding: 6px 10px;
@@ -270,7 +263,6 @@
     display: block;
 }
 
-/* STICKER MENÜSÜ */
 .chat-sticker-picker {
     position: absolute;
     bottom: 56px;
@@ -296,7 +288,6 @@
     transform: scale(1.2);
 }
 
-/* GİRDİ FORMU (TAŞMAYI ÖNLEYEN VE SABİTLEYEN YAPI) */
 .chat-input-area {
     height: 52px;
     border-top: 1px solid #eaeaea;
@@ -310,12 +301,12 @@
 }
 .chat-input-area input {
     flex: 1;
-    min-width: 0; /* Butonların dışarı fırlamasını önler */
+    min-width: 0; 
     height: 38px;
     border: 1.5px solid #6b9c56;
     border-radius: 19px;
     padding: 0 14px;
-    font-size: 15px; /* Büyük ve okunaklı */
+    font-size: 15px;
     outline: none;
     font-family: 'Unkempt', cursive !important;
     background-color: #ffffff;
@@ -350,7 +341,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0; /* Asla ezilmez ve kaybolmaz */
+    flex-shrink: 0; 
 }
 .chat-btn-icon {
     width: 24px;
@@ -389,7 +380,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
-    // --- SES MOTORU ---
     const SOUND_URLS = {
         closed: "{{ asset('sounds/yeni-mesaj.mp3') }}",
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
@@ -433,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
     }
 
-    // SÜRÜKLE - BIRAK
     btn.addEventListener('mousedown', (e) => {
         isDragging = false;
         shiftX = e.clientX - btn.getBoundingClientRect().left;

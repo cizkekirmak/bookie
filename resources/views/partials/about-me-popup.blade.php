@@ -1,13 +1,11 @@
-<!-- YUKARI ÇEKİLEN BİRLEŞİK POST-IT KARTI -->
+
 <div id="about-postit-container" class="postit-wrapper">
-    <!-- Birleşik tırnak (Açma / Kapama sekmesi) -->
     <button type="button" id="about-postit-tab" class="postit-tab" title="{{ __('About Me') }}">
         <span class="postit-pin">📌</span>
         <span class="postit-tab-text">{{ __('about bookie') }}</span>
         <span id="postit-arrow" class="postit-arrow">▲</span>
     </button>
 
-    <!-- Post-it Gövdesi -->
     <div class="postit-body">
         <div class="postit-content">
             <span class="postit-tape"></span>
@@ -18,7 +16,6 @@
                 {{ __('Bookie is an independent project made by a solo developer. Thank you so much for being part of it and using it! For any bugs, ideas, or feedback, feel free to reach out anytime:') }}
             </p>
 
-            <!-- Sosyal / İletişim Butonları -->
             <div class="postit-links">
                 <a href="https://github.com/cizkekirmak/bookie" target="_blank" class="postit-pill" title="GitHub">
                     🐙 GitHub
@@ -35,32 +32,28 @@
 </div>
 
 <style>
-/* KAPSAYICI - Ekranın altına kilitlenir */
 .postit-wrapper {
     position: fixed;
     bottom: 0;
-    left: 125px; /* Chat simgesinin hemen sağı */
+    left: 125px;
     z-index: 99998;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    /* Kartın boyu kadar aşağı kaydırır, sadece tırnak görünür */
     transform: translateY(205px);
     transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15);
     user-select: none;
     -webkit-tap-highlight-color: transparent !important;
 }
 
-/* AÇIK HALİ */
 .postit-wrapper.is-open {
     transform: translateY(0);
 }
 
-/* BİRLEŞİK TIRNAK KISMI */
 .postit-tab {
     background: #fdf3a9;
     border: 2px solid #5a7d3b;
-    border-bottom: none; /* Kartla tek parça hissi verir */
+    border-bottom: none; 
     border-radius: 12px 12px 0 0;
     padding: 5px 14px;
     display: flex;
@@ -96,7 +89,6 @@
     transform: rotate(180deg);
 }
 
-/* KART GÖVDESİ */
 .postit-body {
     width: 270px;
     height: 205px;
@@ -117,7 +109,6 @@
     position: relative;
 }
 
-/* Not kağıdı bandı efekti */
 .postit-tape {
     position: absolute;
     top: -18px;
@@ -144,7 +135,6 @@
     margin: 0 0 auto 0;
 }
 
-/* LİNKLER - 3 BUTON YAN YANA */
 .postit-links {
     display: flex;
     gap: 6px;

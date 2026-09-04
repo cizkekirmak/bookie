@@ -11,11 +11,10 @@ return new class extends Migration
         Schema::create('reading_goals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->unsignedSmallInteger('year'); // Örn: 2026
-            $table->unsignedSmallInteger('target_books'); // Kullanıcının koyduğu hedef (örn: 15)
+            $table->unsignedSmallInteger('year');
+            $table->unsignedSmallInteger('target_books'); 
             $table->timestamps();
 
-            // Bir kullanıcı aynı yıl için sadece 1 kayıt açabilsin (hile önleme)
             $table->unique(['user_id', 'year']);
         });
     }

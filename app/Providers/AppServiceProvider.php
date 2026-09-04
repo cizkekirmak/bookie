@@ -14,7 +14,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Canlı ortamda (veya Render üzerinde) tüm asset ve form linklerini zorla HTTPS yap
         if (config('app.env') === 'production' || str_contains(request()->url(), 'onrender.com')) {
             URL::forceScheme('https');
         }

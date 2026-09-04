@@ -16,9 +16,6 @@ class BookController extends Controller
 {
     private string $googleApiKey = 'AIzaSyBGjDodZWAvBQ57QjOZ24VAGHOKf2p0Pus';
 
-    /**
-     * Kapağı Cloudinary API'sine doğrudan yükleyip kalıcı CDN URL'sini döner
-     */
     private function getCachedCoverUrl(?string $url, string $key): ?string
     {
         if (empty($url)) {
@@ -240,7 +237,6 @@ class BookController extends Controller
             return response()->json([]);
         }
 
-        // 1. Cache Kontrolü (Varsa anında milisaniyede döner)
         $cacheKey = 'search_safe_' . md5(mb_strtolower($query, 'UTF-8'));
         if (Cache::has($cacheKey)) {
             $cached = Cache::get($cacheKey);
@@ -249,7 +245,6 @@ class BookController extends Controller
             }
         }
 
-        // 2. Yerel DB Eşleşmeleri
         $localBooks = Book::where(function ($q) use ($query) {
                 $q->where('title', 'LIKE', "%{$query}%")
                   ->orWhere('author', 'LIKE', "%{$query}%");
@@ -266,7 +261,6 @@ class BookController extends Controller
                 ];
             })->toArray();
 
-        // 3. Google Books ve Open Library'ye AYNI ANDA (Paralel) İstek
         $googleParams = [
             'q'          => 'intitle:' . $query,
             'maxResults' => 15,
@@ -294,7 +288,6 @@ class BookController extends Controller
                 ]),
         ]);
 
-        // Google Sonuçlarını Ayrıştır
         $googleResults = [];
         try {
             if ($responses['google']->successful()) {
@@ -314,7 +307,6 @@ class BookController extends Controller
             }
         } catch (\Throwable $e) {}
 
-        // Open Library Sonuçlarını Ayrıştır
         $openLibResults = [];
         try {
             if ($responses['openlib']->successful()) {
@@ -334,7 +326,6 @@ class BookController extends Controller
             }
         } catch (\Throwable $e) {}
 
-        // 4. Birebir Aynı Orijinal Sıralama ve Filtreleme
         $merged = array_merge($localBooks, $googleResults, $openLibResults);
         
         $cleanQuery = mb_strtolower($query, 'UTF-8');
@@ -578,7 +569,6 @@ class BookController extends Controller
             ]
         );
 
-        // Hatalı 'return back()' yerine garanti kitap detay sayfasına yönlendirme:
         $targetKey = $book->open_library_key ?? ($book->google_book_id ?? $book->id);
         return redirect()->route('show', $targetKey)->with('success', 'Kitap kütüphanene kaydedildi!');
     }

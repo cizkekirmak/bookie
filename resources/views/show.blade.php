@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? __('Book Details') }} - Bookie</title>
     
-    <!-- Fontlar -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mystery+Quest&display=swap" rel="stylesheet">
@@ -33,7 +32,6 @@
             -webkit-tap-highlight-color: transparent !important;
         }
 
-        /* TIKLANABİLİR ELEMANLARDA MAVİ VURGU VE METİN SEÇİMİNİ ENGELLE */
         a,
         button,
         input,
@@ -182,7 +180,6 @@
             z-index: 9999;
         }
 
-        /* MOBİL UYARLAMA */
         @media (max-width: 1024px) {
             body {
                 padding: 16px 10px;
@@ -520,7 +517,6 @@
                             <p style="color: #4a5d44; font-size: 13px; line-height: 1.35; margin: 0 0 8px 0;">{{ $item->review }}</p>
                         @endif
 
-                        <!-- Beğeni Butonu & Tarih -->
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 6px; border-top: 1px dashed #d7e8cf;">
                             @include('partials.review-like-btn', ['review' => $item])
 

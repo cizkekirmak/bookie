@@ -11,9 +11,7 @@ return new class extends Migration
         Schema::create('user_boards', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-            // Panodaki tüm post-it'ler ve sticker'lar (JSON array)
             $table->json('board_items')->nullable();
-            // 9 adet kancada asılı olan anahtarlık key'leri (JSON array, örn: ["maymun", null, "jake", ...])
             $table->json('hook_slots')->nullable();
             $table->timestamps();
         });

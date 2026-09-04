@@ -258,9 +258,7 @@ Route::middleware(['auth'])->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth'])->group(function () {
-    // Mesajlaşma arka plan rotaları
     Route::get('/messages/friends', function (Request $request) {
-        // Son geçerli sayfayı session'da koru
         if ($request->headers->has('referer')) {
             session()->setPreviousUrl($request->headers->get('referer'));
         }
@@ -277,7 +275,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/{friendId}', [MessageController::class, 'getMessages']);
     Route::post('/messages/send', [MessageController::class, 'sendMessage']);
 
-    // Bildirimler
     Route::get("/notifications/unread-count", function (Request $request) {
         if ($request->headers->has('referer')) {
             session()->setPreviousUrl($request->headers->get('referer'));

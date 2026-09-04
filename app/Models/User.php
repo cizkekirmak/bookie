@@ -33,7 +33,6 @@ class User extends Authenticatable
             'email' => $this->getEmailForPasswordReset(),
         ], false));
 
-        // public/images/logo.png
         $logoUrl = url('images/logo.png');
 
         $salutationText = __('with love,\nBookie Team');

@@ -119,7 +119,6 @@
             -webkit-touch-callout: none !important;
         }
 
-        /* HEADER: Masaüstü (76px) */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -187,7 +186,6 @@
             transform: scale(1.1);
         }
 
-        /* ANA GÖVDE: Masaüstü */
         .profile-container {
             width: 100%;
             max-width: 1520px;
@@ -225,12 +223,10 @@
             background-color: #f7faf5;
         }
 
-        /* PANO AÇILDIĞINDA İÇERİK KUTUSUNUN GENİŞLEMESİ */
         .profile-main-content.board-active {
             overflow-y: auto !important;
         }
 
-        /* Pano Görünümü Kapsayıcısı */
         #profile-board-view {
             display: none;
             width: 100%;
@@ -281,7 +277,6 @@
             display: none !important;
         }
 
-        /* TELEFON / MOBİL UYARLAMA */
         @media (max-width: 1024px) {
             .site-header-outer {
                 height: 68px !important;
@@ -312,7 +307,6 @@
                 display: block !important;
             }
 
-            /* Ana konteyner ekranın kalan tam yüksekliğini alır */
             .profile-container {
                 height: calc(100vh - 68px) !important;
                 height: calc(100dvh - 68px) !important;
@@ -404,7 +398,6 @@
                 transform: rotate(-1.5deg);
             }
 
-            /* BEYAZ KART: Tam ekran boyuna kilitli, asla içeriğe göre kısalmaz/uzamaz */
             .profile-main-content {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -431,7 +424,6 @@
                 font-size: 19px !important;
             }
 
-            /* Kitap listesi ve Pano: Kartın dibine kadar açılır, kendi içinde akar */
             #profile-list-view,
             #profile-board-view {
                 flex: 1 1 0% !important;

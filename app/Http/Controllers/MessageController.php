@@ -17,7 +17,6 @@ class MessageController extends Controller
 
         $data = [];
         foreach ($friendsList as $friend) {
-            // Bu arkadaşla aramızdaki en son mesajın tarihi
             $lastMessage = Message::where(function ($q) use ($user, $friend) {
                     $q->where('sender_id', $user->id)->where('receiver_id', $friend->id);
                 })
@@ -27,13 +26,11 @@ class MessageController extends Controller
                 ->latest()
                 ->first();
 
-            // Bu arkadaştan gelen okunmamış mesaj sayısı
             $unreadCount = Message::where('sender_id', $friend->id)
                 ->where('receiver_id', $user->id)
                 ->where('is_read', false)
                 ->count();
 
-            // Avatar belirleme (Cloudinary URL veya Varsayılan Görsel)
             if ($friend->avatar && str_starts_with($friend->avatar, 'http')) {
                 $avatar = $friend->avatar;
             } else {
@@ -49,7 +46,6 @@ class MessageController extends Controller
             ];
         }
 
-        // En son konuşulan kişiyi en üste alacak şekilde sırala
         usort($data, function ($a, $b) {
             return $b['last_interaction'] <=> $a['last_interaction'];
         });
@@ -57,19 +53,16 @@ class MessageController extends Controller
         return response()->json($data);
     }
 
-    // 2. Mesaj Geçmişi
     public function getMessages($friendId)
     {
         try {
             $user = Auth::user();
 
-            // Okundu olarak işaretle
             Message::where('sender_id', $friendId)
                 ->where('receiver_id', $user->id)
                 ->where('is_read', false)
                 ->update(['is_read' => true]);
 
-            // Mesajları çek
             $messages = Message::where(function ($q) use ($user, $friendId) {
                     $q->where('sender_id', $user->id)->where('receiver_id', $friendId);
                 })
@@ -93,7 +86,6 @@ class MessageController extends Controller
         }
     }
 
-    // 3. Mesaj Gönder
     public function sendMessage(Request $request)
     {
         try {
@@ -125,7 +117,6 @@ class MessageController extends Controller
         }
     }
 
-    // 4. Okunmamış Sayısı
     public function getUnreadCount()
     {
         $unreadCount = Message::where('receiver_id', Auth::id())

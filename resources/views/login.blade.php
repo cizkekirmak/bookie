@@ -148,7 +148,6 @@
             text-decoration: underline;
         }
 
-        /* ---- MASAÜSTÜ ÇEKMECESİ ---- */
         .cekmece {
             position: absolute;
             top: 50%;
@@ -194,8 +193,8 @@
         }
 
         .cekmece-tab img {
-            width: 30px;
-            height: 30px;
+            width: 27px;
+            height: 27px;
             pointer-events: none;
             transition: transform 0.35s ease;
         }
@@ -240,12 +239,10 @@
             background-color: #235631;
         }
 
-        /* Mobildeki buton varsayılanda gizli */
         .mobil-indir-alani {
             display: none;
         }
 
-        /* ---- MOBİL UYUMLULUK (@media) ---- */
         @media (max-width: 640px) {
             .site-basligi {
                 font-size: 80px;
@@ -257,12 +254,10 @@
                 padding: 18px;
             }
 
-            /* Mobilde masaüstü çekmecesini kapat */
             .cekmece {
                 display: none !important;
             }
 
-            /* Kutunun altındaki mobil butonunu aktif et */
             .mobil-indir-alani {
                 display: block;
                 margin-top: 14px;
@@ -289,8 +284,8 @@
             }
 
             .mobil-indir-btn img {
-                width: 25px;
-                height: 25px;
+                width: 21px;
+                height: 21px;
             }
         }
 
@@ -371,13 +366,11 @@
     </div>
 
     <script>
-        // Çeviriler
         const pwaLang = {
             generalHint: @json(__('To install, you can use your browser\'s menu or address bar! ✨')),
             iosHint: @json(__('To install on iPhone/iPad: tap the Share button below and select \'Add to Home Screen\'! ✨'))
         };
 
-        // 1. SADECE UYGULAMA İÇİNDEYKEN İNDİRME ALANLARINI KALDIR
         function kontrolEtVeGizle() {
             const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
             if (isStandalone) {
@@ -389,12 +382,10 @@
         }
         kontrolEtVeGizle();
 
-        // 2. Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('/sw.js').catch(() => {});
         }
 
-        // 3. Masaüstü Çekmece Aç/Kapat
         const tabBtn = document.getElementById('cekmeceTab');
         const sarmalayici = document.getElementById('kutucukSarmalayici');
         if (tabBtn && sarmalayici) {
@@ -403,20 +394,17 @@
             });
         }
 
-        // 4. PWA Kurulum Olayı
         let deferredPrompt = null;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
         });
 
-        // Kurulum tamamlandığı an kapat
         window.addEventListener('appinstalled', () => {
             if (sarmalayici) sarmalayici.classList.remove('acik');
             deferredPrompt = null;
         });
 
-        // 5. İndirme Tetikleyicisi (Hem Masaüstü Hem Mobil İçin Ortak)
         async function indir() {
             const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
 
@@ -440,7 +428,6 @@
         const mobilIndirBtn = document.getElementById('mobilIndirBtn');
         if (mobilIndirBtn) mobilIndirBtn.addEventListener('click', indir);
 
-        // 6. Giriş Butonu Tıklandığında Anında Geri Bildirim
         const loginForm = document.querySelector('form[action="/login"]');
         if (loginForm) {
             loginForm.addEventListener('submit', function () {

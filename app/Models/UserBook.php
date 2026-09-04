@@ -26,13 +26,11 @@ class UserBook extends Model
     {
         return $this->belongsTo(Book::class, "book_id");
     }
-    // --- BEĞENİ İLİŞKİSİ ---
     public function likes()
     {
         return $this->hasMany(ReviewLike::class, 'review_id');
     }
 
-    // --- KULLANICI BEĞENDİ Mİ KONTROLÜ ---
     public function isLikedBy(?User $user): bool
     {
         if (!$user) {

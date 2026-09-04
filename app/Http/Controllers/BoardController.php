@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\DB;
 
 class BoardController extends Controller
 {
-    /**
-     * İki kullanıcının onaylanmış arkadaş olup olmadığını kontrol eder
-     */
     private function checkFriendship($userA, $userB)
     {
         if (!$userA || !$userB) return false;
@@ -31,15 +28,11 @@ class BoardController extends Controller
             ->exists();
     }
 
-    /**
-     * Kullanıcının 15 rozet durumunu hesaplar
-     */
     private function checkAchievements(User $user, UserBoard $board, $readThisYear, $goalTarget): array
     {
         $targetId = $user->id;
         $username = $user->username ?? $user->name ?? '';
 
-        // 1. BURGER: Tek bir incelemesine 10+ beğeni gelmesi
         $unlockedBurger = DB::table('review_likes')
             ->join('user_books', 'review_likes.review_id', '=', 'user_books.id')
             ->where('user_books.user_id', $targetId)
@@ -47,7 +40,6 @@ class BoardController extends Controller
             ->havingRaw('COUNT(*) >= 10')
             ->exists();
 
-        // 2. YONCA: 10+ kabul edilmiş arkadaş
         $friendCount = DB::table('friendships')
             ->where('status', 'accepted')
             ->where(function ($q) use ($targetId) {
@@ -56,7 +48,6 @@ class BoardController extends Controller
             ->count();
         $unlockedYonca = ($friendCount >= 10);
 
-        // 3. MAYMUN: 5 farklı panoya post-it bırakmak
         $authorTag = '@' . mb_strtolower(trim($username));
         $otherBoards = DB::table('user_boards')
             ->where('user_id', '!=', $targetId)
@@ -83,7 +74,6 @@ class BoardController extends Controller
         }
         $unlockedMaymun = ($distinctBoardsCount >= 5);
 
-        // 4. AYICIK: Kendi panosuna 5 farklı kişiden not gelmesi
         $myItems = $board->board_items;
         $uniqueAuthors = [];
         if (is_array($myItems)) {
@@ -98,18 +88,15 @@ class BoardController extends Controller
         }
         $unlockedAyicik = (count($uniqueAuthors) >= 5);
 
-        // 5. ASK: 15 farklı incelemeyi beğenmek
         $unlockedAsk = DB::table('review_likes')
             ->where('user_id', $targetId)
             ->count() >= 15;
 
-        // 6. CILEK: 10 farklı kitaba 5 yıldız vermek
         $unlockedCilek = DB::table('user_books')
             ->where('user_id', $targetId)
             ->where('rating', 5)
             ->count() >= 10;
 
-        // 7. JAKE: 7 gün içinde 3 kitap bitirmek (status = 'read')
         $readDates = DB::table('user_books')
             ->where('user_id', $targetId)
             ->where('status', 'read')
@@ -130,7 +117,6 @@ class BoardController extends Controller
             }
         }
 
-        // 8. KITAP: Aktif admin önerisinden en az 1 kitap ekleme
         $unlockedKitap = DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->join('admin_recommendations', 'books.google_book_id', '=', 'admin_recommendations.book_key')
@@ -138,10 +124,8 @@ class BoardController extends Controller
             ->where('admin_recommendations.is_active', 1)
             ->exists();
 
-        // 9. ELMA: Yıllık hedefi tamamlama
         $unlockedElma = ($goalTarget && $goalTarget > 0 && $readThisYear >= $goalTarget);
 
-        // 10. KRUVASAN: 400+ sayfalık bir kitap bitirmek
         $unlockedKruvasan = DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->where('user_books.user_id', $targetId)
@@ -149,7 +133,6 @@ class BoardController extends Controller
             ->where('books.page_count', '>=', 400)
             ->exists();
 
-        // 11. KEDI (Çerezlik): 50 sayfa ve altı bir kitap bitirmek
         $unlockedKedi = DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->where('user_books.user_id', $targetId)
@@ -158,13 +141,11 @@ class BoardController extends Controller
             ->where('books.page_count', '>', 0)
             ->exists();
 
-        // 12. USAGI: Aynı anda 10 kitabı okunuyor (reading) tutmak
         $unlockedUsagi = DB::table('user_books')
             ->where('user_id', $targetId)
             ->where('status', 'reading')
             ->count() >= 10;
 
-        // 13. TAMA: Panodaki 9 kancanın hepsini doldurmak
         $filledHooks = 0;
         if (is_array($board->hook_slots)) {
             foreach ($board->hook_slots as $slot) {
@@ -175,10 +156,8 @@ class BoardController extends Controller
         }
         $unlockedTama = ($filledHooks >= 9);
 
-        // 14. GEYIK: En az 30 gündür üye olmak (bookie veteran)
         $unlockedGeyik = $user->created_at && Carbon::parse($user->created_at)->diffInDays(now()) >= 30;
 
-        // 15. YENGEC: 5 farklı kitaba 1 yıldız vermek
         $unlockedYengec = DB::table('user_books')
             ->where('user_id', $targetId)
             ->where('rating', 1)
@@ -214,7 +193,6 @@ class BoardController extends Controller
             ]
         );
 
-        // Katmanlı JSON çözümlemesi
         $items = $board->board_items;
         while (is_string($items)) {
             $items = json_decode($items, true);
@@ -236,7 +214,6 @@ class BoardController extends Controller
             $isFriend = $this->checkFriendship(auth()->user(), $user);
         }
 
-        // Yıllık Okuma Hedefi ve İlerleme Verileri
         $currentYear = (int) now()->format('Y');
 
         $readingGoal = DB::table('reading_goals')
@@ -253,7 +230,6 @@ class BoardController extends Controller
         $goalTarget = $readingGoal ? $readingGoal->target_books : null;
         $goalProgress = $goalTarget ? min(100, round(($readThisYear / $goalTarget) * 100)) : 0;
 
-        // 15 Başarım kontrolü
         $achievements = $this->checkAchievements($user, $board, $readThisYear, $goalTarget);
 
         return view('profile.shelf-view', compact(
@@ -315,9 +291,6 @@ class BoardController extends Controller
         ]);
     }
 
-    /**
-     * Yıllık okuma hedefini kaydeder (Yılda 1 kez belirlenebilir)
-     */
     public function setReadingGoal(Request $request)
     {
         $request->validate([

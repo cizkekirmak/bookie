@@ -45,7 +45,6 @@
             font-family: 'Unkempt', cursive;
         }
 
-        /* HEADER: Masaüstü */
         .site-header-outer {
             width: 100%;
             height: 76px;
@@ -145,7 +144,6 @@
             display: none !important;
         }
 
-        /* ANA GÖVDE */
         .app-container {
             width: 100%;
             max-width: 1520px;
@@ -205,7 +203,6 @@
             object-fit: cover !important;
         }
 
-        /* MOBİL UYARLAMA */
         @media (max-width: 1024px) {
             body {
                 overflow-x: hidden !important;
@@ -330,17 +327,17 @@
                 display: flex;
                 align-items: center;
                 justify-content: center;
-                overflow: visible !important; /* Rozetin kesilmesini engeller */
+                overflow: visible !important;
                 text-decoration: none;
                 flex-shrink: 0;
-                position: relative !important; /* Rozetin buraya göre konumlanmasını sağlar */
+                position: relative !important; 
             }
 
             .mobile-icon-box img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                border-radius: 8px !important; /* Kutunun taşmasını önlemek için köşeleri doğrudan resme verir */
+                border-radius: 8px !important; 
                 display: block;
             }
 
@@ -416,7 +413,7 @@
 
            .right-sidebar-panel {
                 position: fixed !important;
-                top: 68px !important; /* Header'ın bittiği yerden başlar */
+                top: 68px !important; 
                 bottom: 0 !important;
                 right: 0 !important;
                 width: 86vw !important;
@@ -439,7 +436,7 @@
             .mobile-drawer-overlay {
                 display: block !important;
                 position: fixed;
-                top: 68px !important; /* Karartma perdesi de header'ın altından başlar */
+                top: 68px !important; 
                 left: 0;
                 right: 0;
                 bottom: 0;
@@ -452,7 +449,6 @@
                 display: none !important;
             }
 
-            /* SAĞ ALT: FRIENDS BUTONU (Görsel denge için yukarı çekildi) */
             .mobile-friends-tab {
                 display: flex !important;
                 align-items: center;
@@ -475,7 +471,6 @@
                 transform: none !important;
             }
 
-            /* SOL ALT: CHAT PATİ BUTONU (Görsel alt çizgiyi yakalamak için aşağı indirildi) */
             #chat-draggable-btn,
             .chat-bubble-btn,
             .chat-toggle-btn {
@@ -488,7 +483,6 @@
                 margin: 0 !important;
             }
 
-            /* ORTA ALT: PARTIAL İÇİNDEKİ ABOUT BUTONU */
             #aboutMeBtn,
             .about-me-tab,
             .about-bookie-btn,
@@ -784,7 +778,6 @@ document.addEventListener('DOMContentLoaded', function () {
         if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeDrawer);
     }
 
-    // KİTAP ARAMA SİSTEMİ (Yalnızca Enter veya Yıldız Butonu İle Çalışır)
     const input = document.getElementById('bookSearchInput');
     const searchStarBtn = document.getElementById('searchStarBtn');
     const dropdown = document.getElementById('searchResultsDropdown');
@@ -862,7 +855,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // SADECE ENTER TUŞUNA BASILDIĞINDA TETİKLENİR
         input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
@@ -871,7 +863,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
-        // YILDIZ İKONUNA TIKLANDIĞINDA TETİKLENİR
         if (searchStarBtn) {
             searchStarBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
@@ -886,7 +877,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // KULLANICI ARAMA
     const userSearchInput = document.getElementById('userSearchInput');
     const userSearchResults = document.getElementById('userSearchResults');
 

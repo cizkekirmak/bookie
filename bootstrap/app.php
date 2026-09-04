@@ -12,7 +12,6 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // Render'ın Reverse Proxy (HTTPS) yönlendirmesine güven
         $middleware->trustProxies(at: '*');
 
         $middleware->web(append: [

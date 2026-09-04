@@ -1,5 +1,4 @@
 <style>
-/* MASAÜSTÜ: 1. Görseldeki Orijinal Boyutlar */
 .cat-rec-main-card {
     background: #cae28c;
     border: 2px solid #5a8c69; 
@@ -72,7 +71,6 @@
     100% { transform: scale(1.06); }
 }
 
-/* MOBİL UYARLAMA */
 @media (max-width: 1024px) {
     .cat-rec-main-card {
         width: 100% !important;

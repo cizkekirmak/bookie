@@ -16,7 +16,6 @@
 @endphp
 
 <style>
-    /* MASAÜSTÜ: Birebir Orijinal Hali */
     .continue-reading-card {
         background: #cae28c;
         border: 2px solid #5a8c69; 
@@ -65,7 +64,6 @@
         transform: scale(1.05);
     }
 
-    /* MOBİL UYARLAMA */
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
@@ -79,7 +77,7 @@
             align-items: center !important;
             justify-content: center !important;
             flex: 1 !important;
-            margin-top: -4px !important; /* Başlıkla dengelemek için ortalama */
+            margin-top: -4px !important;
         }
 
         .continue-book-cover {
