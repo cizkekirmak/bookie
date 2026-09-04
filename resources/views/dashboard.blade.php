@@ -411,21 +411,22 @@
                 min-width: 0 !important;
             }
 
-            .right-sidebar-panel {
+           .right-sidebar-panel {
                 position: fixed !important;
-                top: 0 !important;
+                top: 68px !important; /* Header'ın bittiği yerden başlar */
                 bottom: 0 !important;
                 right: 0 !important;
                 width: 86vw !important;
                 max-width: 340px !important;
-                height: 100vh !important;
-                height: 100dvh !important;
-                max-height: 100% !important;
+                height: calc(100vh - 68px) !important;
+                height: calc(100dvh - 68px) !important;
+                max-height: calc(100vh - 68px) !important;
                 border-radius: 16px 0 0 16px !important;
                 z-index: 100001 !important;
                 transform: translateX(100%);
                 transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
                 box-shadow: -6px 0 24px rgba(0,0,0,0.3) !important;
+                overflow-y: auto !important;
             }
 
             .right-sidebar-panel.drawer-open {
@@ -435,7 +436,10 @@
             .mobile-drawer-overlay {
                 display: block !important;
                 position: fixed;
-                inset: 0;
+                top: 68px !important; /* Karartma perdesi de header'ın altından başlar */
+                left: 0;
+                right: 0;
+                bottom: 0;
                 background: rgba(0, 0, 0, 0.45);
                 z-index: 100000;
                 backdrop-filter: blur(2px);
