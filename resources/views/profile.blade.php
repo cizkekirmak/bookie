@@ -627,7 +627,7 @@
                         {{ __('Book List') }}
                     </button>
                     <button type="button" id="btn-board-view" onclick="switchProfileView('board')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
-                        📌 {{ __('Board') }}
+                        {{ __('Board') }}
                     </button>
                 </div>
             </div>

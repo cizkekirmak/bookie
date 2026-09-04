@@ -729,10 +729,10 @@
                         <div class="color-ball" style="background:#b5e2fa;" data-c="#b5e2fa"></div>
                         <div class="color-ball" style="background:#dfccf1;" data-c="#dfccf1"></div>
                         <div class="color-ball" style="background:#ffe2b3;" data-c="#ffe2b3"></div>
-                        <div class="color-ball" style="background:#b8f2e6;" data-c="#b8f2e6"></div>
-                        <div class="color-ball" style="background:#fcd5ce;" data-c="#fcd5ce"></div>
-                        <div class="color-ball" style="background:#d8e2dc;" data-c="#d8e2dc"></div>
-                        <div class="color-ball" style="background:#fff1e6;" data-c="#fff1e6"></div>
+                        <div class="color-ball" style="background:#b8f2e6;" data-c="#9beedd"></div>
+                        <div class="color-ball" style="background:#fcd5ce;" data-c="#f3c6be"></div>
+                        <div class="color-ball" style="background:#d8e2dc;" data-c="#d4dad7"></div>
+                        <div class="color-ball" style="background:#fff1e6;" data-c="#c8b2a1"></div>
                     </div>
                 </div>
 
