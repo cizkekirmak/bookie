@@ -272,7 +272,6 @@
             .mobil-indir-btn {
                 background: #d1ffbd;
                 color: #1a562b;
-                border: 2px solid #2e6f40;
                 padding: 8px 16px;
                 border-radius: 20px;
                 font-size: 14px;
