@@ -320,14 +320,15 @@
         text-transform: lowercase;
     }
 
+    /* ÇEKMECE / MODAL STİLLERİ */
     .keychain-collection-drawer {
         position: fixed;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%) scale(0.95);
         width: 90%;
-        max-width: 460px;
-        max-height: 75vh;
+        max-width: 520px;
+        max-height: 80vh;
         background: #fdfaf3;
         border: 2px solid #7ea863;
         border-radius: 22px;
@@ -335,7 +336,7 @@
         display: none;
         flex-direction: column;
         z-index: 100000;
-        overflow: hidden;
+        overflow: visible;
         opacity: 0;
         transition: all 0.2s ease-out;
     }
@@ -352,54 +353,123 @@
         padding: 12px 18px;
         background: #f4f9f0;
         border-bottom: 1.5px solid #bddbb0;
+        border-radius: 20px 20px 0 0;
     }
     .drawer-header h4 { 
         margin: 0; 
-        font-size: 15px; 
+        font-size: 16px; 
         color: #1a3c11; 
         text-transform: lowercase;
     }
-    .drawer-close-btn { background: none; border: none; font-size: 18px; font-weight: bold; color: #2d5a27; cursor: pointer; }
+    .drawer-close-btn { background: none; border: none; font-size: 20px; font-weight: bold; color: #2d5a27; cursor: pointer; }
 
     .drawer-body {
-        padding: 16px 14px;
+        padding: 18px 14px;
         overflow-y: auto;
+        overflow-x: visible;
         display: grid;
         grid-template-columns: repeat(4, 1fr);
-        gap: 16px 10px;
+        gap: 20px 10px;
         justify-items: center;
     }
 
     .bag-badge-item {
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
         background: transparent;
         border: none;
-        cursor: grab;
         user-select: none;
-        transition: transform 0.15s;
+        width: 90px;
     }
-    .bag-badge-item:hover { transform: translateY(-3px) scale(1.08); }
-    .bag-badge-item.locked { opacity: 0.35; filter: grayscale(100%); cursor: not-allowed; }
+    .bag-badge-item.unlocked { cursor: grab; }
+    .bag-badge-item.unlocked:active { cursor: grabbing; }
+    .bag-badge-item.locked { cursor: not-allowed; }
 
-    .bag-badge-img {
+    .bag-badge-img-box {
+        position: relative;
         width: 58px;
         height: 58px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .bag-badge-img {
+        max-width: 100%;
+        max-height: 100%;
         object-fit: contain;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.14));
         -webkit-user-drag: none;
+        transition: transform 0.2s ease;
     }
+    .bag-badge-item.unlocked:hover .bag-badge-img { transform: scale(1.1); }
+    .bag-badge-item.locked .bag-badge-img {
+        opacity: 0.35;
+        filter: grayscale(100%);
+    }
+
+    .bag-badge-lock {
+        position: absolute;
+        bottom: -2px;
+        right: 0px;
+        font-size: 13px;
+        line-height: 1;
+        filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+    }
+
     .bag-badge-title {
+        font-family: 'Unkempt', cursive;
         font-size: 11px;
         font-weight: bold;
         color: #1a3c11;
-        margin: 4px 0 0 0;
+        margin-top: 5px;
         line-height: 1.15;
-        max-width: 72px;
+        max-width: 85px;
         word-break: break-word;
         text-transform: lowercase;
+    }
+    .bag-badge-item.locked .bag-badge-title {
+        color: #888888;
+    }
+
+    /* TOOLTIP / BİLGİ BALONU */
+    .bag-badge-tooltip {
+        visibility: hidden;
+        opacity: 0;
+        position: absolute;
+        bottom: calc(100% + 8px);
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #255719;
+        color: #ffffff;
+        text-align: center;
+        padding: 6px 10px;
+        border-radius: 8px;
+        font-size: 11px;
+        font-family: 'Unkempt', cursive;
+        white-space: normal;
+        width: 130px;
+        z-index: 100005;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    .bag-badge-tooltip::after {
+        content: "";
+        position: absolute;
+        top: 100%;
+        left: 50%;
+        margin-left: -5px;
+        border-width: 5px;
+        border-style: solid;
+        border-color: #255719 transparent transparent transparent;
+    }
+    .bag-badge-item:hover .bag-badge-tooltip {
+        visibility: visible !important;
+        opacity: 1 !important;
+        transform: translateX(-50%) translateY(-3px) !important;
     }
 
     .modal-overlay {
@@ -567,23 +637,8 @@
     }
     $hookSlots = is_array($rawHooks) ? $rawHooks : array_fill(0, 9, null);
 
-    $achievements = $achievements ?? [
-        'ask'       => ['title' => 'love',       'file' => 'aşk.png',       'unlocked' => true],
-        'ayicik'    => ['title' => 'teddy bear', 'file' => 'ayıcık.png',    'unlocked' => true],
-        'burger'    => ['title' => 'burger',     'file' => 'burger.png',    'unlocked' => false],
-        'cilek'     => ['title' => 'strawberry', 'file' => 'çilek.png',     'unlocked' => true],
-        'elma'      => ['title' => 'apple',      'file' => 'elma.png',      'unlocked' => false],
-        'geyik'     => ['title' => 'deer',       'file' => 'geyik.png',     'unlocked' => false],
-        'jake'      => ['title' => 'jake',       'file' => 'jake.png',      'unlocked' => true],
-        'kedi'      => ['title' => 'cat',        'file' => 'kedi.png',      'unlocked' => false],
-        'kitap'     => ['title' => 'book',       'file' => 'kitap.png',     'unlocked' => true],
-        'kruvasan'  => ['title' => 'croissant',  'file' => 'kruvasan.png',  'unlocked' => false],
-        'maymun'    => ['title' => 'monkey',     'file' => 'maymun.png',    'unlocked' => true],
-        'tama'      => ['title' => 'tama',       'file' => 'tama.png',      'unlocked' => false],
-        'usagi'     => ['title' => 'usagi',      'file' => 'usagi.png',     'unlocked' => true],
-        'yengec'    => ['title' => 'crab',       'file' => 'yengeç.png',    'unlocked' => false],
-        'yonca'     => ['title' => 'clover',     'file' => 'yonca.png',     'unlocked' => false],
-    ];
+    // Controller'dan gelen $keychains veya $achievements verisini al
+    $achievementsList = $keychains ?? ($achievements ?? []);
 @endphp
 
 <div class="board-page-container">
@@ -655,7 +710,7 @@
                 @for($slot = 1; $slot <= 9; $slot++)
                     @php
                         $key = $hookSlots[$slot - 1] ?? null;
-                        $badge = ($key && isset($achievements[$key])) ? $achievements[$key] : null;
+                        $badge = ($key && isset($achievementsList[$key])) ? $achievementsList[$key] : null;
                     @endphp
                     <div class="keychain-hook-unit" data-slot="{{ $slot }}" onclick="handleHookSlotClick({{ $slot }})">
                         <div class="hook-nail"></div>
@@ -663,7 +718,7 @@
                             <img src="{{ asset('images/badges/' . $badge['file']) }}" 
                                  class="keychain-plush-img" 
                                  data-key="{{ $key }}" 
-                                 title="{{ $badge['title'] }}"
+                                 title="{{ $badge['name'] ?? ($badge['title'] ?? '') }}"
                                  onerror="this.src='{{ asset('images/badges/maymun.png') }}';">
                         @else
                             <div class="empty-hook-slot" title="{{ $isOwnProfile ? __('empty hook') : '' }}"></div>
@@ -802,7 +857,9 @@
         handleResize: @json(__('resize')),
         dragMove: @json(__('click and move')),
         lockedBadge: @json(__('locked')),
-        defaultText: @json(__('haii'))
+        defaultText: @json(__('haii')),
+        unlockedStatus: @json(__('Unlocked!')),
+        howToUnlock: @json(__('How to unlock?'))
     };
 
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
@@ -810,7 +867,7 @@
     const SAVE_URL = @json(route('board.save', $user->id ?? auth()->id()));
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
-    const ACHIEVEMENTS_DATA = @json($achievements ?? []);
+    const ACHIEVEMENTS_DATA = @json($achievementsList);
     const FALLBACK_BADGE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="none" stroke="%23888" stroke-width="4"/><rect x="25" y="32" width="50" height="56" rx="14" fill="%23badfa0" stroke="%234b813b" stroke-width="3"/><circle cx="42" cy="54" r="4" fill="%232d5a27"/><circle cx="58" cy="54" r="4" fill="%232d5a27"/><path d="M 45 64 Q 50 68 55 64" fill="none" stroke="%232d5a27" stroke-width="3" stroke-linecap="round"/></svg>`;
 
     const corkboard = document.getElementById('corkboardArea');
@@ -1527,14 +1584,27 @@
         Object.keys(ACHIEVEMENTS_DATA).forEach(key => {
             const item = ACHIEVEMENTS_DATA[key];
             const isUnlocked = item.unlocked;
+            const titleText = item.name || item.title;
+            const descText = item.desc || '';
 
             const wrap = document.createElement('div');
             wrap.className = `bag-badge-item ${isUnlocked ? 'unlocked' : 'locked'}`;
-            wrap.title = isUnlocked ? I18N.dragMove : I18N.lockedBadge;
 
             wrap.innerHTML = `
-                <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${item.title}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
-                <span class="bag-badge-title">${item.title}</span>
+                <div class="bag-badge-img-box">
+                    <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
+                    ${!isUnlocked ? '<span class="bag-badge-lock">🔒</span>' : ''}
+                </div>
+                <span class="bag-badge-title">${titleText}</span>
+                
+                <div class="bag-badge-tooltip">
+                    <div style="font-weight: bold; margin-bottom: 2px;">
+                        ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
+                    </div>
+                    <div style="font-size: 10px; opacity: 0.9;">
+                        ${descText}
+                    </div>
+                </div>
             `;
 
             if (isUnlocked && isEditingModeActive) {
@@ -1557,10 +1627,11 @@
     function selectBadgeFromBag(key, item) {
         if (!IS_OWN_PROFILE || !isEditingModeActive) return;
         const slots = document.querySelectorAll('.keychain-hook-unit');
+        const titleText = item.name || item.title;
         for (let slot of slots) {
             const emptySlot = slot.querySelector('.empty-hook-slot');
             if (emptySlot) {
-                hangBadgeToSlot(slot, key, `/images/badges/${item.file}`, item.title);
+                hangBadgeToSlot(slot, key, `/images/badges/${item.file}`, titleText);
                 return;
             }
         }
@@ -1598,7 +1669,8 @@
             hook.classList.remove('drag-over');
             const key = e.dataTransfer.getData('text/plain');
             if (key && ACHIEVEMENTS_DATA[key] && ACHIEVEMENTS_DATA[key].unlocked) {
-                hangBadgeToSlot(hook, key, `/images/badges/${ACHIEVEMENTS_DATA[key].file}`, ACHIEVEMENTS_DATA[key].title);
+                const titleText = ACHIEVEMENTS_DATA[key].name || ACHIEVEMENTS_DATA[key].title;
+                hangBadgeToSlot(hook, key, `/images/badges/${ACHIEVEMENTS_DATA[key].file}`, titleText);
             }
         };
     });
