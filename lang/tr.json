@@ -266,5 +266,6 @@
     "Can only be set once a year": "Yılda yalnızca bir kez belirlenebilir",
     "No goal set for this year.": "Bu yıl için henüz bir hedef belirlenmedi.",
     "switch to a computer to edit your board": "panonu düzenlemek için bilgisayara geç",
-    "switch to a computer to leave notes on this board": "bu panoya not bırakmak için bilgisayara geç"
+    "switch to a computer to leave notes on this board": "bu panoya not bırakmak için bilgisayara geç",
+    "This user hasn't saved any books yet.": "Bu kullanıcı henüz hiçbir kitap kaydetmedi."
 }
