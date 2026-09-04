@@ -726,12 +726,11 @@
                     </div>
                 </div>
 
-                <!-- Çift ID çakışmasını engellemek için doğrudan oninput ile bağlı -->
                 <textarea id="uniqueTextInput" 
                           class="studio-input-box" 
                           placeholder="Write something cozy..." 
                           maxlength="120"
-                          oninput="var txt = document.getElementById('uniqueTextLayer'); if(txt){ txt.textContent = this.value.trim() !== '' ? this.value : 'selam'; var b = document.getElementById('uniqueTextBox'); if(b) b.style.width = 'auto'; }"></textarea>
+                          oninput="handleStudioTextInput(this.value)"></textarea>
 
                 <label class="btn-gentle-upload">
                     Resim / Sticker Ekle
@@ -743,13 +742,12 @@
                 <div class="postit-inner-card size-square" id="uniquePreviewCard" style="background:#fdf5a6; position: relative;">
                     <span class="postit-pin"></span>
                     
-                    <div id="uniqueTextBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10;">
+                    <div id="uniqueTextBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10; width: auto; max-width: 85%;">
                         <div class="postit-text-content" id="uniqueTextLayer" style="position:relative; font-size:18px; line-height: 1.2; word-break: break-word; white-space: pre-wrap; pointer-events: none;">selam</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <!-- Kırık resim çıkmaması için içi tamamen boş başlar, resim seçilince dolar -->
                     <div id="uniqueStickerBox" class="transform-box" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;"></div>
 
                     <div class="postit-author" id="uniqueAuthorLayer" style="position: absolute; bottom: 4px; left: 6px; font-size: 11px;"></div>
@@ -802,18 +800,37 @@
     }
 
     // --- MODAL YÖNETİMİ ---
+    window.handleStudioTextInput = function(val) {
+        const modal = document.getElementById('postitStudioModalUnique');
+        if (!modal) return;
+
+        // Sadece modalın içindeki metin alanını güncelle
+        const textLayer = modal.querySelector('.postit-text-content');
+        const textBox = modal.querySelector('#uniqueTextBox');
+
+        if (textLayer) {
+            textLayer.textContent = (val && val.trim() !== '') ? val : 'selam';
+        }
+        if (textBox) {
+            textBox.style.width = 'auto';
+        }
+    };
+
     window.openStudioModalSafe = function() {
         const modal = document.getElementById('postitStudioModalUnique');
-        const authLbl = document.getElementById('uniqueAuthorLayer');
-        const txt = document.getElementById('uniqueTextInput');
-        const txtLayer = document.getElementById('uniqueTextLayer');
-        const sBox = document.getElementById('uniqueStickerBox');
-        const fInput = document.getElementById('uniqueFileInput');
-        const textBox = document.getElementById('uniqueTextBox');
+        if (!modal) return;
+
+        const authLbl = modal.querySelector('#uniqueAuthorLayer');
+        const txt = modal.querySelector('#uniqueTextInput');
+        const sBox = modal.querySelector('#uniqueStickerBox');
+        const fInput = modal.querySelector('#uniqueFileInput');
+        const textBox = modal.querySelector('#uniqueTextBox');
 
         if (authLbl) authLbl.innerText = '@' + CURRENT_USERNAME;
         if (txt) txt.value = '';
-        if (txtLayer) txtLayer.textContent = 'selam';
+        
+        handleStudioTextInput('');
+
         if (fInput) fInput.value = '';
 
         if (sBox) {
@@ -827,7 +844,7 @@
             textBox.classList.add('is-selected');
         }
 
-        if (modal) modal.classList.add('active');
+        modal.classList.add('active');
         if (txt) setTimeout(() => txt.focus(), 50);
     };
 
@@ -836,7 +853,6 @@
         if (modal) modal.classList.remove('active');
     };
 
-    // Resim seçilince DOM'a temiz basma
     window.handleStudioImageUpload = function(input) {
         if (!input.files || !input.files[0]) return;
         const file = input.files[0];
@@ -885,7 +901,6 @@
         if (textBox) textBox.classList.add('is-selected');
     };
 
-    // Renk ve Şekil
     document.querySelectorAll('.color-ball').forEach(b => {
         b.addEventListener('click', function() {
             document.querySelectorAll('.color-ball').forEach(x => x.classList.remove('selected'));
@@ -904,7 +919,6 @@
         });
     });
 
-    // Modal İçi Boyutlandırma / Döndürme
     function setupModalStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
         if (!box) return;
@@ -984,10 +998,13 @@
     setupModalStoryTransformer('uniqueTextBox');
     setupModalStoryTransformer('uniqueStickerBox');
 
-    // Panoya Notu Sabitle
+    // Panoya Notu Sabitle (Tekrar tekrar eklendiğinde ID çakışması olmaması için klondan ID'leri temizler)
     window.pinStudioNoteSafe = function() {
+        const modal = document.getElementById('postitStudioModalUnique');
         const previewCard = document.getElementById('uniquePreviewCard');
         const sBox = document.getElementById('uniqueStickerBox');
+        const txtInput = document.getElementById('uniqueTextInput');
+        
         if (!corkboard || !previewCard) return;
 
         const postitWrapper = document.createElement('div');
@@ -1003,21 +1020,29 @@
         postitWrapper.style.transform = `scale(${initialScale}) rotate(${rot}deg)`;
         bringToFront(postitWrapper);
 
+        // Klonu al ve İÇİNDEKİ TÜM ID'LERİ KALDIR (Böylece bir sonraki post-it ile asla karışmaz)
         const clonedCard = previewCard.cloneNode(true);
         clonedCard.removeAttribute('id');
+        clonedCard.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
 
         clonedCard.querySelectorAll('.handle-btn').forEach(btn => btn.remove());
         clonedCard.querySelectorAll('.transform-box').forEach(box => {
-            box.removeAttribute('id');
             box.classList.remove('is-selected');
             box.style.border = 'none';
         });
 
-        // Resim eklenmediyse boş kutuyu panoya kopyalama
         if (sBox && (sBox.style.display === 'none' || sBox.innerHTML.trim() === '')) {
             const emptySticker = clonedCard.querySelector('.postit-sticker-img')?.closest('.transform-box');
             if (emptySticker) emptySticker.remove();
         }
+
+        let authorDiv = clonedCard.querySelector('.postit-author');
+        if (!authorDiv) {
+            authorDiv = document.createElement('div');
+            authorDiv.className = 'postit-author';
+            clonedCard.appendChild(authorDiv);
+        }
+        authorDiv.innerText = '@' + CURRENT_USERNAME;
 
         postitWrapper.appendChild(clonedCard);
         postitWrapper.innerHTML += `
@@ -1029,7 +1054,23 @@
         setupPostitControls(postitWrapper, true);
         makeItemDraggable(postitWrapper, true);
         corkboard.appendChild(postitWrapper);
+
         window.closeStudioModalSafe();
+
+        // Modalı bir sonraki post-it için sıfırla
+        if (txtInput) txtInput.value = '';
+        if (modal) {
+            const modalText = modal.querySelector('.postit-text-content');
+            if (modalText) modalText.textContent = 'selam';
+        }
+        
+        if (sBox) {
+            sBox.style.display = 'none';
+            sBox.innerHTML = '';
+            sBox.classList.remove('is-selected');
+        }
+        const fInput = document.getElementById('uniqueFileInput');
+        if (fInput) fInput.value = '';
 
         showFriendSaveButton();
     };
@@ -1056,7 +1097,7 @@
                 e.stopPropagation();
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 wrapper.remove();
-                showFriendSaveButton();
+                if (!IS_OWN_PROFILE) showFriendSaveButton();
             };
         }
 
@@ -1081,7 +1122,7 @@
                 function onStop() {
                     window.removeEventListener('mousemove', onResize);
                     window.removeEventListener('mouseup', onStop);
-                    showFriendSaveButton();
+                    if (!IS_OWN_PROFILE) showFriendSaveButton();
                 }
 
                 window.addEventListener('mousemove', onResize);
@@ -1111,7 +1152,7 @@
                 function onRotateStop() {
                     window.removeEventListener('mousemove', onRotate);
                     window.removeEventListener('mouseup', onRotateStop);
-                    showFriendSaveButton();
+                    if (!IS_OWN_PROFILE) showFriendSaveButton();
                 }
 
                 window.addEventListener('mousemove', onRotate);
@@ -1401,7 +1442,6 @@
         }
     }
 
-    // --- PROFİL SAHİBİ EDIT / SAVE DÖNGÜSÜ ---
     if (toggleEditBtn && IS_OWN_PROFILE) {
         toggleEditBtn.addEventListener('click', async function() {
             isEditingModeActive = !isEditingModeActive;
@@ -1431,7 +1471,6 @@
         });
     }
 
-    // --- PANO KİLİTLEME ---
     if (boardLockBtn && IS_OWN_PROFILE) {
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
@@ -1441,7 +1480,6 @@
         });
     }
 
-    // --- KEYCHAIN / ÇANTA ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
@@ -1533,7 +1571,6 @@
         };
     });
 
-    // Sayfa Yüklendiğinde Panodakileri Aktifleştir
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const canManage = wrapper.dataset.canManage === '1';
