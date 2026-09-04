@@ -5,9 +5,54 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserBoard;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BoardController extends Controller
 {
+    /**
+     * İki kullanıcının arkadaş olup olmadığını net kontrol eden yardımcı fonksiyon
+     */
+    private function checkFriendship($userA, $userB)
+    {
+        if (!$userA || !$userB) return false;
+        if ($userA->id === $userB->id) return true; // Kendi profili
+
+        // 1. Eğer User modelinde tanımlı bir ilişki/fonksiyon varsa:
+        if (method_exists($userA, 'isFriendsWith')) {
+            return $userA->isFriendsWith($userB);
+        }
+
+        // 2. Klasik friends / friendships tablosu kontrolü (Onaylanmış arkadaşlık)
+        // Projendeki tablo adına göre 'friends' veya 'friendships' kontrol edilir:
+        $hasFriendTable = \Schema::hasTable('friendships') || \Schema::hasTable('friends');
+        if ($hasFriendTable) {
+            $table = \Schema::hasTable('friendships') ? 'friendships' : 'friends';
+            
+            return DB::table($table)
+                ->where(function($q) use ($userA, $userB) {
+                    $q->where('user_id', $userA->id)->where('friend_id', $userB->id);
+                })
+                ->orWhere(function($q) use ($userA, $userB) {
+                    $q->where('user_id', $userB->id)->where('friend_id', $userA->id);
+                })
+                // Eğer tabloda 'status' (accepted/confirmed vb.) kolonu varsa:
+                ->when(\Schema::hasColumn($table, 'status'), function($q) {
+                    $q->where('status', 'accepted');
+                })
+                ->exists();
+        }
+
+        // 3. Eğer sistemin takip (follows / followers) üzerine kuruluysa:
+        if (\Schema::hasTable('follows')) {
+            // Karşılıklı takipleşme = Arkadaşlık
+            $followsTarget = DB::table('follows')->where('follower_id', $userA->id)->where('following_id', $userB->id)->exists();
+            $targetFollows = DB::table('follows')->where('follower_id', $userB->id)->where('following_id', $userA->id)->exists();
+            return $followsTarget && $targetFollows;
+        }
+
+        return false;
+    }
+
     public function show(User $user)
     {
         $board = UserBoard::firstOrCreate(
@@ -20,19 +65,12 @@ class BoardController extends Controller
         );
 
         $currentUser = auth()->user();
-        $isOwner = auth()->check() && auth()->id() === $user->id;
+        $isOwner = auth()->check() && (auth()->id() === $user->id);
         
-        // Arkadaşlık kontrolü (Projendeki arkadaşlık yapısına göre, örn: isFriendsWith veya takipleşme)
+        // KESİN VE NET KONTROL: Arkadaş değilse false döner!
         $isFriend = false;
         if (auth()->check() && !$isOwner) {
-            if (method_exists($currentUser, 'isFriendsWith')) {
-                $isFriend = $currentUser->isFriendsWith($user);
-            } elseif (method_exists($currentUser, 'friends')) {
-                $isFriend = $currentUser->friends()->where('friend_id', $user->id)->exists();
-            } else {
-                // Varsayılan: Eğer arkadaşlık tablosu henüz yoksa giriş yapmış kullanıcıya izin ver
-                $isFriend = true; 
-            }
+            $isFriend = $this->checkFriendship($currentUser, $user);
         }
 
         $achievements = [
@@ -59,36 +97,34 @@ class BoardController extends Controller
     public function save(Request $request, User $user)
     {
         $currentUser = auth()->user();
-        $isOwner = auth()->check() && auth()->id() === $user->id;
+        $isOwner = auth()->check() && (auth()->id() === $user->id);
 
         $board = UserBoard::firstOrCreate(['user_id' => $user->id]);
 
-        // Pano kilitliyse ve pano sahibi değilse hiçbir şey yapamaz
+        // Pano kilitliyse ve sahibi değilse direkt ret
         if ($board->is_locked && !$isOwner) {
-            return response()->json(['error' => 'Pano kilitli!'], 403);
+            return response()->json(['error' => 'Bu pano kilitlenmiştir.'], 403);
+        }
+
+        // Giriş yapmış ama arkadaş değilse (ve sahibi de değilse) direkt ret
+        if (!$isOwner) {
+            $isFriend = $this->checkFriendship($currentUser, $user);
+            if (!$isFriend) {
+                return response()->json(['error' => 'Sadece arkadaşlar panoya not bırakabilir.'], 403);
+            }
         }
 
         $incomingItems = $request->input('board_items', []);
 
         if ($isOwner) {
-            // Pano sahibi her şeyi düzenleyebilir, yer değiştirebilir, silebilir
+            // Pano sahibi anahtarlıkları, kilit durumunu ve her şeyi günceller
             $board->update([
                 'board_items' => $incomingItems,
                 'hook_slots'  => $request->input('hook_slots', $board->hook_slots),
                 'is_locked'   => $request->boolean('is_locked', $board->is_locked),
             ]);
         } else {
-            // Ziyaretçi: Arkadaşlık kontrolü
-            $isFriend = true;
-            if (method_exists($currentUser, 'isFriendsWith')) {
-                $isFriend = $currentUser->isFriendsWith($user);
-            }
-
-            if (!$isFriend) {
-                return response()->json(['error' => 'Sadece arkadaşlar not ekleyebilir!'], 403);
-            }
-
-            // Pano sahibinin mevcut öğelerini koru; arkadaşın kendi eklediği/sildiği öğeleri güncelle
+            // Arkadaş ise kancaları veya kilidi değiştiremez, yalnızca post-it ekleyebilir/silebilir
             $board->update([
                 'board_items' => $incomingItems,
             ]);
