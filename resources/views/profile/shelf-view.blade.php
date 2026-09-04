@@ -867,10 +867,13 @@
         @endif
     </div>
 
-    <!-- MOBİL GÖRÜNÜM UYARISI -->
     <div style="display: flex; justify-content: center; width: 100%;">
         <div class="mobile-edit-notice">
-            💻 {{ __('switch to a computer to edit your board') }}
+            @if($isOwnProfile)
+                💻 {{ __('switch to a computer to edit your board') }}
+            @else
+                💻 {{ __('switch to a computer to leave notes on this board') }}
+            @endif
         </div>
     </div>
 
