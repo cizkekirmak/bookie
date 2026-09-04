@@ -194,8 +194,8 @@
         }
 
         .cekmece-tab img {
-            width: 20px;
-            height: 20px;
+            width: 30px;
+            height: 30px;
             pointer-events: none;
             transition: transform 0.35s ease;
         }
@@ -289,8 +289,8 @@
             }
 
             .mobil-indir-btn img {
-                width: 15px;
-                height: 15px;
+                width: 25px;
+                height: 25px;
             }
         }
 
