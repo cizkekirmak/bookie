@@ -29,43 +29,8 @@ class BoardController extends Controller
             ->exists();
     }
 
-    /**
-     * Kullanıcı adını hem ham hem normalize ederek veritabanında arar
-     */
-    private function findUserSafely($username)
+    public function show(User $user)
     {
-        $decoded = urldecode($username);
-        $clean = trim($decoded);
-
-        // Türkçe I/ı ve İ/i dönüşümü
-        $lower = str_replace(['I', 'İ'], ['ı', 'i'], $clean);
-        $lower = mb_strtolower($lower, 'UTF-8');
-
-        $user = User::where('username', $clean)->first();
-
-        if (!$user) {
-            $user = User::whereRaw('LOWER(username) = ?', [$lower])->first();
-        }
-
-        if (!$user) {
-            // Son çare veritabanındaki tüm kullanıcı adlarını esnek eşleştir
-            $user = User::all()->first(function ($u) use ($lower) {
-                $uLower = str_replace(['I', 'İ'], ['ı', 'i'], $u->username);
-                return mb_strtolower($uLower, 'UTF-8') === $lower;
-            });
-        }
-
-        if (!$user) {
-            abort(404, 'Kullanıcı bulunamadı.');
-        }
-
-        return $user;
-    }
-
-    public function show($username)
-    {
-        $user = $this->findUserSafely($username);
-
         $board = UserBoard::firstOrCreate(
             ['user_id' => $user->id],
             [
@@ -75,7 +40,7 @@ class BoardController extends Controller
             ]
         );
 
-        // Katmanlı JSON / String çözümlemesi
+        // Katmanlı JSON çözümlemesi
         $items = $board->board_items;
         while (is_string($items)) {
             $items = json_decode($items, true);
@@ -115,12 +80,11 @@ class BoardController extends Controller
             'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => false],
         ];
 
-        return view('board', compact('user', 'board', 'achievements', 'isFriend', 'isOwner'));
+        return view('profile.shelf-view', compact('user', 'board', 'achievements', 'isFriend', 'isOwner'));
     }
 
-    public function save(Request $request, $username)
+    public function save(Request $request, User $user)
     {
-        $user = $this->findUserSafely($username);
         $currentUser = auth()->user();
         $isOwner = auth()->check() && (auth()->id() === $user->id);
 
@@ -137,7 +101,7 @@ class BoardController extends Controller
             }
         }
 
-        // Gelen veriyi güvenle diziye dönüştür
+        // Gelen veriyi çöz
         $incoming = $request->input('board_items', []);
         while (is_string($incoming)) {
             $incoming = json_decode($incoming, true);

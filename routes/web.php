@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\BookController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\BoardController;
 use App\Http\Controllers\AdminRecommendationController;
 
 /*
@@ -350,7 +351,5 @@ Route::get('/lang/{locale}', function (Request $request, $locale) {
     return redirect()->to($referer);
 })->name('lang.switch');
 
-use App\Http\Controllers\BoardController;
-
-Route::get('/u/{user:username}/board', [BoardController::class, 'show'])->name('board.show');
-Route::post('/u/{user:username}/board/save', [BoardController::class, 'save'])->middleware('auth')->name('board.save');
+Route::get('/u/{username}/board', [BoardController::class, 'show'])->name('board.show');
+Route::post('/u/{username}/board/save', [BoardController::class, 'save'])->middleware('auth')->name('board.save');
