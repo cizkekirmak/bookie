@@ -547,7 +547,7 @@
     $targetId = $user->id ?? 0;
     $isOwnProfile = auth()->check() && ($authId === $targetId);
 
-    // Veritabanındaki friendships tablosundan doğrudan teyit:
+    // friendships tablosundan doğrudan arkadaşlık doğrulaması
     $isFriendUser = false;
     if (auth()->check() && !$isOwnProfile) {
         $isFriendUser = \DB::table('friendships')
@@ -607,6 +607,7 @@
                         $loggedUsername = auth()->user()->username ?? '';
                         $authorText = $item['author'] ?? '';
 
+                        // Türkçe I/ı ve İ/i duyarsızlaştırması
                         $normalize = function($str) {
                             $str = str_replace(['I', 'İ'], ['ı', 'i'], $str);
                             return mb_strtolower($str, 'UTF-8');
@@ -620,6 +621,7 @@
                             str_contains($cleanAuthor, $cleanLogged)
                         );
 
+                        // Profil sahibi her şeyi, notu yazan kişi de kendi notunu düzenleyebilir
                         $canManage = $isOwnProfile || ($isAuthor && !$isBoardLocked);
                         $scale = $item['scale'] ?? 0.65;
                         $rot = $item['rotation'] ?? 0;
@@ -761,6 +763,7 @@
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
+                    <!-- ASLA BASIK ÇIKMAYAN ORANTILI STICKER KUTUSU -->
                     <div id="stickerTransformBox" class="transform-box" style="display:none; top:55px; left:35px; width:70px; height:auto;">
                         <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:auto; display:block;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
@@ -859,7 +862,7 @@
         });
     }
 
-    // --- VERİTABANINA GERÇEK ASYNC KAYIT ---
+    // --- DOĞRUDAN VERİTABANINA GERÇEK ASYNC KAYIT ---
     async function saveBoardToDatabase(triggerBtn = null) {
         if (triggerBtn) {
             triggerBtn.innerText = '⏳ Kaydediliyor...';
@@ -946,6 +949,7 @@
         }
     }
 
+    // --- SAYFA AÇILDIĞINDA MEVCUT NOTLARI CANLANDIR (LOCALSTORAGE KULLANILMAZ) ---
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const canManage = wrapper.dataset.canManage === '1';
@@ -1237,6 +1241,7 @@
                     let newWidth = Math.max(20, startWidth + delta);
                     box.style.width = newWidth + 'px';
 
+                    // Görselin oranını kilitleyip basıklığı önler
                     if (boxId === 'stickerTransformBox') {
                         box.style.height = (newWidth * stickerAspectRatio) + 'px';
                     }

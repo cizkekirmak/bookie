@@ -98,12 +98,17 @@ class BoardController extends Controller
             if ($request->has('is_locked')) {
                 $board->is_locked = $request->boolean('is_locked');
             }
-            $board->save();
         } else {
+            // Arkadaş not eklediğinde/sildiğinde sadece board_items güncellenir
             $board->board_items = $incomingItems;
-            $board->save();
         }
 
-        return response()->json(['success' => true]);
+        $saved = $board->save();
+
+        return response()->json([
+            'success' => $saved,
+            'count' => count($incomingItems),
+            'items' => $board->board_items
+        ]);
     }
 }
