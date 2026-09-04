@@ -1,12 +1,10 @@
-<div id="profile-list-view" class="custom-scroll" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; padding-right: 10px;">
-    
-    @if($isOwnProfile ?? false)
-    <form id="bulkDeleteForm" action="{{ route('profile.books.bulkRemove') }}" method="POST" onsubmit="return confirm(@json(__('Are you sure you want to remove the selected books?')));" style="margin: 0;">
-        @csrf
-    @endif
+@if($isOwnProfile ?? false)
+<form id="bulkDeleteForm" action="{{ route('profile.books.bulkRemove') }}" method="POST" onsubmit="return confirm(@json(__('Are you sure you want to remove the selected books?')));" style="margin: 0; display: flex; flex-direction: column; height: 100%; width: 100%; flex: 1; min-height: 0;">
+    @csrf
+@endif
 
     {{-- DURUM SEKMELERİ & SİLME BUTONU --}}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; flex-wrap: wrap; gap: 8px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
             <button type="button" onclick="filterStatus('all', this)" class="status-tab" style="border: none; background: #255719; color: #fff; padding: 6px 14px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">
                 {{ __('All') }} ({{ $userBooks->count() }})
@@ -29,8 +27,8 @@
         @endif
     </div>
 
-    {{-- KİTAP LİSTESİ --}}
-    <div style="display: flex; flex-direction: column; gap: 14px;">
+    {{-- KİTAP LİSTESİ: BEYAZ ALANIN EN DİBİNE KADAR AKAN ASIL KAYDIRMA ALANI --}}
+    <div class="custom-scroll book-items-scroll-area" style="flex: 1 1 0%; min-height: 0; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; padding-bottom: 36px;">
         @forelse($userBooks as $item)
             @include('profile.book-card', ['item' => $item])
         @empty
@@ -44,11 +42,9 @@
         @endforelse
     </div>
 
-    @if($isOwnProfile ?? false)
-    </form>
-    @endif
-
-</div>
+@if($isOwnProfile ?? false)
+</form>
+@endif
 
 <script>
 function updateDeleteButtonState() {
@@ -66,14 +62,3 @@ function updateDeleteButtonState() {
     }
 }
 </script>
-<style>
-@media (max-width: 1024px) {
-    #profile-list-view {
-        max-height: 60vh !important;
-        max-height: 60dvh !important; /* Mobil tarayıcı çubukları için dinamik yükseklik */
-        overflow-y: auto !important;
-        -webkit-overflow-scrolling: touch;
-        padding-bottom: 24px !important;
-    }
-}
-</style>
