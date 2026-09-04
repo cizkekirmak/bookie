@@ -42,7 +42,6 @@
                 @endif
             </div>
         @endforelse
-        @endforelse
     </div>
 
     @if($isOwnProfile ?? false)
