@@ -312,6 +312,7 @@
                 display: block !important;
             }
 
+            /* Ana konteyner ekranın kalan tam yüksekliğini alır */
             .profile-container {
                 height: calc(100vh - 68px) !important;
                 height: calc(100dvh - 68px) !important;
@@ -319,9 +320,9 @@
                 border: none !important;
                 display: flex !important;
                 flex-direction: column !important;
-                align-items: center !important;
+                align-items: stretch !important;
                 background-color: transparent !important;
-                padding: 8px 8px 12px 8px !important;
+                padding: 10px 8px 14px 8px !important;
                 overflow: hidden !important;
                 box-sizing: border-box !important;
             }
@@ -403,13 +404,14 @@
                 transform: rotate(-1.5deg);
             }
 
+            /* BEYAZ KART: Tam ekran boyuna kilitli, asla içeriğe göre kısalmaz/uzamaz */
             .profile-main-content {
                 width: 100% !important;
                 max-width: 100% !important;
                 flex: 1 1 0% !important;
                 height: 100% !important;
-                max-height: 100% !important;
-                padding: 12px 10px 10px 10px !important;
+                min-height: 0 !important;
+                padding: 12px 10px 8px 10px !important;
                 border: 2px solid #4c7237 !important;
                 border-radius: 16px !important;
                 background-color: #f7faf5 !important;
@@ -429,13 +431,16 @@
                 font-size: 19px !important;
             }
 
+            /* Kitap listesi ve Pano: Kartın dibine kadar açılır, kendi içinde akar */
             #profile-list-view,
             #profile-board-view {
                 flex: 1 1 0% !important;
                 height: 100% !important;
-                overflow-y: auto !important;
-                -webkit-overflow-scrolling: touch;
                 min-height: 0 !important;
+                overflow-y: auto !important;
+                overflow-x: hidden !important;
+                -webkit-overflow-scrolling: touch;
+                padding-bottom: 30px !important;
             }
         }
     </style>
@@ -739,7 +744,7 @@
             </div>
 
             {{-- 1. KİTAP LİSTESİ GÖRÜNÜMÜ --}}
-            <div id="profile-list-view" style="display: flex; flex-direction: column; flex: 1; overflow: hidden;">
+            <div id="profile-list-view" style="display: flex; flex-direction: column; flex: 1 1 0%; height: 100%; min-height: 0; overflow: hidden;">
                 @include('profile.list-view')
             </div>
 
