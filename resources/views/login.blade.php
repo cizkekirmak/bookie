@@ -10,48 +10,53 @@
     
     <style>
         @font-face {
-            font-family: 'Unkempt';
-            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-            font-weight: 400;
-            font-display: swap;
-        }
-        @font-face {
-            font-family: 'Henny Penny';
-            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-            font-weight: 400;
-            font-display: swap;
-        }
+    font-family: 'Unkempt';
+    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
 
-        * {
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent !important;
-        }
-
+@font-face {
+    font-family: 'Henny Penny';
+    src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
         body { 
             font-family: "Mystery Quest", system-ui;
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            min-height: 100vh; 
-            background-color: #D1FFBD; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #D1FFBD;
             margin: 0; 
             background-image: url("{{ asset('images/arkaplan.png') }}");
-            background-size: cover; 
-            background-position: center; 
-            background-repeat: no-repeat; 
-            overflow-x: hidden;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
         }
+          * {
+                -webkit-tap-highlight-color: transparent !important;
+            }
 
-        button, a, label, span, img {
-            user-select: none !important;
-            -webkit-user-select: none !important;
-            -webkit-touch-callout: none !important;
-        }
+            button,
+            a,
+            label,
+            span,
+            img {
+                user-select: none !important;
+                -webkit-user-select: none !important;
+                -webkit-touch-callout: none !important;
+            }
 
         .dis-kapsayici {
             display: flex;
             flex-direction: column;
             align-items: center;
+            gap: 0px;
         }
         
         .site-basligi {
@@ -61,24 +66,21 @@
             margin: 0 0 -20px 0;
             letter-spacing: 2px;
             user-select: none;
-            z-index: 10;
         }
 
-        /* KART ALANI */
-        .login-card-wrapper {
+        .kutucuk-sarmalayici {
             position: relative;
-            width: 280px;
         }
 
         .kutucuk { 
+            position: relative;
+            z-index: 2;
             background: #ebf8e2;
             padding: 20px;
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(44, 159, 76, 0.64);
             font-family: "Henny Penny", cursive;
             width: 280px;
-            position: relative;
-            z-index: 5;
         }
 
         .kutucuk label {
@@ -95,6 +97,7 @@
             margin-bottom: 18px;
             border: 1px solid #5f9852;
             border-radius: 5px;
+            box-sizing: border-box;
             font-family: Arial, sans-serif;
             outline: none;
         }
@@ -102,6 +105,7 @@
         .kutucuk button {
             width: 100%;
             padding: 10px;
+            margin: 0px auto;
             background-color: #2e6f40;
             color: #d1ffbd;
             border: none;
@@ -113,8 +117,8 @@
             transition: background-color 0.2s ease;
         }
 
-        .kutucuk button:hover { 
-            background-color: #235631; 
+        .kutucuk button:hover {
+            background-color: #235631;
         }
 
         .alt-linkler {
@@ -122,81 +126,107 @@
             text-align: center;
             font-size: 14px;
         }
-        .alt-linkler p { margin: 8px 0; color: #0f511e; }
-        .alt-linkler a { color: #2e6f40; text-decoration: none; font-family: "Henny Penny", cursive; }
 
-        /* --- DEFTER AYRACI --- */
-        .postit-tab-container {
+        .alt-linkler p {
+            margin: 8px 0;
+            color: #0f511e;
+        }
+
+        .alt-linkler a {
+            color: #2e6f40;
+            text-decoration: none;
+            font-family: "Henny Penny", cursive;
+            font-weight: normal;
+        }
+
+        .alt-linkler a:hover {
+            text-decoration: underline;
+        }
+
+        /* ---- İNDİRME ÇEKMECESİ ---- */
+
+        .cekmece-tab {
             position: absolute;
-            top: 55px;
-            left: 0;
-            z-index: 1; /* Login kutusunun arkasında */
-            display: flex;
-            align-items: center;
-            /* 180px gövde + 38px kulakçık = 218px. 280 - 218 = 62px. */
-            transform: translateX(62px); 
-            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* Tıklanınca sağa fırlar */
-        .postit-tab-container.open {
-            transform: translateX(280px);
-        }
-
-        /* Sarı Not Kağıdı (Solda) */
-        .postit-content {
-            width: 180px;
-            background: #fdf5a6;
-            border: 2px solid #5a7d3b;
-            border-radius: 0 12px 12px 0;
-            padding: 12px 10px;
-            text-align: center;
-            font-family: 'Unkempt', cursive;
-            box-shadow: 3px 4px 10px rgba(0,0,0,0.15);
-            flex-shrink: 0;
-        }
-
-        /* Kulakçık (Sağ Uçta) */
-        .postit-handle {
-            width: 38px;
-            height: 48px;
-            background: #fdf5a6;
-            border: 2px solid #5a7d3b;
-            border-left: none;
+            top: 50%;
+            right: -34px;
+            transform: translateY(-50%);
+            width: 34px;
+            height: 64px;
+            background: #2e6f40;
             border-radius: 0 10px 10px 0;
+            box-shadow: 3px 2px 6px rgba(44, 159, 76, 0.55);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
             cursor: pointer;
-            box-shadow: 3px 2px 5px rgba(0,0,0,0.12);
-            flex-shrink: 0;
-            margin-left: -2px;
-        }
-
-        .btn-app-install {
-            background: #2e6f40;
-            color: #ffffff;
+            z-index: 3;
             border: none;
-            border-radius: 10px;
-            padding: 6px 12px;
-            font-size: 12px;
-            font-weight: bold;
-            font-family: 'Unkempt', cursive;
+            padding: 0;
+            transition: background-color 0.2s ease;
+        }
+
+        .cekmece-tab:hover {
+            background-color: #235631;
+        }
+
+        .cekmece-tab img {
+            width: 20px;
+            height: 20px;
+            pointer-events: none;
+            transition: transform 0.35s ease;
+        }
+
+        .kutucuk-sarmalayici.acik .cekmece-tab img {
+            transform: rotate(180deg);
+        }
+
+        .cekmece {
+            position: absolute;
+            top: 50%;
+            left: 100%;
+            transform: translateY(-50%) translateX(-100%);
+            background: #ebf8e2;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 4px 4px 8px rgba(44, 159, 76, 0.5);
+            padding: 22px 20px;
+            width: 190px;
+            box-sizing: border-box;
+            z-index: 1;
+            opacity: 0;
+            visibility: hidden;
+            text-align: center;
+            transition: transform 0.4s ease, opacity 0.35s ease, visibility 0.4s;
+        }
+
+        .kutucuk-sarmalayici.acik .cekmece {
+            transform: translateY(-50%) translateX(0);
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .cekmece p {
+            font-family: "Henny Penny", cursive;
+            color: #1a562b;
+            font-size: 18px;
+            margin: 0 0 14px 0;
+        }
+
+        .cekmece button {
+            width: 100%;
+            padding: 10px;
+            background-color: #2e6f40;
+            color: #d1ffbd;
+            border: none;
+            border-radius: 5px;
+            font-size: 15px;
             cursor: pointer;
-            margin-top: 8px;
-            display: inline-block;
+            font-weight: bold;
+            font-family: "Henny Penny", cursive;
+            transition: background-color 0.2s ease;
         }
 
-        .btn-app-install:hover {
-            background: #235631;
-        }
-
-        /* Uygulama yüklüyse ayracı gizle */
-        @media all and (display-mode: standalone) {
-            .postit-tab-container {
-                display: none !important;
-            }
+        .cekmece button:hover {
+            background-color: #235631;
         }
 
         .floating-lang-switch {
@@ -210,11 +240,10 @@
 <body>
     <div class="dis-kapsayici">
         <h1 class="site-basligi">Bookie</h1>
-        
-        <div class="login-card-wrapper">
-            
-            {{-- GİRİŞ KUTUSU --}}
+
+        <div class="kutucuk-sarmalayici" id="kutucukSarmalayici">
             <div class="kutucuk">
+
                 <form method="POST" action="/login">
                     @csrf
                     
@@ -249,51 +278,33 @@
                 </form>
             </div>
 
-            {{-- ARKADAKİ DEFTER AYRACI --}}
-            <div class="postit-tab-container" id="postitTab">
-                <div class="postit-content">
-                    <div style="font-size: 13px; font-weight: bold; color: #1a562b; line-height: 1.2;">
-                        download the bookieapp !!
-                    </div>
-                    <button type="button" class="btn-app-install" onclick="installAppAction()">
-                        {{ __('install now') }} 📲
-                    </button>
-                </div>
-                <div class="postit-handle" onclick="togglePostit(event)">
-                    📲
-                </div>
-            </div>
+            {{-- KUTUDAN ÇIKAN İNDİRME SEKMESİ --}}
+            <button type="button" class="cekmece-tab" id="cekmeceTab" aria-label="{{ __('Download Bookie') }}">
+                <img src="{{ asset('images/indir-ikon.png') }}" alt="download">
+            </button>
 
+            {{-- ARKADAN AÇILAN ÇEKMECE --}}
+            <div class="cekmece">
+                <p>{{ __('download bookie') }}</p>
+                <button type="button" id="indirButonu">{{ __('download') }}</button>
+            </div>
         </div>
     </div>
 
-    {{-- SAĞ ALT DİL BUTONU --}}
+    {{-- SAĞ ALT KÖŞE DİL BUTONU --}}
     <div class="floating-lang-switch">
         @include('partials.lang-switch')
     </div>
 
     <script>
-        // Yüklü uygulama kontrolü
-        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
-            const tab = document.getElementById('postitTab');
-            if (tab) tab.style.display = 'none';
-        }
-
-        function togglePostit(e) {
-            e.stopPropagation();
-            document.getElementById('postitTab').classList.toggle('open');
-        }
-
-        document.addEventListener('click', function(e) {
-            const tab = document.getElementById('postitTab');
-            if (tab && !tab.contains(e.target)) {
-                tab.classList.remove('open');
-            }
+        document.getElementById('cekmeceTab').addEventListener('click', function () {
+            document.getElementById('kutucukSarmalayici').classList.toggle('acik');
         });
 
-        function installAppAction() {
-            alert("Bookie uygulamasını telefonuna eklemek için Safari/Chrome menüsünden 'Ana Ekrana Ekle' seçeneğini seçebilirsin! ✨");
-        }
+        // indirButonu'na kendi indirme linkini/işlevini bağla
+        document.getElementById('indirButonu').addEventListener('click', function () {
+            // window.location.href = "{{ asset('downloads/bookie.apk') }}";
+        });
     </script>
 </body>
 </html>
