@@ -591,11 +591,11 @@
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
             <div class="board-lock-badge" id="boardLockBtn" 
-                 title="{{ $isOwnProfile ? __('board.lock_toggle_title') : ($isBoardLocked ? __('board.status_locked') : __('board.status_open')) }}" 
+                 title="{{ $isOwnProfile ? __('lock / unlock for visitors') : ($isBoardLocked ? __('board is locked') : __('board is open')) }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
                 <img id="boardLockImg" 
                      src="{{ $isBoardLocked ? asset('images/locke.png') : asset('images/unlocked.png') }}" 
-                     alt="{{ __('board.lock_status_alt') }}" 
+                     alt="{{ __('lock status') }}" 
                      onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
             </div>
 
@@ -631,9 +631,9 @@
                             {!! $item['html'] !!}
                         </div>
                         @if($canManage)
-                            <div class="handle-btn handle-delete postit-delete-btn" title="{{ __('board.handle_delete') }}">✕</div>
-                            <div class="handle-btn handle-rotate" title="{{ __('board.handle_rotate') }}">↻</div>
-                            <div class="handle-btn handle-resize" title="{{ __('board.handle_resize') }}">⤡</div>
+                            <div class="handle-btn handle-delete postit-delete-btn" title="{{ __('delete') }}">✕</div>
+                            <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
+                            <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
                         @endif
                     </div>
                 @elseif(($item['type'] ?? '') === 'free_sticker')
@@ -641,9 +641,9 @@
                          style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; width: {{ $item['width'] ?? '80px' }}; height: {{ $item['height'] ?? '80px' }}; transform: {{ $item['transform'] ?? 'rotate(0deg)' }}; z-index: {{ $item['zIndex'] ?? 10 }};">
                         <img src="{{ $item['src'] }}">
                         @if($isOwnProfile)
-                            <div class="handle-btn handle-delete" title="{{ __('board.handle_delete') }}">✕</div>
-                            <div class="handle-btn handle-rotate" title="{{ __('board.handle_rotate') }}">↻</div>
-                            <div class="handle-btn handle-resize" title="{{ __('board.handle_resize') }}">⤡</div>
+                            <div class="handle-btn handle-delete" title="{{ __('delete') }}">✕</div>
+                            <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
+                            <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
                         @endif
                     </div>
                 @endif
@@ -666,16 +666,16 @@
                                  title="{{ $badge['title'] }}"
                                  onerror="this.src='{{ asset('images/badges/maymun.png') }}';">
                         @else
-                            <div class="empty-hook-slot" title="{{ $isOwnProfile ? __('board.empty_hook_title') : '' }}"></div>
+                            <div class="empty-hook-slot" title="{{ $isOwnProfile ? __('empty hook') : '' }}"></div>
                         @endif
                     </div>
                 @endfor
             </div>
 
             @if($isOwnProfile)
-            <div class="folder-container" onclick="toggleCollectionDrawer()" title="{{ __('board.all_keychains_title') }}">
-                <img src="{{ asset('images/dosya.png') }}" alt="{{ __('board.folder_alt') }}" class="folder-img" onerror="this.onerror=null; this.src='{{ asset('images/folder.png') }}';">
-                <span class="folder-label">{{ __('board.all_keychains_label') }}</span>
+            <div class="folder-container" onclick="toggleCollectionDrawer()" title="{{ __('all keychains') }}">
+                <img src="{{ asset('images/dosya.png') }}" alt="{{ __('folder') }}" class="folder-img" onerror="this.onerror=null; this.src='{{ asset('images/folder.png') }}';">
+                <span class="folder-label">{{ __('all keychains u own') }}</span>
             </div>
             @endif
         </div>
@@ -684,27 +684,27 @@
     <!-- ALT BUTON BARI -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
-            <button id="toggleEditBtn" class="btn-action desktop-only-action">{{ __('board.btn_edit_board') }}</button>
-            <button type="button" id="btnAddStickerBtn" class="btn-action" style="display:none;" onclick="document.getElementById('freeStickerUploadInput').click()">{{ __('board.btn_add_sticker') }}</button>
+            <button id="toggleEditBtn" class="btn-action desktop-only-action">{{ __('edit board') }}</button>
+            <button type="button" id="btnAddStickerBtn" class="btn-action" style="display:none;" onclick="document.getElementById('freeStickerUploadInput').click()">{{ __('add sticker') }}</button>
             <input type="file" id="freeStickerUploadInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;">
         @endif
 
         @if($canAddPostit)
-            <button id="openPostitModalBtn" class="btn-action" onclick="openStudioModalSafe()">{{ __('board.btn_add_note') }}</button>
+            <button id="openPostitModalBtn" class="btn-action" onclick="openStudioModalSafe()">{{ __('add a note') }}</button>
             @if(!$isOwnProfile)
-                <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">{{ __('board.btn_save') }}</button>
+                <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">{{ __('save') }}</button>
             @endif
         @elseif($isBoardLocked)
-            <button class="btn-action" disabled>{{ __('board.msg_board_locked') }}</button>
+            <button class="btn-action" disabled>{{ __('board is locked, sorry') }}</button>
         @elseif(auth()->check() && !$isOwnProfile && !$isFriendUser)
-            <button class="btn-action" disabled title="{{ __('board.msg_only_friends_title') }}">{{ __('board.msg_only_friends_btn') }}</button>
+            <button class="btn-action" disabled title="{{ __('only friends can leave notes on this board') }}">{{ __('only friends can edit each others\' boards') }}</button>
         @endif
     </div>
 
     @if($isOwnProfile)
     <div class="keychain-collection-drawer" id="collectionDrawer">
         <div class="drawer-header">
-            <h4>{{ __('board.drawer_title') }}</h4>
+            <h4>{{ __('keychains !!') }}</h4>
             <button type="button" class="drawer-close-btn" onclick="toggleCollectionDrawer()">✕</button>
         </div>
         <div class="drawer-body" id="drawerBadgesList"></div>
@@ -716,20 +716,18 @@
 <!-- POST-IT MİNİ STÜDYO MODAL -->
 <div class="modal-overlay" id="postitStudioModalUnique">
     <div class="studio-modal-box">
-        <h3 style="margin: 0; font-size: 16px; color: #1e4215; text-transform: lowercase;">{{ __('board.studio_title') }}</h3>
+        <h3 style="margin: 0; font-size: 16px; color: #1e4215; text-transform: lowercase;">{{ __('create your note !') }}</h3>
         
         <div class="studio-columns">
             <div class="studio-tools">
                 <div>
-                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('board.label_color') }}</label>
+                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('color:') }}</label>
                     <div class="color-selector" style="margin-top: 4px;">
-                        <!-- Orijinal 5 pastel renk -->
                         <div class="color-ball selected" style="background:#fdf5a6;" data-c="#fdf5a6"></div>
                         <div class="color-ball" style="background:#ffd1dc;" data-c="#ffd1dc"></div>
                         <div class="color-ball" style="background:#c6e085;" data-c="#c6e085"></div>
                         <div class="color-ball" style="background:#b5e2fa;" data-c="#b5e2fa"></div>
                         <div class="color-ball" style="background:#dfccf1;" data-c="#dfccf1"></div>
-                        <!-- Yeni 5 pastel renk -->
                         <div class="color-ball" style="background:#ffe2b3;" data-c="#ffe2b3"></div>
                         <div class="color-ball" style="background:#b8f2e6;" data-c="#b8f2e6"></div>
                         <div class="color-ball" style="background:#fcd5ce;" data-c="#fcd5ce"></div>
@@ -739,22 +737,22 @@
                 </div>
 
                 <div>
-                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('board.label_shape') }}</label>
+                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('shape:') }}</label>
                     <div class="shape-btn-group" style="margin-top: 4px;">
-                        <button type="button" class="shape-btn active" data-shape="size-square">{{ __('board.shape_square') }}</button>
-                        <button type="button" class="shape-btn" data-shape="size-portrait">{{ __('board.shape_portrait') }}</button>
-                        <button type="button" class="shape-btn" data-shape="size-landscape">{{ __('board.shape_landscape') }}</button>
+                        <button type="button" class="shape-btn active" data-shape="size-square">{{ __('square') }}</button>
+                        <button type="button" class="shape-btn" data-shape="size-portrait">{{ __('portrait') }}</button>
+                        <button type="button" class="shape-btn" data-shape="size-landscape">{{ __('landscape') }}</button>
                     </div>
                 </div>
 
                 <textarea id="uniqueTextInput" 
                           class="studio-input-box" 
-                          placeholder="{{ __('board.input_placeholder') }}" 
+                          placeholder="{{ __('write something cozy...') }}" 
                           maxlength="120" 
                           oninput="handleStudioTextInput(this.value)"></textarea>
 
                 <label class="btn-gentle-upload">
-                    {{ __('board.btn_upload_image') }}
+                    {{ __('add image / sticker') }}
                     <input type="file" id="uniqueFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;" onchange="handleStudioImageUpload(this)">
                 </label>
             </div>
@@ -765,21 +763,21 @@
                     
                     <div id="uniqueTextBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10; width: auto; max-width: 85%;">
                         <div class="postit-text-content" id="uniqueTextLayer" style="position:relative; font-size:18px; line-height: 1.2; word-break: break-word; white-space: pre-wrap; pointer-events: none;">haii</div>
-                        <div class="handle-btn handle-rotate" title="{{ __('board.handle_rotate') }}">↻</div>
-                        <div class="handle-btn handle-resize" title="{{ __('board.handle_resize') }}">⤡</div>
+                        <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
+                        <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
                     </div>
 
                     <div id="uniqueStickerBox" class="transform-box" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;"></div>
 
                     <div class="postit-author" id="uniqueAuthorLayer" style="position: absolute; bottom: 4px; left: 6px; font-size: 11px;"></div>
                 </div>
-                <span style="font-size:10px; color:#777; text-transform: lowercase;">{{ __('board.hint_drag') }}</span>
+                <span style="font-size:10px; color:#777; text-transform: lowercase;">{{ __('*drag to move') }}</span>
             </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 4px;">
-            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closeStudioModalSafe()">{{ __('board.btn_cancel') }}</button>
-            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinStudioNoteSafe()">{{ __('board.btn_ok') }}</button>
+            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closeStudioModalSafe()">{{ __('cancel') }}</button>
+            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinStudioNoteSafe()">{{ __('ok!') }}</button>
         </div>
     </div>
 </div>
@@ -791,20 +789,20 @@
     let isBoardLocked = @json($isBoardLocked);
 
     const I18N = {
-        saving: @json(__('board.js_saving')),
-        saved: @json(__('board.js_saved')),
-        editBoard: @json(__('board.btn_edit_board')),
-        save: @json(__('board.btn_save')),
-        saveFailed: @json(__('board.js_save_failed')),
-        hooksFull: @json(__('board.js_hooks_full')),
-        lockClosedTitle: @json(__('board.status_locked')),
-        lockOpenTitle: @json(__('board.status_open')),
-        handleDelete: @json(__('board.handle_delete')),
-        handleRotate: @json(__('board.handle_rotate')),
-        handleResize: @json(__('board.handle_resize')),
-        dragMove: @json(__('board.js_drag_move')),
-        lockedBadge: @json(__('board.js_locked_badge')),
-        defaultText: @json(__('board.js_default_text'))
+        saving: @json(__('saving...')),
+        saved: @json(__('saved !')),
+        editBoard: @json(__('edit board')),
+        save: @json(__('save')),
+        saveFailed: @json(__('save failed')),
+        hooksFull: @json(__('all 9 hooks are full! click on edit mode to free up a hook.')),
+        lockClosedTitle: @json(__('board is locked')),
+        lockOpenTitle: @json(__('board is open')),
+        handleDelete: @json(__('delete')),
+        handleRotate: @json(__('rotate')),
+        handleResize: @json(__('resize')),
+        dragMove: @json(__('click and move')),
+        lockedBadge: @json(__('locked')),
+        defaultText: @json(__('haii'))
     };
 
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
@@ -887,7 +885,8 @@
 
     window.closeStudioModalSafe = function() {
         const modal = document.getElementById('postitStudioModalUnique');
-        if (modal) modal.classList.remove('active');
+        if (!modal) return;
+        modal.classList.remove('active');
     };
 
     window.handleStudioImageUpload = function(input) {
