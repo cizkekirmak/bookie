@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="theme-color" content="#2e6f40">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('Login') }} - Bookie</title>
@@ -343,14 +345,37 @@
     </div>
 
     <script>
-        document.getElementById('cekmeceTab').addEventListener('click', function () {
-            document.getElementById('kutucukSarmalayici').classList.toggle('acik');
-        });
+    document.getElementById('cekmeceTab').addEventListener('click', function () {
+        document.getElementById('kutucukSarmalayici').classList.toggle('acik');
+    });
 
-        // indirButonu'na kendi indirme linkini/işlevini bağla
-        document.getElementById('indirButonu').addEventListener('click', function () {
-            // window.location.href = "{{ asset('downloads/bookie.apk') }}";
-        });
-    </script>
+    // Service Worker Kaydı
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js');
+    }
+
+    // PWA İndirme Olayını Yakala
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+    });
+
+    // Download Butonuna Tıklanınca
+    document.getElementById('indirButonu').addEventListener('click', async () => {
+        if (deferredPrompt) {
+            // Chrome/Edge kurulum penceresini fırlatır
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                document.getElementById('kutucukSarmalayici').classList.remove('acik');
+            }
+            deferredPrompt = null;
+        } else {
+            // Henüz tetiklenmediyse veya desteklenmiyorsa yönlendirme
+            alert("Uygulamayı yüklemek için Chrome adres çubuğunun sağındaki 'Yükle' simgesine basabilirsin! ✨");
+        }
+    });
+</script>
 </body>
 </html>
