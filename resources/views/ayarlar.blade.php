@@ -399,7 +399,7 @@
                 </div>
 
                 {{-- Avatar Yükleme Butonu --}}
-                <input type="file" name="avatar" id="avatar-input" accept="image/*" style="display: none;" onchange="previewImage(event)">
+                <input type="file" name="avatar" id="avatar-input" accept="image/*,.heic,.heif" style="display: none;" onchange="previewImage(event)">
                 <button type="button" class="choose-pic-btn" onclick="document.getElementById('avatar-input').click()">
                     {{ __('choose your best pic !') }}
                 </button>
@@ -422,16 +422,65 @@
     </div>
 
 <script>
-function previewImage(event) {
-    const reader = new FileReader();
-    reader.onload = function() {
-        const preview = document.getElementById('avatar-preview');
-        if (preview) {
-            preview.src = reader.result;
-        }
-    }
-    if (event.target.files[0]) {
-        reader.readAsDataURL(event.target.files[0]);
+// Mobilden gelen devasa fotoğrafları (ve HEIC/PNG'leri) form gitmeden önce hafif JPEG'e çeviren sıkıştırıcı
+function compressAvatar(file, maxSize = 400, quality = 0.85) {
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = function(e) {
+            const img = new Image();
+            img.src = e.target.result;
+            img.onload = function() {
+                let width = img.width;
+                let height = img.height;
+
+                // En-boy oranını koruyarak 400px sınırına çek
+                if (width > height) {
+                    if (width > maxSize) {
+                        height = Math.round((height * maxSize) / width);
+                        width = maxSize;
+                    }
+                } else {
+                    if (height > maxSize) {
+                        width = Math.round((width * maxSize) / height);
+                        height = maxSize;
+                    }
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                // Her zaman standart JPEG Blob'a dönüştür (HEIC veya dev boyutları yok eder)
+                canvas.toBlob((blob) => {
+                    resolve(new File([blob], "avatar.jpg", { type: "image/jpeg" }));
+                }, 'image/jpeg', quality);
+            };
+        };
+    });
+}
+
+// Dosya seçildiği anda çalışan önizleme ve anında sıkıştırma
+async function previewImage(event) {
+    const input = event.target;
+    if (!input.files || !input.files[0]) return;
+
+    const originalFile = input.files[0];
+    
+    // Tarayıcıda anında sıkıştır
+    const compressedFile = await compressAvatar(originalFile, 400, 0.85);
+
+    // Sıkıştırılmış küçük JPEG'i doğrudan input'un içine yerleştir (Sunucuya bu gidecek!)
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(compressedFile);
+    input.files = dataTransfer.files;
+
+    // Önizlemeyi güncelle
+    const preview = document.getElementById('avatar-preview');
+    if (preview) {
+        preview.src = URL.createObjectURL(compressedFile);
     }
 }
 

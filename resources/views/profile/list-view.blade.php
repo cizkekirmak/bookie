@@ -62,3 +62,14 @@ function updateDeleteButtonState() {
     }
 }
 </script>
+<style>
+@media (max-width: 1024px) {
+    #profile-list-view {
+        max-height: 60vh !important;
+        max-height: 60dvh !important; /* Mobil tarayıcı çubukları için dinamik yükseklik */
+        overflow-y: auto !important;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 24px !important;
+    }
+}
+</style>
