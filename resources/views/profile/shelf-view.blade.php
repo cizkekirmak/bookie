@@ -1613,7 +1613,7 @@
 
             wrap.innerHTML = `
             <div class="bag-badge-img-box">
-                <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
+                <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror='this.onerror=null; this.src="${FALLBACK_BADGE_SVG}";'>
                 ${!isUnlocked ? '<span class="bag-badge-lock">🔒</span>' : ''}
             </div>
             <span class="bag-badge-title">${titleText}</span>
