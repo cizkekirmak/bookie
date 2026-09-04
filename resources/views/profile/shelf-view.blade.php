@@ -736,11 +736,11 @@
                     <div class="keychain-hook-unit" data-slot="{{ $slot }}" onclick="handleHookSlotClick({{ $slot }})">
                         <div class="hook-nail"></div>
                         @if($badge)
-                            <img src="{{ asset('images/keychains/' . $badge['file']) }}" 
-                                 class="keychain-plush-img" 
-                                 data-key="{{ $key }}" 
-                                 title="{{ $badge['name'] ?? ($badge['title'] ?? '') }}"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/keychains/kitap.png') }}';">
+                            <img src="{{ asset('images/badges/' . $badge['file']) }}" 
+                                class="keychain-plush-img" 
+                                data-key="{{ $key }}" 
+                                title="{{ $badge['name'] ?? ($badge['title'] ?? '') }}"
+                                onerror="this.onerror=null; this.src='{{ asset('images/badges/maymun.png') }}';">
                         @else
                             <div class="empty-hook-slot" title="{{ $isOwnProfile ? __('empty hook') : '' }}"></div>
                         @endif
@@ -1612,21 +1612,21 @@
             wrap.className = `bag-badge-item ${isUnlocked ? 'unlocked' : 'locked'}`;
 
             wrap.innerHTML = `
-                <div class="bag-badge-img-box">
-                    <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
-                    ${!isUnlocked ? '<span class="bag-badge-lock">🔒</span>' : ''}
+            <div class="bag-badge-img-box">
+                <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
+                ${!isUnlocked ? '<span class="bag-badge-lock">🔒</span>' : ''}
+            </div>
+            <span class="bag-badge-title">${titleText}</span>
+            
+            <div class="bag-badge-tooltip">
+                <div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">
+                    ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
                 </div>
-                <span class="bag-badge-title">${titleText}</span>
-                
-                <div class="bag-badge-tooltip">
-                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">
-                        ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
-                    </div>
-                    <div style="font-size: 10px; opacity: 0.95; line-height: 1.2;">
-                        ${descText}
-                    </div>
+                <div style="font-size: 10px; opacity: 0.95; line-height: 1.2;">
+                    ${descText}
                 </div>
-            `;
+            </div>
+        `;
 
             if (isUnlocked && isEditingModeActive) {
                 wrap.onclick = () => selectBadgeFromBag(key, item);
