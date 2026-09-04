@@ -400,7 +400,7 @@
 
             .profile-main-content {
                 width: 100% !important;
-                max-width: 100% !important; /* Pano mobilde taşmadan tam yayılsın */
+                max-width: 100% !important;
                 height: auto !important;
                 min-height: 520px !important;
                 padding: 14px 10px !important;
@@ -572,7 +572,7 @@
                 </div>
             @endif
 
-            {{-- Friends Butonu --}}
+            {{-- Friends Butonu (Arka Plan Görselli) --}}
             <div style="width: 100%; border-top: 1.5px solid #deeaa5; padding-top: 20px; margin-top: 14px; display: flex; justify-content: center;">
                 <button 
                     type="button" 
@@ -582,7 +582,10 @@
                         display: flex; 
                         align-items: center; 
                         justify-content: space-between; 
-                        background: #deeaa5; 
+                        background-color: #deeaa5; 
+                        background-image: url('{{ asset('images/friends-bg.jpg') }}');
+                        background-size: cover;
+                        background-position: center;
                         border: 1.5px solid #2d5a27; 
                         border-radius: 12px; 
                         padding: 8px 14px; 
@@ -591,10 +594,10 @@
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); 
                         transition: all 0.2s ease;
                     "
-                    onmouseenter="this.style.background='#c5f58b'; this.style.transform='translateY(-1px)';"
-                    onmouseleave="this.style.background='#deeaa5'; this.style.transform='translateY(0)';"
+                    onmouseenter="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.12)';"
+                    onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.06)';"
                 >
-                    <span style="font-size: 15px; font-weight: bold; color: #1a3c11; display: flex; align-items: center; gap: 6px;">
+                    <span style="font-size: 15px; font-weight: bold; color: #1a3c11; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
                         🌱 {{ __('friends') }}
                     </span>
 
@@ -605,12 +608,14 @@
                         font-weight: bold; 
                         padding: 2px 8px; 
                         border-radius: 12px;
+                        box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                     ">
                         {{ $friendsCount }}
                     </span>
                 </button>
             </div>
-        {{-- Yıllık Okuma Hedefi Kartı --}}
+
+            {{-- Yıllık Okuma Hedefi Kartı --}}
             <div style="
                 width: 100%; 
                 margin-top: 14px; 
@@ -621,13 +626,13 @@
                 border: 1.5px solid #2d5a27; 
                 border-radius: 12px; 
                 padding: 10px 12px; 
-                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-                display: flex;
-                flex-direction: column;
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); 
+                display: flex; 
+                flex-direction: column; 
                 gap: 6px;
             ">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 14px; font-weight: bold; color: #1a3c11;">
+                    <span style="font-size: 14px; font-weight: bold; color: #1a3c11; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
                         🎯 {{ $currentYear ?? date('Y') }} {{ __('Goal') }}
                     </span>
                     @if(!empty($readingGoal))
@@ -638,6 +643,7 @@
                             font-weight: bold; 
                             padding: 2px 8px; 
                             border-radius: 12px;
+                            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                         ">
                             {{ $readThisYear ?? 0 }} / {{ $readingGoal->target_books }}
                         </span>
@@ -726,7 +732,7 @@
                 @include('profile.list-view')
             </div>
 
-            {{-- 2. YENİ PANO (BOARD) GÖRÜNÜMÜ (Bookshelf yerine geçen alan) --}}
+            {{-- 2. YENİ PANO (BOARD) GÖRÜNÜMÜ --}}
             <div id="profile-board-view">
                 @include('profile.shelf-view')
             </div>
@@ -959,34 +965,35 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <script>
     function saveReadingGoal(e) {
-    e.preventDefault();
-    const input = document.getElementById('reading_goal_input');
-    if (!input || !input.value) return;
+        e.preventDefault();
+        const input = document.getElementById('reading_goal_input');
+        if (!input || !input.value) return;
 
-    fetch("{{ route('profile.goal.set') }}", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-        },
-        body: JSON.stringify({ target_books: input.value })
-    })
-    .then(r => r.json())
-    .then(res => {
-        if (res.success) {
-            location.reload();
-        } else {
-            alert(res.error || 'Bir hata oluştu.');
-        }
-    })
-    .catch(() => alert('Hedef kaydedilemedi.'));
-}
-window.addEventListener('click', function(e) {
-    const modal = document.getElementById('friendsModal');
-    if (e.target === modal) {
-        closeFriendsModal();
+        fetch("{{ route('profile.goal.set') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+            },
+            body: JSON.stringify({ target_books: input.value })
+        })
+        .then(r => r.json())
+        .then(res => {
+            if (res.success) {
+                location.reload();
+            } else {
+                alert(res.error || 'Bir hata oluştu.');
+            }
+        })
+        .catch(() => alert('Hedef kaydedilemedi.'));
     }
-});
+
+    window.addEventListener('click', function(e) {
+        const modal = document.getElementById('friendsModal');
+        if (e.target === modal) {
+            closeFriendsModal();
+        }
+    });
 </script>
 
 @include('partials.chat')
