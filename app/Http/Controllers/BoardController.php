@@ -39,6 +39,14 @@ class BoardController extends Controller
             ]
         );
 
+        // KRİTİK: Sayfa yenilendiğinde Blade'e mutlaka saf dizi (array) gitmeli
+        if (is_string($board->board_items)) {
+            $board->board_items = json_decode($board->board_items, true) ?? [];
+        }
+        if (is_string($board->hook_slots)) {
+            $board->hook_slots = json_decode($board->hook_slots, true) ?? array_fill(0, 9, null);
+        }
+
         $currentUserId = auth()->id();
         $targetUserId = $user->id;
         $isOwner = auth()->check() && ($currentUserId === $targetUserId);
@@ -77,10 +85,12 @@ class BoardController extends Controller
 
         $board = UserBoard::firstOrCreate(['user_id' => $user->id]);
 
+        // Kilit kontrolü
         if ($board->is_locked && !$isOwner) {
             return response()->json(['error' => 'Bu pano kilitlenmiştir.'], 403);
         }
 
+        // Arkadaşlık kontrolü
         if (!$isOwner) {
             $isFriend = $this->checkFriendship($currentUser, $user);
             if (!$isFriend) {
@@ -99,7 +109,6 @@ class BoardController extends Controller
                 $board->is_locked = $request->boolean('is_locked');
             }
         } else {
-            // Arkadaş not eklediğinde/sildiğinde sadece board_items güncellenir
             $board->board_items = $incomingItems;
         }
 

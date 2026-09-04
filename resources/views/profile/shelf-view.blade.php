@@ -65,7 +65,6 @@
             overflow: hidden;
         }
 
-        /* 50PX BELİRGİN KİLİT SİMGESİ (locke.png / unlocked.png) */
         .board-lock-badge {
             position: absolute;
             top: 14px;
@@ -547,7 +546,7 @@
     $targetId = $user->id ?? 0;
     $isOwnProfile = auth()->check() && ($authId === $targetId);
 
-    // friendships tablosundan doğrudan arkadaşlık doğrulaması
+    // Friendships tablosu doğrudan kontrolü
     $isFriendUser = false;
     if (auth()->check() && !$isOwnProfile) {
         $isFriendUser = \DB::table('friendships')
@@ -565,8 +564,20 @@
     $isBoardLocked = $board->is_locked ?? false;
     $canAddPostit = $isOwnProfile || ($isFriendUser && !$isBoardLocked);
 
-    $hookSlots = (isset($board) && is_array($board->hook_slots)) ? $board->hook_slots : array_fill(0, 9, null);
-    $boardItems = (isset($board) && is_array($board->board_items)) ? $board->board_items : [];
+    // VERİTABANINDAN GELEN VERİYİ GARANTİLİ DİZİYE DÖNÜŞTÜRME
+    $rawItems = $board->board_items ?? [];
+    if (is_string($rawItems)) {
+        $boardItems = json_decode($rawItems, true) ?? [];
+    } else {
+        $boardItems = is_array($rawItems) ? $rawItems : [];
+    }
+
+    $rawHooks = $board->hook_slots ?? [];
+    if (is_string($rawHooks)) {
+        $hookSlots = json_decode($rawHooks, true) ?? array_fill(0, 9, null);
+    } else {
+        $hookSlots = is_array($rawHooks) ? $rawHooks : array_fill(0, 9, null);
+    }
 
     $achievements = $achievements ?? [
         'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
@@ -591,7 +602,6 @@
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
-            <!-- KİLİT BUTONU (locke.png / unlocked.png) -->
             <div class="board-lock-badge" id="boardLockBtn" 
                  title="{{ $isOwnProfile ? 'Ziyaretçilere Kilitle / Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
@@ -607,7 +617,6 @@
                         $loggedUsername = auth()->user()->username ?? '';
                         $authorText = $item['author'] ?? '';
 
-                        // Türkçe I/ı ve İ/i duyarsızlaştırması
                         $normalize = function($str) {
                             $str = str_replace(['I', 'İ'], ['ı', 'i'], $str);
                             return mb_strtolower($str, 'UTF-8');
@@ -621,7 +630,6 @@
                             str_contains($cleanAuthor, $cleanLogged)
                         );
 
-                        // Profil sahibi her şeyi, notu yazan kişi de kendi notunu düzenleyebilir
                         $canManage = $isOwnProfile || ($isAuthor && !$isBoardLocked);
                         $scale = $item['scale'] ?? 0.65;
                         $rot = $item['rotation'] ?? 0;
@@ -695,7 +703,6 @@
 
         @if($canAddPostit)
             <button id="openPostitModalBtn" class="btn-action">📌 ADD POST-IT</button>
-            {{-- Arkadaşın yaptığı değişiklikleri kaydetmesi için SAVE butonu --}}
             @if(!$isOwnProfile)
                 <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">💾 SAVE</button>
             @endif
@@ -763,7 +770,6 @@
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <!-- ASLA BASIK ÇIKMAYAN ORANTILI STICKER KUTUSU -->
                     <div id="stickerTransformBox" class="transform-box" style="display:none; top:55px; left:35px; width:70px; height:auto;">
                         <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:auto; display:block;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
@@ -862,7 +868,7 @@
         });
     }
 
-    // --- DOĞRUDAN VERİTABANINA GERÇEK ASYNC KAYIT ---
+    // --- VERİTABANINA ASYNC KAYIT ---
     async function saveBoardToDatabase(triggerBtn = null) {
         if (triggerBtn) {
             triggerBtn.innerText = '⏳ Kaydediliyor...';
@@ -949,7 +955,7 @@
         }
     }
 
-    // --- SAYFA AÇILDIĞINDA MEVCUT NOTLARI CANLANDIR (LOCALSTORAGE KULLANILMAZ) ---
+    // --- DOMContentLoaded: SADECE VERİTABANINDAN GELENLERİ ETKİNLEŞTİRİR ---
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const canManage = wrapper.dataset.canManage === '1';
@@ -1241,7 +1247,6 @@
                     let newWidth = Math.max(20, startWidth + delta);
                     box.style.width = newWidth + 'px';
 
-                    // Görselin oranını kilitleyip basıklığı önler
                     if (boxId === 'stickerTransformBox') {
                         box.style.height = (newWidth * stickerAspectRatio) + 'px';
                     }
@@ -1409,7 +1414,6 @@
         previewSticker.src = '';
         fileInput.value = '';
 
-        // Arkadaş eklediyse SAVE butonunu çıkar
         if (!IS_OWN_PROFILE) {
             showFriendSaveButton();
         }
