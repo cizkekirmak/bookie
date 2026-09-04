@@ -1000,6 +1000,12 @@
 
     let isEditingModeActive = false;
     let globalMaxZIndex = 100;
+    document.querySelectorAll('#boardStage .cork-postit, #boardStage .free-sticker-wrapper, #corkboardArea .cork-postit, #corkboardArea .free-sticker-wrapper').forEach(el => {
+        const z = parseInt(window.getComputedStyle(el).zIndex) || parseInt(el.style.zIndex) || 10;
+        if (z > globalMaxZIndex) {
+            globalMaxZIndex = z;
+        }
+    });
     let studioStickerRatio = 1;
 
     function isMobileView() {
@@ -1301,6 +1307,8 @@
         postitWrapper.dataset.rotation = rot;
         postitWrapper.style.transform = `scale(${initialScale}) rotate(${rot}deg)`;
         bringToFront(postitWrapper);
+        globalMaxZIndex += 2;
+        postitWrapper.style.zIndex = globalMaxZIndex;
 
         const clonedCard = previewCard.cloneNode(true);
         clonedCard.removeAttribute('id');
@@ -1660,7 +1668,7 @@
                 left: item.style.left,
                 scale: item.dataset.scale || '0.65',
                 rotation: item.dataset.rotation || '0',
-                zIndex: item.style.zIndex || 10,
+                zIndex: parseInt(item.style.zIndex) || 10,
                 html: inner.innerHTML,
                 author: authorText
             });
@@ -1676,7 +1684,7 @@
                 width: wrap.style.width,
                 height: wrap.style.height,
                 transform: wrap.style.transform,
-                zIndex: wrap.style.zIndex || 10
+                zIndex: parseInt(wrap.style.zIndex) || 10
             });
         });
 
