@@ -104,6 +104,22 @@
         filter: grayscale(60%);
     }
 
+    .mobile-edit-notice {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        margin-top: 18px;
+        background: #fdf5a6;
+        border: 1.5px dashed #7ea863;
+        color: #2b461c;
+        padding: 8px 18px;
+        border-radius: 16px;
+        font-size: 13px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+        text-align: center;
+    }
+
     .cork-postit {
         position: absolute;
         cursor: default;
@@ -435,7 +451,6 @@
     }
 
     /* TOOLTIP / BİLGİ BALONU */
-    /* VARSAYILAN TOOLTIP: YUKARI DOĞRU AÇILIR (Orta ve alt sıradakiler için) */
     .bag-badge-tooltip {
         visibility: hidden;
         opacity: 0;
@@ -458,7 +473,6 @@
         transition: opacity 0.2s ease, transform 0.2s ease;
     }
 
-    /* Varsayılan Ok: Aşağıya bakar (baloncuğun alt kenarında) */
     .bag-badge-tooltip::after {
         content: "";
         position: absolute;
@@ -476,13 +490,11 @@
         transform: translateX(-50%) translateY(-3px) !important;
     }
 
-    /* SADECE İLK SIRADAKİLER (İlk 4 rozet): AŞAĞI DOĞRU AÇILIR */
     .bag-badge-item:nth-child(-n+4) .bag-badge-tooltip {
         bottom: auto;
         top: calc(100% + 8px);
     }
 
-    /* İlk sıradakilerin oku yukarı bakar (baloncuğun üst kenarında) */
     .bag-badge-item:nth-child(-n+4) .bag-badge-tooltip::after {
         top: auto;
         bottom: 100%;
@@ -609,15 +621,93 @@
     .transform-box.is-selected { border-color: #2d5a27; }
 
     @media (max-width: 1024px) {
-        .corkboard-main-wrapper { flex-direction: column; align-items: center; gap: 16px; }
-        .corkboard-frame { max-width: 100%; border-radius: 10px; }
-        .keychain-area-wrapper { width: 100%; margin-top: 6px; }
-        .keychain-grid-9 { display: flex; flex-direction: row; overflow-x: auto; width: 100%; justify-content: flex-start; padding: 10px 6px; gap: 12px; }
-        .keychain-hook-unit { width: 56px; height: 78px; flex-shrink: 0; }
-        .keychain-collection-drawer { width: 92%; max-height: 70vh; }
-        .drawer-body { grid-template-columns: repeat(3, 1fr); }
-        .desktop-only-action { display: none !important; }
-        .studio-columns { flex-direction: column; }
+        .board-page-container {
+            padding: 0 4px 40px 4px;
+            margin: 5px auto;
+            width: 100%;
+            overflow-x: hidden;
+        }
+
+        .corkboard-main-wrapper { 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 14px; 
+            width: 100%;
+        }
+
+        /* Panoyu Masaüstü Oranında Sabitleyip Mobilde Orantılı Küçültme Alanı */
+        .corkboard-frame { 
+            width: 100% !important;
+            max-width: 100% !important;
+            aspect-ratio: 16 / 10 !important;
+            border-radius: 12px; 
+            position: relative;
+            overflow: hidden !important;
+        }
+
+        /* Post-it'leri ve Çıkartmaları Ekran Genişliğine Göre Küçült */
+        /* Masaüstündeki 780px tahtaya göre mobilde yaklaşık 0.48x oranında minyatürleşir */
+        .cork-postit {
+            zoom: 0.50; /* Modern tarayıcılarda tüm post-it öğelerini ve fontlarını oranlar */
+            pointer-events: none !important;
+        }
+
+        .free-sticker-wrapper {
+            zoom: 0.50;
+            pointer-events: none !important;
+        }
+
+        /* Safari ve zoom desteklemeyen mobil tarayıcılar için yedekleme */
+        @supports not (zoom: 0.5) {
+            .cork-postit, .free-sticker-wrapper {
+                transform: scale(calc(var(--mobile-scale, 1) * 0.52)) !important;
+            }
+        }
+
+        .keychain-area-wrapper { 
+            width: 100%; 
+            margin-top: 6px; 
+        }
+
+        .keychain-grid-9 { 
+            display: flex; 
+            flex-direction: row; 
+            overflow-x: auto; 
+            width: 100%; 
+            justify-content: flex-start; 
+            padding: 10px 6px; 
+            gap: 12px; 
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .keychain-hook-unit { 
+            width: 56px; 
+            height: 78px; 
+            flex-shrink: 0; 
+        }
+
+        .keychain-collection-drawer { 
+            width: 92%; 
+            max-height: 70vh; 
+        }
+
+        .drawer-body { 
+            grid-template-columns: repeat(3, 1fr); 
+        }
+        
+        /* Mobilde buton barını ve kilitleri gizle, sadece uyarıyı göster */
+        .board-bottom-bar { 
+            display: none !important; 
+        }
+        .mobile-edit-notice { 
+            display: inline-flex !important; 
+        }
+        .board-lock-badge {
+            display: none !important;
+        }
+        .handle-btn {
+            display: none !important;
+        }
     }
 </style>
 
@@ -658,7 +748,6 @@
     }
     $hookSlots = is_array($rawHooks) ? $rawHooks : array_fill(0, 9, null);
 
-    // Controller'dan gelen $keychains veya $achievements verisini al
     $achievementsList = $keychains ?? ($achievements ?? []);
 @endphp
 
@@ -757,7 +846,7 @@
         </div>
     </div>
 
-    <!-- ALT BUTON BARI -->
+    <!-- ALT BUTON BARI (Masaüstü) -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
             <button id="toggleEditBtn" class="btn-action desktop-only-action">{{ __('edit board') }}</button>
@@ -775,6 +864,13 @@
         @elseif(auth()->check() && !$isOwnProfile && !$isFriendUser)
             <button class="btn-action" disabled title="{{ __('only friends can leave notes on this board') }}">{{ __('only friends can edit each others\' boards') }}</button>
         @endif
+    </div>
+
+    <!-- MOBİL GÖRÜNÜM UYARISI -->
+    <div style="display: flex; justify-content: center; width: 100%;">
+        <div class="mobile-edit-notice">
+            💻 {{ __('switch to a computer to edit your board') }}
+        </div>
     </div>
 
     @if($isOwnProfile)
@@ -901,13 +997,17 @@
     let globalMaxZIndex = 100;
     let studioStickerRatio = 1;
 
+    function isMobileView() {
+        return window.innerWidth <= 1024;
+    }
+
     function bringToFront(element) {
         globalMaxZIndex++;
         element.style.zIndex = globalMaxZIndex;
     }
 
     function showFriendSaveButton() {
-        if (!IS_OWN_PROFILE) {
+        if (!IS_OWN_PROFILE && !isMobileView()) {
             const btn = document.getElementById('friendSaveBtn');
             if (btn) btn.style.display = 'inline-block';
         }
@@ -930,6 +1030,7 @@
     };
 
     window.openStudioModalSafe = function() {
+        if (isMobileView()) return;
         const modal = document.getElementById('postitStudioModalUnique');
         if (!modal) return;
 
@@ -1188,6 +1289,7 @@
 
     function setupPostitControls(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
+            if (isMobileView()) return;
             if (IS_OWN_PROFILE && !isEditingModeActive) return;
             if (!IS_OWN_PROFILE && !canEdit) return;
             
@@ -1205,6 +1307,7 @@
         if (deleteBtn) {
             deleteBtn.onclick = function(e) {
                 e.stopPropagation();
+                if (isMobileView()) return;
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 wrapper.remove();
                 if (!IS_OWN_PROFILE) showFriendSaveButton();
@@ -1213,6 +1316,7 @@
 
         if (resizeBtn) {
             resizeBtn.addEventListener('mousedown', (e) => {
+                if (isMobileView()) return;
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 e.stopPropagation();
                 e.preventDefault();
@@ -1242,6 +1346,7 @@
 
         if (rotateBtn) {
             rotateBtn.addEventListener('mousedown', (e) => {
+                if (isMobileView()) return;
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 e.stopPropagation();
                 e.preventDefault();
@@ -1305,6 +1410,7 @@
         const resBtn = wrap.querySelector('.handle-resize');
 
         wrap.addEventListener('mousedown', (e) => {
+            if (isMobileView()) return;
             if (IS_OWN_PROFILE && !isEditingModeActive) return;
             if (e.target.classList.contains('handle-btn')) return;
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
@@ -1314,6 +1420,7 @@
 
         if (delBtn) {
             delBtn.addEventListener('click', (e) => {
+                if (isMobileView()) return;
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 e.stopPropagation();
                 wrap.remove();
@@ -1322,6 +1429,7 @@
 
         if (resBtn) {
             resBtn.addEventListener('mousedown', (e) => {
+                if (isMobileView()) return;
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 e.stopPropagation();
                 e.preventDefault();
@@ -1347,6 +1455,7 @@
 
         if (rotBtn) {
             rotBtn.addEventListener('mousedown', (e) => {
+                if (isMobileView()) return;
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 e.stopPropagation();
                 e.preventDefault();
@@ -1401,6 +1510,7 @@
     }
 
     function handleHookSlotClick(slotNum) {
+        if (isMobileView()) return;
         if (!IS_OWN_PROFILE || !isEditingModeActive) return;
         const slotElem = document.querySelector(`.keychain-hook-unit[data-slot="${slotNum}"]`);
         const existingImg = slotElem.querySelector('.keychain-plush-img');
@@ -1422,6 +1532,7 @@
         element.ondragstart = () => false;
 
         element.onmousedown = function(e) {
+            if (isMobileView()) return;
             if (IS_OWN_PROFILE && !isEditingModeActive) return;
             if (e.target.classList.contains('handle-btn')) return;
 
@@ -1465,7 +1576,6 @@
         };
     }
 
-    // --- VERİTABANINA ASYNC KAYIT ---
     async function saveBoardToDatabase(triggerBtn = null) {
         if (triggerBtn) {
             triggerBtn.innerText = I18N.saving;
@@ -1612,21 +1722,21 @@
             wrap.className = `bag-badge-item ${isUnlocked ? 'unlocked' : 'locked'}`;
 
             wrap.innerHTML = `
-            <div class="bag-badge-img-box">
-                <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror='this.onerror=null; this.src="${FALLBACK_BADGE_SVG}";'>
-                ${!isUnlocked ? '<span class="bag-badge-lock">🔒</span>' : ''}
-            </div>
-            <span class="bag-badge-title">${titleText}</span>
-            
-            <div class="bag-badge-tooltip">
-                <div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">
-                    ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
+                <div class="bag-badge-img-box">
+                    <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${titleText}" onerror='this.onerror=null; this.src="${FALLBACK_BADGE_SVG}";'>
+                    ${!isUnlocked ? '<span class="bag-badge-lock">🔒</span>' : ''}
                 </div>
-                <div style="font-size: 10px; opacity: 0.95; line-height: 1.2;">
-                    ${descText}
+                <span class="bag-badge-title">${titleText}</span>
+                
+                <div class="bag-badge-tooltip">
+                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">
+                        ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
+                    </div>
+                    <div style="font-size: 10px; opacity: 0.95; line-height: 1.2;">
+                        ${descText}
+                    </div>
                 </div>
-            </div>
-        `;
+            `;
 
             if (isUnlocked && isEditingModeActive) {
                 wrap.onclick = () => selectBadgeFromBag(key, item);
