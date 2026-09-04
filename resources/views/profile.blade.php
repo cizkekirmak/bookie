@@ -759,7 +759,7 @@
 
     {{-- SAĞDAKİ MOBİL PROFİL POST-IT BUTONU & OVERLAY --}}
     <div class="mobile-profile-tab" id="openProfileDrawerBtn">
-        <span>📌 {{ __('Profile') }}</span>
+        <span>{{ __('Profile') }}</span>
     </div>
     <div class="mobile-profile-overlay hidden" id="profileDrawerOverlay"></div>
 
