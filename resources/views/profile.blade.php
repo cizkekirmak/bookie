@@ -321,19 +321,19 @@
                 flex-direction: column !important;
                 align-items: center !important;
                 background-color: transparent !important;
-                padding: 16px 8px 100px 8px !important;
-                overflow-x: hidden !important;
+                padding: 12px 8px 80px 8px !important;
+                overflow: hidden !important;
             }
 
             .profile-sidebar-panel {
                 position: fixed !important;
-                top: 68px !important; /* Header'ın mobil yüksekliği kadar aşağıdan başlar */
+                top: 68px !important;
                 right: 0 !important;
                 left: auto !important;
                 width: 82vw !important;
                 max-width: 320px !important;
-                height: calc(100vh - 68px) !important; /* Kalan ekran kadar uzanır */
-                height: calc(100dvh - 68px) !important; /* Mobil tarayıcı çubukları için dinamik yükseklik */
+                height: calc(100vh - 68px) !important;
+                height: calc(100dvh - 68px) !important;
                 max-height: calc(100vh - 68px) !important;
                 border-radius: 16px 0 0 16px !important;
                 border-left: 2px solid #2d5a27 !important;
@@ -402,19 +402,21 @@
                 transform: rotate(-1.5deg);
             }
 
+            /* BEYAZ ALANIN MOBİLDE HER İKİ GÖRÜNÜMDE DE BOYUTUNU SABİTLEME */
             .profile-main-content {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: auto !important;
-                min-height: 520px !important;
-                padding: 14px 10px !important;
+                height: calc(100vh - 90px) !important;
+                height: calc(100dvh - 90px) !important;
+                max-height: calc(100dvh - 90px) !important;
+                padding: 14px 10px 10px 10px !important;
                 border: 2px solid #4c7237 !important;
                 border-radius: 16px !important;
                 background-color: #f7faf5 !important;
                 box-shadow: 0 4px 16px rgba(0,0,0,0.08) !important;
                 display: flex !important;
                 flex-direction: column !important;
-                overflow: visible !important;
+                overflow: hidden !important;
                 flex: none !important;
             }
 
@@ -423,12 +425,27 @@
                 flex-direction: row !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                margin-bottom: 12px !important;
+                margin-bottom: 10px !important;
                 flex-shrink: 0 !important;
             }
 
             .profile-main-content h3 {
                 font-size: 19px !important;
+            }
+
+            /* İKİ SEKMEYİ DE BEYAZ ALANIN İÇİNDE KAYDIRMA */
+            #profile-list-view {
+                flex: 1 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                min-height: 0 !important;
+            }
+
+            #profile-board-view {
+                flex: 1 !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+                min-height: 0 !important;
             }
         }
     </style>
@@ -694,8 +711,8 @@
                                 border-radius: 6px; 
                                 font-size: 12px; 
                                 font-weight: bold; 
-                                cursor: pointer;
-                                font-family: 'Unkempt', cursive;
+                                cursor: pointer; 
+                                font-family: 'Unkempt', cursive; 
                             "
                         >
                             {{ __('Save') }}
