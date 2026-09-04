@@ -42,6 +42,12 @@
             overflow-x: hidden;
         }
 
+        button, a, label, span, img {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
+
         .dis-kapsayici {
             display: flex;
             flex-direction: column;
@@ -70,7 +76,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 6px rgba(44, 159, 76, 0.64);
             font-family: "Henny Penny", cursive;
-            width: 100%;
+            width: 280px;
             position: relative;
             z-index: 5;
         }
@@ -80,6 +86,7 @@
             margin-bottom: 2px;
             color: #333;
             font-size: 17px;
+            cursor: pointer;
         }
 
         .kutucuk input {
@@ -106,7 +113,9 @@
             transition: background-color 0.2s ease;
         }
 
-        .kutucuk button:hover { background-color: #235631; }
+        .kutucuk button:hover { 
+            background-color: #235631; 
+        }
 
         .alt-linkler {
             margin-top: 18px;
@@ -119,21 +128,35 @@
         /* --- DEFTER AYRACI --- */
         .postit-tab-container {
             position: absolute;
-            top: 40px;
-            right: 0;
-            z-index: 100;
+            top: 55px;
+            left: 0;
+            z-index: 1; /* Login kutusunun arkasında */
             display: flex;
             align-items: center;
-            transform: translateX(38px);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            /* 180px gövde + 38px kulakçık = 218px. 280 - 218 = 62px. */
+            transform: translateX(62px); 
+            transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         /* Tıklanınca sağa fırlar */
         .postit-tab-container.open {
-            transform: translateX(100%);
+            transform: translateX(280px);
         }
 
-        /* Kulakçık */
+        /* Sarı Not Kağıdı (Solda) */
+        .postit-content {
+            width: 180px;
+            background: #fdf5a6;
+            border: 2px solid #5a7d3b;
+            border-radius: 0 12px 12px 0;
+            padding: 12px 10px;
+            text-align: center;
+            font-family: 'Unkempt', cursive;
+            box-shadow: 3px 4px 10px rgba(0,0,0,0.15);
+            flex-shrink: 0;
+        }
+
+        /* Kulakçık (Sağ Uçta) */
         .postit-handle {
             width: 38px;
             height: 48px;
@@ -146,21 +169,9 @@
             justify-content: center;
             font-size: 18px;
             cursor: pointer;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+            box-shadow: 3px 2px 5px rgba(0,0,0,0.12);
             flex-shrink: 0;
-        }
-
-        /* Dışarı fırlayan kart */
-        .postit-content {
-            width: 170px;
-            background: #fdf5a6;
-            border: 2px solid #5a7d3b;
-            border-radius: 12px;
-            padding: 12px 10px;
-            text-align: center;
-            font-family: 'Unkempt', cursive;
-            box-shadow: 4px 4px 12px rgba(0,0,0,0.18);
-            margin-left: 6px;
+            margin-left: -2px;
         }
 
         .btn-app-install {
@@ -181,7 +192,7 @@
             background: #235631;
         }
 
-        /* Yüklü uygulamada ayracı tamamen gizle */
+        /* Uygulama yüklüyse ayracı gizle */
         @media all and (display-mode: standalone) {
             .postit-tab-container {
                 display: none !important;
@@ -238,11 +249,8 @@
                 </form>
             </div>
 
-            {{-- DEFTER AYRACI --}}
+            {{-- ARKADAKİ DEFTER AYRACI --}}
             <div class="postit-tab-container" id="postitTab">
-                <div class="postit-handle" onclick="togglePostit(event)">
-                    📲
-                </div>
                 <div class="postit-content">
                     <div style="font-size: 13px; font-weight: bold; color: #1a562b; line-height: 1.2;">
                         download the bookieapp !!
@@ -250,6 +258,9 @@
                     <button type="button" class="btn-app-install" onclick="installAppAction()">
                         {{ __('install now') }} 📲
                     </button>
+                </div>
+                <div class="postit-handle" onclick="togglePostit(event)">
+                    📲
                 </div>
             </div>
 
@@ -280,26 +291,8 @@
             }
         });
 
-        // Android / Chrome için PWA tetikleyici
-        let deferredPrompt;
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
         function installAppAction() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        const tab = document.getElementById('postitTab');
-                        if (tab) tab.style.display = 'none';
-                    }
-                    deferredPrompt = null;
-                });
-            } else {
-                alert("iPhone için: Safari'de alttaki 'Paylaş' simgesine basıp 'Ana Ekrana Ekle' diyebilirsin! ✨");
-            }
+            alert("Bookie uygulamasını telefonuna eklemek için Safari/Chrome menüsünden 'Ana Ekrana Ekle' seçeneğini seçebilirsin! ✨");
         }
     </script>
 </body>
