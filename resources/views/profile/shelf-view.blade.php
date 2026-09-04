@@ -435,6 +435,7 @@
     }
 
     /* TOOLTIP / BİLGİ BALONU */
+    /* VARSAYILAN TOOLTIP: YUKARI DOĞRU AÇILIR (Orta ve alt sıradakiler için) */
     .bag-badge-tooltip {
         visibility: hidden;
         opacity: 0;
@@ -446,16 +447,18 @@
         color: #ffffff;
         text-align: center;
         padding: 6px 10px;
-        border-radius: 8px;
+        border-radius: 10px;
         font-size: 11px;
         font-family: 'Unkempt', cursive;
         white-space: normal;
-        width: 130px;
+        width: 140px;
         z-index: 100005;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
         pointer-events: none;
         transition: opacity 0.2s ease, transform 0.2s ease;
     }
+
+    /* Varsayılan Ok: Aşağıya bakar (baloncuğun alt kenarında) */
     .bag-badge-tooltip::after {
         content: "";
         position: absolute;
@@ -466,10 +469,28 @@
         border-style: solid;
         border-color: #255719 transparent transparent transparent;
     }
+
     .bag-badge-item:hover .bag-badge-tooltip {
         visibility: visible !important;
         opacity: 1 !important;
         transform: translateX(-50%) translateY(-3px) !important;
+    }
+
+    /* SADECE İLK SIRADAKİLER (İlk 4 rozet): AŞAĞI DOĞRU AÇILIR */
+    .bag-badge-item:nth-child(-n+4) .bag-badge-tooltip {
+        bottom: auto;
+        top: calc(100% + 8px);
+    }
+
+    /* İlk sıradakilerin oku yukarı bakar (baloncuğun üst kenarında) */
+    .bag-badge-item:nth-child(-n+4) .bag-badge-tooltip::after {
+        top: auto;
+        bottom: 100%;
+        border-color: transparent transparent #255719 transparent;
+    }
+
+    .bag-badge-item:nth-child(-n+4):hover .bag-badge-tooltip {
+        transform: translateX(-50%) translateY(3px) !important;
     }
 
     .modal-overlay {
@@ -1598,10 +1619,10 @@
                 <span class="bag-badge-title">${titleText}</span>
                 
                 <div class="bag-badge-tooltip">
-                    <div style="font-weight: bold; margin-bottom: 2px;">
+                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">
                         ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
                     </div>
-                    <div style="font-size: 10px; opacity: 0.9;">
+                    <div style="font-size: 10px; opacity: 0.95; line-height: 1.2;">
                         ${descText}
                     </div>
                 </div>
