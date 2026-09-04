@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Notifications\FriendRequestRejected;
 use App\Notifications\FriendRequestAccepted;
-use App\Models\Friendship;
+use App\Models\friendship;
 use App\Models\User;
 
 class FriendshipController extends Controller
@@ -20,22 +20,19 @@ class FriendshipController extends Controller
             return back();
         }
 
-        // Önceden var olan ilişkiyi ara
-        $friendship = Friendship::where(function ($q) use ($authId, $targetId) {
+        $friendship = friendship::where(function ($q) use ($authId, $targetId) {
             $q->where('user_id', $authId)->where('friend_id', $targetId);
         })->orWhere(function ($q) use ($authId, $targetId) {
             $q->where('user_id', $targetId)->where('friend_id', $authId);
         })->first();
 
         if (!$friendship) {
-            // Hiç istek yoksa yeni istek oluştur
-            Friendship::create([
-                'user_id' => $authId,
+            friendship::create([
+                'user_id'   => $authId,
                 'friend_id' => $targetId,
-                'status' => 'pending',
+                'status'    => 'pending',
             ]);
         } elseif ($friendship->status === 'pending' && $friendship->user_id === $authId) {
-            // Biz istek atmışsak ve bekliyorsa, butona tekrar basıldığında isteği iptal et
             $friendship->delete();
         }
 
@@ -43,32 +40,40 @@ class FriendshipController extends Controller
     }
 
     // İsteği Kabul Et
-public function acceptRequest($id)
-{
-    $authId = auth()->id();
-    $targetId = (int)$id;
+    public function acceptRequest($id)
+    {
+        $authId = auth()->id();
+        $targetId = (int)$id;
 
-    // 1. İsteği atan kullanıcıyı doğrudan bul
-    $sender = \App\Models\User::find($targetId);
+        // Bize gelen bekleyen isteği bul ve onayla
+        $friendship = friendship::where('user_id', $targetId)
+            ->where('friend_id', $authId)
+            ->where('status', 'pending')
+            ->first();
 
-    // 2. Bildirimi zorla gönder
-    if ($sender) {
-        $sender->notify(new \App\Notifications\FriendRequestAccepted(auth()->user()));
+        if ($friendship) {
+            $friendship->update(['status' => 'accepted']);
+
+            $sender = User::find($targetId);
+            if ($sender) {
+                $sender->notify(new FriendRequestAccepted(auth()->user()));
+            }
+        }
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(["success" => true]);
+        }
+
+        return back();
     }
 
-    // 3. Bildirim tablosuna yazıp yazmadığını ekranda hemen gör
-    dd([
-        'Bulunan Kullanıcı' => $sender ? $sender->toArray() : 'Kullanıcı bulunamadı!',
-        'Son Eklenen Bildirim' => \DB::table('notifications')->latest()->first()
-    ]);
-}
-
+    // İsteği Reddet
     public function rejectRequest($id)
     {
         $authId = auth()->id();
         $targetId = (int)$id;
 
-        $friendship = Friendship::where('user_id', $targetId)
+        $friendship = friendship::where('user_id', $targetId)
             ->where('friend_id', $authId)
             ->where('status', 'pending')
             ->first();
@@ -84,7 +89,7 @@ public function acceptRequest($id)
 
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json(["success" => true]);
-        } 
+        }
 
         return back();
     }
@@ -95,7 +100,7 @@ public function acceptRequest($id)
         $authId = auth()->id();
         $targetId = (int)$id;
 
-        $friendship = Friendship::where(function ($q) use ($authId, $targetId) {
+        $friendship = friendship::where(function ($q) use ($authId, $targetId) {
             $q->where('user_id', $authId)->where('friend_id', $targetId);
         })->orWhere(function ($q) use ($authId, $targetId) {
             $q->where('user_id', $targetId)->where('friend_id', $authId);
@@ -104,7 +109,7 @@ public function acceptRequest($id)
         if ($friendship) {
             $friendship->delete();
         }
-        
+
         if (request()->ajax() || request()->wantsJson()) {
             return response()->json(["success" => true]);
         }
