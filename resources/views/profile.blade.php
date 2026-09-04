@@ -610,7 +610,96 @@
                     </span>
                 </button>
             </div>
+        {{-- Yıllık Okuma Hedefi Kartı --}}
+            <div style="
+                width: 100%; 
+                margin-top: 14px; 
+                background-color: #deeaa5;
+                background-image: url('{{ asset('images/goal-bg.jpg') }}');
+                background-size: cover;
+                background-position: center;
+                border: 1.5px solid #2d5a27; 
+                border-radius: 12px; 
+                padding: 10px 12px; 
+                box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
+            ">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 14px; font-weight: bold; color: #1a3c11;">
+                        🎯 {{ $currentYear ?? date('Y') }} {{ __('Goal') }}
+                    </span>
+                    @if(!empty($readingGoal))
+                        <span style="
+                            background: #2d5a27; 
+                            color: #ffffff; 
+                            font-size: 11px; 
+                            font-weight: bold; 
+                            padding: 2px 8px; 
+                            border-radius: 12px;
+                        ">
+                            {{ $readThisYear ?? 0 }} / {{ $readingGoal->target_books }}
+                        </span>
+                    @endif
+                </div>
 
+                @if(!empty($readingGoal))
+                    {{-- İlerleme Çubuğu --}}
+                    <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.12); border-radius: 6px; overflow: hidden; margin-top: 2px;">
+                        <div style="height: 100%; width: {{ $goalProgress ?? 0 }}%; background: #255719; border-radius: 6px; transition: width 0.4s ease;"></div>
+                    </div>
+                    <div style="text-align: right; font-size: 10px; color: #1a3c11; font-weight: bold;">
+                        %{{ $goalProgress ?? 0 }} {{ __('completed') }}
+                    </div>
+                @elseif($isOwner ?? ($isOwnProfile ?? false))
+                    {{-- Hedef Belirleme Formu (Yılda 1 kez girilebilir) --}}
+                    <form onsubmit="saveReadingGoal(event)" style="display: flex; gap: 6px; margin-top: 4px;">
+                        @csrf
+                        <input 
+                            type="number" 
+                            id="reading_goal_input" 
+                            min="1" 
+                            max="500" 
+                            placeholder="{{ __('Set goal...') }}" 
+                            required
+                            style="
+                                width: 100%; 
+                                font-size: 12px; 
+                                padding: 4px 8px; 
+                                border-radius: 6px; 
+                                border: 1.5px solid #2d5a27; 
+                                background: rgba(255,255,255,0.85); 
+                                outline: none;
+                                font-family: 'Unkempt', cursive;
+                            "
+                        >
+                        <button 
+                            type="submit" 
+                            style="
+                                background: #2d5a27; 
+                                color: white; 
+                                border: none; 
+                                padding: 4px 10px; 
+                                border-radius: 6px; 
+                                font-size: 12px; 
+                                font-weight: bold; 
+                                cursor: pointer;
+                                font-family: 'Unkempt', cursive;
+                            "
+                        >
+                            {{ __('Save') }}
+                        </button>
+                    </form>
+                    <span style="font-size: 9px; color: #355e28; font-style: italic;">
+                        *{{ __('Can only be set once a year') }}
+                    </span>
+                @else
+                    <span style="font-size: 11px; color: #355e28; font-style: italic; text-align: center; margin-top: 2px;">
+                        {{ __('No goal set for this year.') }}
+                    </span>
+                @endif
+            </div>
         </aside>
 
         {{-- SAĞ İÇERİK ALANI --}}
@@ -869,6 +958,29 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <script>
+    function saveReadingGoal(e) {
+    e.preventDefault();
+    const input = document.getElementById('reading_goal_input');
+    if (!input || !input.value) return;
+
+    fetch("{{ route('profile.goal.set') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({ target_books: input.value })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res.success) {
+            location.reload();
+        } else {
+            alert(res.error || 'Bir hata oluştu.');
+        }
+    })
+    .catch(() => alert('Hedef kaydedilemedi.'));
+}
 window.addEventListener('click', function(e) {
     const modal = document.getElementById('friendsModal');
     if (e.target === modal) {

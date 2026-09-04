@@ -352,3 +352,4 @@ Route::get('/lang/{locale}', function (Request $request, $locale) {
 })->name('lang.switch');
 
 Route::post('/board/save/{user}', [BoardController::class, 'save'])->middleware('auth')->name('board.save');
+Route::post('/profile/goal', [App\Http\Controllers\BoardController::class, 'setReadingGoal'])->middleware('auth')->name('profile.goal.set');
