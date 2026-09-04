@@ -53,46 +53,59 @@ class BoardController extends Controller
         return false;
     }
 
-    public function show(User $user)
-    {
-        $board = UserBoard::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'board_items' => [],
-                'hook_slots' => array_fill(0, 9, null),
-                'is_locked' => false,
-            ]
-        );
+    public function show($username)
+{
+    // Kullanıcıyı username üzerinden kesin olarak bul
+    $user = User::where('username', $username)->firstOrFail();
 
-        $currentUser = auth()->user();
-        $isOwner = auth()->check() && (auth()->id() === $user->id);
-        
-        // KESİN VE NET KONTROL: Arkadaş değilse false döner!
-        $isFriend = false;
-        if (auth()->check() && !$isOwner) {
-            $isFriend = $this->checkFriendship($currentUser, $user);
-        }
+    $board = UserBoard::firstOrCreate(
+        ['user_id' => $user->id],
+        [
+            'board_items' => [],
+            'hook_slots' => array_fill(0, 9, null),
+            'is_locked' => false,
+        ]
+    );
 
-        $achievements = [
-            'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
-            'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
-            'burger'    => ['title' => 'Burger',    'file' => 'burger.png',    'unlocked' => false],
-            'cilek'     => ['title' => 'Çilek',     'file' => 'çilek.png',     'unlocked' => true],
-            'elma'      => ['title' => 'Elma',      'file' => 'elma.png',      'unlocked' => false],
-            'geyik'     => ['title' => 'Geyik',     'file' => 'geyik.png',     'unlocked' => false],
-            'jake'      => ['title' => 'Jake',      'file' => 'jake.png',      'unlocked' => true],
-            'kedi'      => ['title' => 'Kedi',      'file' => 'kedi.png',      'unlocked' => false],
-            'kitap'     => ['title' => 'Kitap',     'file' => 'kitap.png',     'unlocked' => true],
-            'kruvasan'  => ['title' => 'Kruvasan',  'file' => 'kruvasan.png',  'unlocked' => false],
-            'maymun'    => ['title' => 'Maymun',    'file' => 'maymun.png',    'unlocked' => true],
-            'tama'      => ['title' => 'Tama',      'file' => 'tama.png',      'unlocked' => false],
-            'usagi'     => ['title' => 'Usagi',     'file' => 'usagi.png',     'unlocked' => true],
-            'yengec'    => ['title' => 'Yengeç',    'file' => 'yengeç.png',    'unlocked' => false],
-            'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => false],
-        ];
-
-        return view('board', compact('user', 'board', 'achievements', 'isFriend', 'isOwner'));
+    $currentUserId = auth()->id();
+    $targetUserId = $user->id;
+    $isOwner = auth()->check() && ($currentUserId === $targetUserId);
+    
+    // Doğrudan veritabanındaki friendships tablosundan kesin kontrol
+    $isFriend = false;
+    if (auth()->check() && !$isOwner) {
+        $isFriend = \DB::table('friendships')
+            ->where('status', 'accepted')
+            ->where(function ($q) use ($currentUserId, $targetUserId) {
+                $q->where(function($sub) use ($currentUserId, $targetUserId) {
+                    $sub->where('user_id', $currentUserId)->where('friend_id', $targetUserId);
+                })->orWhere(function($sub) use ($currentUserId, $targetUserId) {
+                    $sub->where('user_id', $targetUserId)->where('friend_id', $currentUserId);
+                });
+            })
+            ->exists();
     }
+
+    $achievements = [
+        'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
+        'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
+        'burger'    => ['title' => 'Burger',    'file' => 'burger.png',    'unlocked' => false],
+        'cilek'     => ['title' => 'Çilek',     'file' => 'çilek.png',     'unlocked' => true],
+        'elma'      => ['title' => 'Elma',      'file' => 'elma.png',      'unlocked' => false],
+        'geyik'     => ['title' => 'Geyik',     'file' => 'geyik.png',     'unlocked' => false],
+        'jake'      => ['title' => 'Jake',      'file' => 'jake.png',      'unlocked' => true],
+        'kedi'      => ['title' => 'Kedi',      'file' => 'kedi.png',      'unlocked' => false],
+        'kitap'     => ['title' => 'Kitap',     'file' => 'kitap.png',     'unlocked' => true],
+        'kruvasan'  => ['title' => 'Kruvasan',  'file' => 'kruvasan.png',  'unlocked' => false],
+        'maymun'    => ['title' => 'Maymun',    'file' => 'maymun.png',    'unlocked' => true],
+        'tama'      => ['title' => 'Tama',      'file' => 'tama.png',      'unlocked' => false],
+        'usagi'     => ['title' => 'Usagi',     'file' => 'usagi.png',     'unlocked' => true],
+        'yengec'    => ['title' => 'Yengeç',    'file' => 'yengeç.png',    'unlocked' => false],
+        'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => false],
+    ];
+
+    return view('board', compact('user', 'board', 'achievements', 'isFriend', 'isOwner'));
+}
 
     public function save(Request $request, User $user)
     {

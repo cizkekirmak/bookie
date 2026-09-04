@@ -65,7 +65,6 @@
             overflow: hidden;
         }
 
-        /* 50PX BELİRGİN KİLİT SİMGESİ (locke.png / unlocked.png) */
         .board-lock-badge {
             position: absolute;
             top: 14px;
@@ -134,8 +133,10 @@
             touch-action: none;
             transform-origin: center center;
         }
-        .is-editing-active .cork-postit { cursor: grab; }
-        .is-editing-active .cork-postit:active { cursor: grabbing; }
+        .is-editing-active .cork-postit,
+        .cork-postit.can-delete { cursor: grab; }
+        .is-editing-active .cork-postit:active,
+        .cork-postit.can-delete:active { cursor: grabbing; }
 
         .postit-inner-card {
             position: relative;
@@ -148,7 +149,7 @@
         .postit-inner-card.size-portrait { width: 160px; height: 220px; }
         .postit-inner-card.size-landscape { width: 220px; height: 160px; }
 
-        .is-editing-active .cork-postit.is-selected .postit-inner-card {
+        .cork-postit.is-selected .postit-inner-card {
             outline: 2px dashed #2d5a27;
             outline-offset: 4px;
         }
@@ -232,7 +233,7 @@
         }
         .transform-box.is-selected .handle-btn,
         .is-editing-active .free-sticker-wrapper.is-selected .handle-btn,
-        .is-editing-active .cork-postit.is-selected .handle-btn {
+        .cork-postit.can-delete.is-selected .handle-btn {
             display: flex;
             align-items: center;
             justify-content: center;
@@ -540,12 +541,26 @@
 <body>
 
 @php
-    $isOwnProfile = auth()->check() && (auth()->id() === ($user->id ?? 0));
-    $isFriendUser = $isFriend ?? false;
-    $isBoardLocked = $board->is_locked ?? false;
+    $authId = auth()->id();
+    $targetId = $user->id ?? 0;
+    $isOwnProfile = auth()->check() && ($authId === $targetId);
 
-    // Profil sahibi kilitli olsa bile panoyu her zaman düzenleyebilir!
-    // Kilit sadece arkadaşların/ziyaretçilerin not eklemesini durdurur.
+    // Veritabanındaki friendships tablosundan doğrudan kesin kontrol:
+    $isFriendUser = false;
+    if (auth()->check() && !$isOwnProfile) {
+        $isFriendUser = \DB::table('friendships')
+            ->where('status', 'accepted')
+            ->where(function ($q) use ($authId, $targetId) {
+                $q->where(function($sub) use ($authId, $targetId) {
+                    $sub->where('user_id', $authId)->where('friend_id', $targetId);
+                })->orWhere(function($sub) use ($authId, $targetId) {
+                    $sub->where('user_id', $targetId)->where('friend_id', $authId);
+                });
+            })
+            ->exists();
+    }
+
+    $isBoardLocked = $board->is_locked ?? false;
     $canAddPostit = $isOwnProfile || ($isFriendUser && !$isBoardLocked);
 
     $hookSlots = (isset($board) && is_array($board->hook_slots)) ? $board->hook_slots : array_fill(0, 9, null);
@@ -587,15 +602,33 @@
             @foreach($boardItems as $item)
                 @if(($item['type'] ?? '') === 'postit')
                     @php
-                        $isAuthor = str_contains($item['author'] ?? '', '@' . (auth()->user()->username ?? ''));
+                        $loggedUsername = auth()->user()->username ?? '';
+                        $authorText = $item['author'] ?? '';
+
+                        // Türkçe I/ı ve İ/i duyarsızlaştırması
+                        $normalize = function($str) {
+                            $str = str_replace(['I', 'İ'], ['ı', 'i'], $str);
+                            return mb_strtolower($str, 'UTF-8');
+                        };
+
+                        $cleanLogged = $normalize($loggedUsername);
+                        $cleanAuthor = $normalize($authorText);
+
+                        $isAuthor = !empty($cleanLogged) && (
+                            str_contains($cleanAuthor, '@' . $cleanLogged) || 
+                            str_contains($cleanAuthor, $cleanLogged)
+                        );
+
+                        // Profil sahibi her şeyi, notu yazan kişi de kendi notunu düzenleyebilir
                         $canManage = $isOwnProfile || ($isAuthor && !$isBoardLocked);
                         $scale = $item['scale'] ?? 0.65;
                         $rot = $item['rotation'] ?? 0;
                     @endphp
                     <div class="cork-postit {{ $canManage ? 'can-delete' : '' }}" 
-                         style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; z-index: {{ $item['zIndex'] ?? 10 }}; transform: scale({{ $scale }}) rotate({{ $rot }}deg);"
-                         data-scale="{{ $scale }}"
-                         data-rotation="{{ $rot }}">
+                        style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; z-index: {{ $item['zIndex'] ?? 10 }}; transform: scale({{ $scale }}) rotate({{ $rot }}deg);"
+                        data-scale="{{ $scale }}"
+                        data-rotation="{{ $rot }}"
+                        data-can-manage="{{ $canManage ? '1' : '0' }}">
                         <div class="postit-inner-card {{ $item['shapeClass'] ?? 'size-square' }}" style="background-color: {{ $item['bg'] }};">
                             {!! $item['html'] !!}
                         </div>
@@ -724,7 +757,6 @@
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <!-- ORANI KORUNAN STICKER KUTUSU (BASIKLIĞI ÖNLER) -->
                     <div id="stickerTransformBox" class="transform-box" style="display:none; top:55px; left:35px; width:70px; height:auto;">
                         <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:auto; display:block;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
@@ -751,7 +783,6 @@
     const IS_OWN_PROFILE = @json($isOwnProfile);
     let isBoardLocked = @json($isBoardLocked);
 
-    // Kilit görselleri: locke.png ve unlocked.png
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
@@ -768,8 +799,8 @@
     const boardLockImg = document.getElementById('boardLockImg');
     const openPostitModalBtn = document.getElementById('openPostitModalBtn');
 
-    // Profil sahibi EDIT butonuna basmadan panoyu düzenleyemez!
-    let isEditingModeActive = !IS_OWN_PROFILE; // Ziyaretçi kendi notunu her an ekleyebilir
+    // Profil sahibi EDIT butonuna basınca aktif olur; ziyaretçi arkadaş ise doğrudan kendi notunu düzenleyebilir
+    let isEditingModeActive = false;
 
     let globalMaxZIndex = 100;
     function bringToFront(element) {
@@ -777,7 +808,6 @@
         element.style.zIndex = globalMaxZIndex;
     }
 
-    // --- PROFİL SAHİBİ İÇİN EDIT / SAVE GEÇİŞİ ---
     if (toggleEditBtn && IS_OWN_PROFILE) {
         toggleEditBtn.addEventListener('click', function() {
             isEditingModeActive = !isEditingModeActive;
@@ -796,16 +826,12 @@
                 if (grid) grid.classList.remove('is-editing-mode');
                 if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'none';
                 
-                // Seçim çerçevelerini temizle
                 document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
-                
-                // Save butonuna basınca tek seferde DB'ye kaydet
                 saveBoardToDatabase();
             }
         });
     }
 
-    // --- PANO KİLİTLEME (SADECE ZİYARETÇİLERİ KİLİTLER / AÇAR) ---
     if (boardLockBtn && IS_OWN_PROFILE) {
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
@@ -815,7 +841,6 @@
         });
     }
 
-    // --- VERİTABANINA ASYNC KAYIT & GÜVENLİK YEDEĞİ ---
     async function saveBoardToDatabase() {
         const boardItems = [];
         
@@ -879,76 +904,9 @@
         }
     }
 
-    // --- SAYFA YÜKLENDİĞİNDE VERİLERİ KURTARMA & BAĞLAMA ---
     document.addEventListener('DOMContentLoaded', () => {
-        const localBackup = localStorage.getItem(`bookie_board_backup_${@json($user->id ?? 0)}`);
-        if (localBackup) {
-            try {
-                const parsed = JSON.parse(localBackup);
-
-                if (parsed.boardItems && parsed.boardItems.length > 0 && !document.querySelector('.cork-postit') && !document.querySelector('.free-sticker-wrapper')) {
-                    parsed.boardItems.forEach(item => {
-                        if (item.type === 'postit') {
-                            const postitWrapper = document.createElement('div');
-                            postitWrapper.className = 'cork-postit can-delete';
-                            postitWrapper.style.top = item.top;
-                            postitWrapper.style.left = item.left;
-                            postitWrapper.style.zIndex = item.zIndex || 10;
-                            postitWrapper.dataset.scale = item.scale || '0.65';
-                            postitWrapper.dataset.rotation = item.rotation || '0';
-                            postitWrapper.style.transform = `scale(${item.scale || 0.65}) rotate(${item.rotation || 0}deg)`;
-
-                            postitWrapper.innerHTML = `
-                                <div class="postit-inner-card ${item.shapeClass}" style="background-color: ${item.bg};">
-                                    ${item.html}
-                                </div>
-                                <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
-                                <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                                <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
-                            `;
-                            corkboard.appendChild(postitWrapper);
-                        } else if (item.type === 'free_sticker') {
-                            createFreeStickerElement(item.src, item.top, item.left, item.width, item.height, item.transform);
-                        }
-                    });
-                }
-
-                if (parsed.hookSlots && Array.isArray(parsed.hookSlots)) {
-                    parsed.hookSlots.forEach((key, index) => {
-                        const slotUnit = document.querySelector(`.keychain-hook-unit[data-slot="${index + 1}"]`);
-                        if (slotUnit) {
-                            slotUnit.innerHTML = '<div class="hook-nail"></div>';
-                            if (key && ACHIEVEMENTS_DATA[key]) {
-                                const img = document.createElement('img');
-                                img.src = `/images/badges/${ACHIEVEMENTS_DATA[key].file}`;
-                                img.className = 'keychain-plush-img';
-                                img.dataset.key = key;
-                                img.title = ACHIEVEMENTS_DATA[key].title;
-                                img.onerror = function() { this.src = FALLBACK_BADGE_SVG; };
-                                slotUnit.appendChild(img);
-                            } else {
-                                const emptyBox = document.createElement('div');
-                                emptyBox.className = 'empty-hook-slot';
-                                slotUnit.appendChild(emptyBox);
-                            }
-                        }
-                    });
-                }
-
-                if (typeof parsed.isBoardLocked !== 'undefined') {
-                    isBoardLocked = parsed.isBoardLocked;
-                    if (boardLockImg) {
-                        boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
-                    }
-                }
-            } catch (e) {
-                console.error('Yedek yükleme hatası:', e);
-            }
-        }
-
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
-            const isAuthor = wrapper.querySelector('.postit-author')?.innerText.includes(`@${CURRENT_USERNAME}`);
-            const canManage = IS_OWN_PROFILE || isAuthor;
+            const canManage = wrapper.dataset.canManage === '1';
             setupPostitControls(wrapper, canManage);
             makeItemDraggable(wrapper, canManage);
         });
@@ -961,10 +919,11 @@
         });
     });
 
-    // --- POST-IT TUTAMAÇLARI (SADECE EDIT MODUNDA AKTİF OLUR) ---
     function setupPostitControls(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             if (IS_OWN_PROFILE && !isEditingModeActive) return;
+            if (!IS_OWN_PROFILE && !canEdit) return;
+            
             document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
             wrapper.classList.add('is-selected');
             bringToFront(wrapper);
@@ -981,7 +940,7 @@
                 e.stopPropagation();
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 wrapper.remove();
-                if (!IS_OWN_PROFILE) saveBoardToDatabase();
+                saveBoardToDatabase();
             };
         }
 
@@ -1006,7 +965,7 @@
                 function onStop() {
                     window.removeEventListener('mousemove', onResize);
                     window.removeEventListener('mouseup', onStop);
-                    if (!IS_OWN_PROFILE) saveBoardToDatabase();
+                    saveBoardToDatabase();
                 }
 
                 window.addEventListener('mousemove', onResize);
@@ -1036,7 +995,7 @@
                 function onRotateStop() {
                     window.removeEventListener('mousemove', onRotate);
                     window.removeEventListener('mouseup', onRotateStop);
-                    if (!IS_OWN_PROFILE) saveBoardToDatabase();
+                    saveBoardToDatabase();
                 }
 
                 window.addEventListener('mousemove', onRotate);
@@ -1045,7 +1004,6 @@
         }
     }
 
-    // --- SERBEST STICKER OLUŞTURMA & KONTROLLERİ ---
     function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
@@ -1193,7 +1151,6 @@
         }
     }
 
-    // --- MODAL İÇİ STICKER & YAZI TRANSFORMER (ORANI KORUR, ASLA BASIK YAPMAZ) ---
     let stickerAspectRatio = 1;
 
     function setupStoryTransformer(boxId) {
@@ -1238,7 +1195,6 @@
                     let newWidth = Math.max(20, startWidth + delta);
                     box.style.width = newWidth + 'px';
 
-                    // Görselin basık çıkmasını engelleyen kilit: Doğal boy oranına göre yükseklik ver
                     if (boxId === 'stickerTransformBox') {
                         box.style.height = (newWidth * stickerAspectRatio) + 'px';
                     }
@@ -1337,7 +1293,6 @@
         textTransformBox.style.width = 'fit-content';
     });
 
-    // Görsel yüklendiğinde basıklığı engelleyip orijinal oranını alma
     fileInput.addEventListener('change', function() {
         const file = this.files[0];
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
@@ -1369,6 +1324,7 @@
         postitWrapper.className = 'cork-postit can-delete';
         postitWrapper.style.top = '25%';
         postitWrapper.style.left = '35%';
+        postitWrapper.dataset.canManage = '1';
 
         const initialScale = 0.65;
         const rot = Math.floor(Math.random() * 8 - 4);
@@ -1406,11 +1362,9 @@
         previewSticker.src = '';
         fileInput.value = '';
 
-        // Ziyaretçiyse hemen DB'ye kaydeder; Pano sahibiyse Edit modunda serbestçe ekler
         saveBoardToDatabase();
     }
 
-    // --- SÜRÜKLEME (DELTA HESABI - SAÇMA YERDEN TUTMAYI ENGELLER) ---
     function makeItemDraggable(element, isMyItem = false) {
         element.ondragstart = () => false;
 
@@ -1450,7 +1404,7 @@
             function onMouseUp() {
                 window.removeEventListener('mousemove', onMouseMove);
                 window.removeEventListener('mouseup', onMouseUp);
-                if (!IS_OWN_PROFILE) saveBoardToDatabase();
+                saveBoardToDatabase();
             }
 
             window.addEventListener('mousemove', onMouseMove);
@@ -1458,7 +1412,6 @@
         };
     }
 
-    // --- ÇANTA & SÜRÜKLE-BIRAK (DRAG & DROP) ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
