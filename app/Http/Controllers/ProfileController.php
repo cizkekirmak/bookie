@@ -81,9 +81,17 @@ class ProfileController extends Controller
         while (is_string($hSlots)) { $hSlots = json_decode($hSlots, true); }
         $board->hook_slots = is_array($hSlots) ? $hSlots : array_fill(0, 9, null);
 
+        // --- DAHA ÖNCE KAZANILMIŞ KALICI BAŞARIMLARI YÜKLE ---
+        $rawUnlocked = $user->unlocked_achievements ?? [];
+        while (is_string($rawUnlocked)) {
+            $rawUnlocked = json_decode($rawUnlocked, true);
+        }
+        $previouslyUnlocked = is_array($rawUnlocked) ? $rawUnlocked : [];
+
         // --- 15 BAŞARIMIN DİNAMİK KONTROLLERİ ---
 
-        $unlockedBurger = DB::table('review_likes')
+        // 1. BURGER: Tek bir incelemeye 10+ beğeni
+        $unlockedBurger = in_array('burger', $previouslyUnlocked) || DB::table('review_likes')
             ->join('user_books', 'review_likes.review_id', '=', 'user_books.id')
             ->where('user_books.user_id', $targetUserId)
             ->select('review_likes.review_id')
@@ -92,117 +100,131 @@ class ProfileController extends Controller
             ->exists();
 
         // 2. YONCA: 10+ kabul edilmiş arkadaş
-        $unlockedYonca = DB::table('friendships')
+        $unlockedYonca = in_array('yonca', $previouslyUnlocked) || (DB::table('friendships')
             ->where('status', 'accepted')
             ->where(function ($q) use ($targetUserId) {
                 $q->where('user_id', $targetUserId)->orWhere('friend_id', $targetUserId);
-            })->count() >= 10;
+            })->count() >= 10);
 
         // 3. MAYMUN: 5 farklı panoya post-it bırakmak
-        $authorTag = '@' . mb_strtolower(trim($username));
-        $otherBoards = DB::table('user_boards')
-            ->where('user_id', '!=', $targetUserId)
-            ->whereNotNull('board_items')
-            ->get(['board_items']);
-        $distinctBoardsCount = 0;
-        foreach ($otherBoards as $b) {
-            $items = $b->board_items;
-            while (is_string($items)) { $items = json_decode($items, true); }
-            if (is_array($items)) {
-                foreach ($items as $item) {
-                    if (($item['type'] ?? '') === 'postit' && !empty($item['author'])) {
-                        $authClean = mb_strtolower(trim($item['author']));
-                        if (str_contains($authClean, $authorTag) || $authClean === mb_strtolower(trim($username))) {
-                            $distinctBoardsCount++;
-                            break;
+        if (in_array('maymun', $previouslyUnlocked)) {
+            $unlockedMaymun = true;
+        } else {
+            $authorTag = '@' . mb_strtolower(trim($username));
+            $otherBoards = DB::table('user_boards')
+                ->where('user_id', '!=', $targetUserId)
+                ->whereNotNull('board_items')
+                ->get(['board_items']);
+            $distinctBoardsCount = 0;
+            foreach ($otherBoards as $b) {
+                $items = $b->board_items;
+                while (is_string($items)) { $items = json_decode($items, true); }
+                if (is_array($items)) {
+                    foreach ($items as $item) {
+                        if (($item['type'] ?? '') === 'postit' && !empty($item['author'])) {
+                            $authClean = mb_strtolower(trim($item['author']));
+                            if (str_contains($authClean, $authorTag) || $authClean === mb_strtolower(trim($username))) {
+                                $distinctBoardsCount++;
+                                break;
+                            }
                         }
                     }
                 }
             }
+            $unlockedMaymun = ($distinctBoardsCount >= 5);
         }
-        $unlockedMaymun = ($distinctBoardsCount >= 5);
 
         // 4. AYICIK: Kendi panosuna 5 farklı kişiden not gelmesi
-        $uniqueAuthors = [];
-        foreach ($board->board_items as $item) {
-            if (($item['type'] ?? '') === 'postit' && !empty($item['author'])) {
-                $authClean = mb_strtolower(trim($item['author']));
-                if ($authClean !== $authorTag && $authClean !== mb_strtolower(trim($username))) {
-                    $uniqueAuthors[$authClean] = true;
+        if (in_array('ayicik', $previouslyUnlocked)) {
+            $unlockedAyicik = true;
+        } else {
+            $authorTag = '@' . mb_strtolower(trim($username));
+            $uniqueAuthors = [];
+            foreach ($board->board_items as $item) {
+                if (($item['type'] ?? '') === 'postit' && !empty($item['author'])) {
+                    $authClean = mb_strtolower(trim($item['author']));
+                    if ($authClean !== $authorTag && $authClean !== mb_strtolower(trim($username))) {
+                        $uniqueAuthors[$authClean] = true;
+                    }
                 }
             }
+            $unlockedAyicik = (count($uniqueAuthors) >= 5);
         }
-        $unlockedAyicik = (count($uniqueAuthors) >= 5);
 
         // 5. ASK: 15 farklı incelemeyi beğenmek
-        $unlockedAsk = DB::table('review_likes')->where('user_id', $targetUserId)->count() >= 15;
+        $unlockedAsk = in_array('ask', $previouslyUnlocked) || (DB::table('review_likes')->where('user_id', $targetUserId)->count() >= 15);
 
         // 6. CILEK: 10 farklı kitaba 5 yıldız vermek
-        $unlockedCilek = DB::table('user_books')->where('user_id', $targetUserId)->where('rating', 5)->count() >= 10;
+        $unlockedCilek = in_array('cilek', $previouslyUnlocked) || (DB::table('user_books')->where('user_id', $targetUserId)->where('rating', 5)->count() >= 10);
 
         // 7. JAKE: 7 gün içinde 3 kitap bitirmek
-        $readDates = DB::table('user_books')
-            ->where('user_id', $targetUserId)
-            ->where('status', 'read')
-            ->whereNotNull('updated_at')
-            ->orderBy('updated_at', 'asc')
-            ->pluck('updated_at')
-            ->map(fn($d) => Carbon::parse($d))
-            ->values();
-        $unlockedJake = false;
-        if (count($readDates) >= 3) {
-            for ($i = 0; $i <= count($readDates) - 3; $i++) {
-                if ($readDates[$i]->diffInDays($readDates[$i + 2]) <= 7) {
-                    $unlockedJake = true;
-                    break;
+        if (in_array('jake', $previouslyUnlocked)) {
+            $unlockedJake = true;
+        } else {
+            $readDates = DB::table('user_books')
+                ->where('user_id', $targetUserId)
+                ->where('status', 'read')
+                ->whereNotNull('updated_at')
+                ->orderBy('updated_at', 'asc')
+                ->pluck('updated_at')
+                ->map(fn($d) => Carbon::parse($d))
+                ->values();
+            $unlockedJake = false;
+            if (count($readDates) >= 3) {
+                for ($i = 0; $i <= count($readDates) - 3; $i++) {
+                    if ($readDates[$i]->diffInDays($readDates[$i + 2]) <= 7) {
+                        $unlockedJake = true;
+                        break;
+                    }
                 }
             }
         }
 
         // 8. KITAP: Aktif admin önerilerinden en az 1 kitap eklemek (Google & Open Library tam uyumlu)
-        $activeAdminRecs = DB::table('admin_recommendations')
-            ->where(function ($q) {
-                $q->where('is_active', 1)->orWhere('is_active', true);
-            })
-            ->pluck('book_key')
-            ->filter()
-            ->toArray();
-
-        // Key'leri hem ham halleriyle hem de OL_ / GB_ ön ekleri temizlenmiş varyasyonlarıyla toplayalım
-        $searchKeys = [];
-        foreach ($activeAdminRecs as $k) {
-            $cleanK = trim($k);
-            $searchKeys[] = $cleanK;
-            // Eğer başında OL_ varsa hem OL_ halini hem de OL_ olmadan halini ekle
-            if (str_starts_with($cleanK, 'OL_')) {
-                $searchKeys[] = substr($cleanK, 3);
-            } else {
-                $searchKeys[] = 'OL_' . $cleanK;
-            }
-            // Eğer Google Books için GB_ formatı varsa
-            if (str_starts_with($cleanK, 'GB_')) {
-                $searchKeys[] = substr($cleanK, 3);
-            }
-        }
-        $searchKeys = array_unique(array_filter($searchKeys));
-
-        $unlockedKitap = false;
-        if (!empty($searchKeys)) {
-            $unlockedKitap = DB::table('user_books')
-                ->join('books', 'user_books.book_id', '=', 'books.id')
-                ->where('user_books.user_id', $targetUserId)
-                ->where(function ($q) use ($searchKeys) {
-                    $q->whereIn('books.open_library_key', $searchKeys)
-                      ->orWhereIn('books.google_book_id', $searchKeys);
+        if (in_array('kitap', $previouslyUnlocked)) {
+            $unlockedKitap = true;
+        } else {
+            $activeAdminRecs = DB::table('admin_recommendations')
+                ->where(function ($q) {
+                    $q->where('is_active', 1)->orWhere('is_active', true);
                 })
-                ->exists();
+                ->pluck('book_key')
+                ->filter()
+                ->toArray();
+
+            $searchKeys = [];
+            foreach ($activeAdminRecs as $k) {
+                $cleanK = trim($k);
+                $searchKeys[] = $cleanK;
+                if (str_starts_with($cleanK, 'OL_')) {
+                    $searchKeys[] = substr($cleanK, 3);
+                } else {
+                    $searchKeys[] = 'OL_' . $cleanK;
+                }
+                if (str_starts_with($cleanK, 'GB_')) {
+                    $searchKeys[] = substr($cleanK, 3);
+                }
+            }
+            $searchKeys = array_unique(array_filter($searchKeys));
+
+            $unlockedKitap = false;
+            if (!empty($searchKeys)) {
+                $unlockedKitap = DB::table('user_books')
+                    ->join('books', 'user_books.book_id', '=', 'books.id')
+                    ->where('user_books.user_id', $targetUserId)
+                    ->where(function ($q) use ($searchKeys) {
+                        $q->whereIn('books.open_library_key', $searchKeys)
+                          ->orWhereIn('books.google_book_id', $searchKeys);
+                    })
+                    ->exists();
+            }
         }
 
         // 9. ELMA: Yıllık hedefi tamamlama
-        $unlockedElma = ($goalTarget && $goalTarget > 0 && $readThisYear >= $goalTarget);
+        $unlockedElma = in_array('elma', $previouslyUnlocked) || ($goalTarget && $goalTarget > 0 && $readThisYear >= $goalTarget);
 
         // 10. KRUVASAN: 400+ sayfa kitap bitirme
-        $unlockedKruvasan = DB::table('user_books')
+        $unlockedKruvasan = in_array('kruvasan', $previouslyUnlocked) || DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->where('user_books.user_id', $targetUserId)
             ->where('user_books.status', 'read')
@@ -210,7 +232,7 @@ class ProfileController extends Controller
             ->exists();
 
         // 11. KEDI (Çerezlik): 50 sayfa ve altı bir kitap bitirme
-        $unlockedKedi = DB::table('user_books')
+        $unlockedKedi = in_array('kedi', $previouslyUnlocked) || DB::table('user_books')
             ->join('books', 'user_books.book_id', '=', 'books.id')
             ->where('user_books.user_id', $targetUserId)
             ->where('user_books.status', 'read')
@@ -219,116 +241,147 @@ class ProfileController extends Controller
             ->exists();
 
         // 12. USAGI: Aynı anda 10 kitabı okunuyor (reading) tutma
-        $unlockedUsagi = DB::table('user_books')
+        $unlockedUsagi = in_array('usagi', $previouslyUnlocked) || (DB::table('user_books')
             ->where('user_id', $targetUserId)
             ->where('status', 'reading')
-            ->count() >= 10;
+            ->count() >= 10);
 
         // 13. TAMA: Panodaki 9 kancanın hepsini doldurma
         $filledHooks = count(array_filter($board->hook_slots, fn($s) => !empty($s)));
-        $unlockedTama = ($filledHooks >= 9);
+        $unlockedTama = in_array('tama', $previouslyUnlocked) || ($filledHooks >= 9);
 
         // 14. GEYIK: En az 30 gündür üye olma (müdavim)
-        $unlockedGeyik = $user->created_at && Carbon::parse($user->created_at)->diffInDays(now()) >= 30;
+        $unlockedGeyik = in_array('geyik', $previouslyUnlocked) || ($user->created_at && Carbon::parse($user->created_at)->diffInDays(now()) >= 30);
 
         // 15. YENGEC: 5 farklı kitaba 1 yıldız verme
-        $unlockedYengec = DB::table('user_books')
+        $unlockedYengec = in_array('yengec', $previouslyUnlocked) || (DB::table('user_books')
             ->where('user_id', $targetUserId)
             ->where('rating', 1)
-            ->count() >= 5;
+            ->count() >= 5);
 
-        // Seçtiğimiz havalı isimler ve açıklamalar
-        // Çoklu dil (localization) destekli başarım listesi
-        // Çoklu dil (localization) destekli başarım listesi (Varsayılan İngilizce)
+        // --- KAZANILANLARI GÜNCELLE VE KALICI OLARAK KAYDET ---
+        $currentUnlocked = [];
+        $conditionsMap = [
+            'ask' => $unlockedAsk,
+            'ayicik' => $unlockedAyicik,
+            'burger' => $unlockedBurger,
+            'cilek' => $unlockedCilek,
+            'elma' => $unlockedElma,
+            'geyik' => $unlockedGeyik,
+            'jake' => $unlockedJake,
+            'kedi' => $unlockedKedi,
+            'kitap' => $unlockedKitap,
+            'kruvasan' => $unlockedKruvasan,
+            'maymun' => $unlockedMaymun,
+            'tama' => $unlockedTama,
+            'usagi' => $unlockedUsagi,
+            'yengec' => $unlockedYengec,
+            'yonca' => $unlockedYonca,
+        ];
+
+        foreach ($conditionsMap as $badgeKey => $isMet) {
+            if ($isMet || in_array($badgeKey, $previouslyUnlocked)) {
+                $currentUnlocked[] = $badgeKey;
+            }
+        }
+        $currentUnlocked = array_values(array_unique($currentUnlocked));
+
+        // Eğer yeni açılan bir başarım varsa users tablosuna kalıcı olarak yaz
+        if (count(array_diff($currentUnlocked, $previouslyUnlocked)) > 0) {
+            $user->unlocked_achievements = $currentUnlocked;
+            $user->save();
+        }
+
+        // Çoklu dil destekli başarım listesi
         $keychains = [
             'ask'      => [
                 'name'     => __('Book Lover'),
                 'file'     => 'aşk.png',
-                'unlocked' => $unlockedAsk,
+                'unlocked' => in_array('ask', $currentUnlocked),
                 'desc'     => __('Like 15 different reviews')
             ],
             'ayicik'   => [
                 'name'     => __('Local Chief'),
                 'file'     => 'ayıcık.png',
-                'unlocked' => $unlockedAyicik,
+                'unlocked' => in_array('ayicik', $currentUnlocked),
                 'desc'     => __('Receive notes from 5 different users on your board')
             ],
             'burger'   => [
                 'name'     => __('Gourmet Critic'),
                 'file'     => 'burger.png',
-                'unlocked' => $unlockedBurger,
+                'unlocked' => in_array('burger', $currentUnlocked),
                 'desc'     => __('Get 10+ likes on a single review')
             ],
             'cilek'    => [
                 'name'     => __('Generous Reader'),
                 'file'     => 'çilek.png',
-                'unlocked' => $unlockedCilek,
+                'unlocked' => in_array('cilek', $currentUnlocked),
                 'desc'     => __('Give 5 stars to 10 different books')
             ],
             'elma'     => [
                 'name'     => __('Goal Crusher'),
                 'file'     => 'elma.png',
-                'unlocked' => $unlockedElma,
+                'unlocked' => in_array('elma', $currentUnlocked),
                 'desc'     => __('Complete your annual reading goal')
             ],
             'geyik'    => [
                 'name'     => __('Bookie Veteran'),
                 'file'     => 'geyik.png',
-                'unlocked' => $unlockedGeyik,
+                'unlocked' => in_array('geyik', $currentUnlocked),
                 'desc'     => __('Be a member of Bookie for at least 30 days')
             ],
             'jake'     => [
                 'name'     => __('Speedrunner'),
                 'file'     => 'jake.png',
-                'unlocked' => $unlockedJake,
+                'unlocked' => in_array('jake', $currentUnlocked),
                 'desc'     => __('Finish 3 books in a single week')
             ],
             'kedi'     => [
                 'name'     => __('Bite-sized'),
                 'file'     => 'kedi.png',
-                'unlocked' => $unlockedKedi,
+                'unlocked' => in_array('kedi', $currentUnlocked),
                 'desc'     => __('Finish a book with 50 pages or less')
             ],
             'kitap'    => [
                 'name'     => __("Editor's Choice"),
                 'file'     => 'kitap.png',
-                'unlocked' => $unlockedKitap,
+                'unlocked' => in_array('kitap', $currentUnlocked),
                 'desc'     => __('Add a book from the editor recommendations')
             ],
             'kruvasan' => [
                 'name'     => __('Heavyweight'),
                 'file'     => 'kruvasan.png',
-                'unlocked' => $unlockedKruvasan,
+                'unlocked' => in_array('kruvasan', $currentUnlocked),
                 'desc'     => __('Finish a book with 400+ pages')
             ],
             'maymun'   => [
                 'name'     => __('Carrier Pigeon'),
                 'file'     => 'maymun.png',
-                'unlocked' => $unlockedMaymun,
+                'unlocked' => in_array('maymun', $currentUnlocked),
                 'desc'     => __('Leave a note on 5 different user boards')
             ],
             'tama'     => [
                 'name'     => __('Hook Master'),
                 'file'     => 'tama.png',
-                'unlocked' => $unlockedTama,
+                'unlocked' => in_array('tama', $currentUnlocked),
                 'desc'     => __('Fill all 9 hooks on your board')
             ],
             'usagi'    => [
                 'name'     => __('Overambitious'),
                 'file'     => 'usagi.png',
-                'unlocked' => $unlockedUsagi,
+                'unlocked' => in_array('usagi', $currentUnlocked),
                 'desc'     => __('Have 10 books in currently reading status simultaneously')
             ],
             'yengec'   => [
                 'name'     => __('Harsh Judge'),
                 'file'     => 'yengeç.png',
-                'unlocked' => $unlockedYengec,
+                'unlocked' => in_array('yengec', $currentUnlocked),
                 'desc'     => __('Give 1 star to 5 different books')
             ],
             'yonca'    => [
                 'name'     => __('Social Butterfly'),
                 'file'     => 'yonca.png',
-                'unlocked' => $unlockedYonca,
+                'unlocked' => in_array('yonca', $currentUnlocked),
                 'desc'     => __('Have at least 10 accepted friends')
             ],
         ];
@@ -343,13 +396,13 @@ class ProfileController extends Controller
             "friendsCount", 
             "pendingRequests", 
             "friendship", 
-            "isOwnProfile",
-            "readingGoal",
-            "readThisYear",
-            "goalProgress",
-            "currentYear",
-            "board",
-            "keychains",
+            "isOwnProfile", 
+            "readingGoal", 
+            "readThisYear", 
+            "goalProgress", 
+            "currentYear", 
+            "board", 
+            "keychains", 
             "achievements"
         ));
     }

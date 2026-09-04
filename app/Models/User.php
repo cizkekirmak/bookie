@@ -186,4 +186,8 @@ class User extends Authenticatable
             ['req' => 100, 'name' => 'almost a bookie admin',  'icon' => '👑', 'desc' => 'shoot me an email, i might help..'],
         ];
     }
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'unlocked_achievements' => 'array',
+    ];
 }
