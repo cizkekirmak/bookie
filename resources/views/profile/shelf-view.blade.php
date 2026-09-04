@@ -736,11 +736,11 @@
                     <div class="keychain-hook-unit" data-slot="{{ $slot }}" onclick="handleHookSlotClick({{ $slot }})">
                         <div class="hook-nail"></div>
                         @if($badge)
-                            <img src="{{ asset('images/badges/' . $badge['file']) }}" 
+                            <img src="{{ asset('images/keychains/' . $badge['file']) }}" 
                                  class="keychain-plush-img" 
                                  data-key="{{ $key }}" 
                                  title="{{ $badge['name'] ?? ($badge['title'] ?? '') }}"
-                                 onerror="this.src='{{ asset('images/badges/maymun.png') }}';">
+                                 onerror="this.onerror=null; this.src='{{ asset('images/keychains/kitap.png') }}';">
                         @else
                             <div class="empty-hook-slot" title="{{ $isOwnProfile ? __('empty hook') : '' }}"></div>
                         @endif
