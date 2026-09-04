@@ -270,5 +270,7 @@
     "This user hasn't saved any books yet.": "Bu kullanıcı henüz hiçbir kitap kaydetmedi.",
     "Opera restricts direct installation on desktop. For the best app experience, you can use Chrome or Edge!": "Opera masaüstünde doğrudan yüklemeyi kısıtlıyor. En iyi uygulama deneyimi için Chrome veya Edge kullanabilirsin!",
     "To install the app, look for the 'Install' icon in your browser's address bar or menu!": "Uygulamayı yüklemek için tarayıcının adres çubuğundaki 'Yükle' simgesine veya tarayıcı menüsüne bakabilirsin!",
-    "logging in...": "giriş yapılıyor..."
+    "logging in...": "giriş yapılıyor...",
+    "To install, you can use your browser's menu or address bar! ✨": "Yüklemek için tarayıcının adres çubuğundaki yükle simgesini veya menüyü kullanabilirsin! ✨",
+    "To install on iPhone/iPad: tap the Share button below and select 'Add to Home Screen'! ✨": "iPhone'da yüklemek için: Alttaki Paylaş butonuna basıp 'Ana Ekrana Ekle'yi seçebilirsin! ✨"
 }

@@ -12,26 +12,27 @@
     
     <style>
         @font-face {
-    font-family: 'Unkempt';
-    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+            font-family: 'Unkempt';
+            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-@font-face {
-    font-family: 'Henny Penny';
-    src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
+        @font-face {
+            font-family: 'Henny Penny';
+            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
+
         body { 
             font-family: "Mystery Quest", system-ui;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #D1FFBD;
             margin: 0; 
             background-image: url("{{ asset('images/arkaplan.png') }}");
@@ -40,19 +41,16 @@
             background-repeat: no-repeat;
             position: relative;
         }
-          * {
-                -webkit-tap-highlight-color: transparent !important;
-            }
 
-            button,
-            a,
-            label,
-            span,
-            img {
-                user-select: none !important;
-                -webkit-user-select: none !important;
-                -webkit-touch-callout: none !important;
-            }
+        * {
+            -webkit-tap-highlight-color: transparent !important;
+        }
+
+        button, a, label, span, img {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
 
         .dis-kapsayici {
             display: flex;
@@ -117,7 +115,11 @@
             cursor: pointer;
             font-weight: bold;
             font-family: "Henny Penny", cursive;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .kutucuk button:active {
+            transform: scale(0.98);
         }
 
         .kutucuk button:hover {
@@ -146,11 +148,7 @@
             text-decoration: underline;
         }
 
-        /* ---- İNDİRME ÇEKMECESİ ---- */
-        /* Sekme (.cekmece-tab), çekmecenin (.cekmece) bir PARÇASI:
-           kapalıyken kutunun arkasına gizlenir, sadece sekme kenardan
-           taşar; çekildiğinde ikisi birlikte hareket eder. */
-
+        /* ---- MASAÜSTÜ ÇEKMECESİ ---- */
         .cekmece {
             position: absolute;
             top: 50%;
@@ -242,37 +240,58 @@
             background-color: #235631;
         }
 
-        /* ---- MOBİLDE: SAĞDAN DEĞİL, ALTTAN AÇILSIN ---- */
+        /* Mobildeki buton varsayılanda gizli */
+        .mobil-indir-alani {
+            display: none;
+        }
+
+        /* ---- MOBİL UYUMLULUK (@media) ---- */
         @media (max-width: 640px) {
+            .site-basligi {
+                font-size: 80px;
+                margin: 0 0 -10px 0;
+            }
+
+            .kutucuk {
+                width: 260px;
+                padding: 18px;
+            }
+
+            /* Mobilde masaüstü çekmecesini kapat */
             .cekmece {
-                top: 100%;
-                left: 50%;
-                width: min(240px, 82vw);
-                border-radius: 0 0 12px 12px;
-                transform: translateX(-50%) translateY(-100%);
+                display: none !important;
             }
 
-            .kutucuk-sarmalayici.acik .cekmece {
-                transform: translateX(-50%) translateY(0);
+            /* Kutunun altındaki mobil butonunu aktif et */
+            .mobil-indir-alani {
+                display: block;
+                margin-top: 14px;
+                text-align: center;
             }
 
-            .cekmece-tab {
-                top: auto;
-                right: auto;
-                bottom: -34px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 64px;
-                height: 34px;
-                border-radius: 0 0 10px 10px;
+            .mobil-indir-btn {
+                background: #ebf8e2;
+                color: #1a562b;
+                border: 2px solid #2e6f40;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-size: 14px;
+                font-family: "Henny Penny", cursive;
+                cursor: pointer;
+                box-shadow: 0 3px 6px rgba(44, 159, 76, 0.35);
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                transition: transform 0.1s ease;
             }
 
-            .cekmece-tab img {
-                transform: rotate(-90deg);
+            .mobil-indir-btn:active {
+                transform: scale(0.96);
             }
 
-            .kutucuk-sarmalayici.acik .cekmece-tab img {
-                transform: rotate(90deg);
+            .mobil-indir-btn img {
+                width: 15px;
+                height: 15px;
             }
         }
 
@@ -325,8 +344,8 @@
                 </form>
             </div>
 
-            {{-- ÇEKMECE: sekme (tab) ve içerik AYNI parçanın içinde, birlikte hareket ediyor --}}
-            <div class="cekmece">
+            {{-- MASAÜSTÜ ÇEKMECESİ --}}
+            <div class="cekmece" id="masaustuCekmece">
                 <button type="button" class="cekmece-tab" id="cekmeceTab" aria-label="{{ __('Download Bookie') }}">
                     <img src="{{ asset('images/indir-ikon.png') }}" alt="{{ __('download') }}">
                 </button>
@@ -337,57 +356,104 @@
                 </div>
             </div>
         </div>
+
+        {{-- MOBİL BUTONU --}}
+        <div class="mobil-indir-alani" id="mobilIndirAlani">
+            <button type="button" class="mobil-indir-btn" id="mobilIndirBtn">
+                <img src="{{ asset('images/indir-ikon.png') }}" alt="">
+                {{ __('download bookie') }}
+            </button>
+        </div>
     </div>
 
-    {{-- SAĞ ALT KÖŞE DİL BUTONU --}}
+    {{-- DİL BUTONU --}}
     <div class="floating-lang-switch">
         @include('partials.lang-switch')
     </div>
 
-   <script>
-    // Uygulama zaten kuruluysa çekmeceyi sayfada hiç gösterme
-    window.addEventListener('DOMContentLoaded', () => {
-        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-        
-        // Zaten masaüstü uygulaması içindeyse çekmeceyi gizle
-        if (isStandalone) {
-            const cekmece = document.querySelector('.cekmece');
-            if (cekmece) cekmece.style.display = 'none';
-        }
-    });
+    <script>
+        // Çeviriler
+        const pwaLang = {
+            generalHint: @json(__('To install, you can use your browser\'s menu or address bar! ✨')),
+            iosHint: @json(__('To install on iPhone/iPad: tap the Share button below and select \'Add to Home Screen\'! ✨'))
+        };
 
-    document.getElementById('cekmeceTab').addEventListener('click', function () {
-        document.getElementById('kutucukSarmalayici').classList.toggle('acik');
-    });
-
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js');
-    }
-
-    let deferredPrompt;
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-    });
-
-    // Kullanıcı uygulamayı kurduğu an çekmeceyi kapat
-    window.addEventListener('appinstalled', () => {
-        document.getElementById('kutucukSarmalayici').classList.remove('acik');
-        deferredPrompt = null;
-    });
-
-    document.getElementById('indirButonu').addEventListener('click', async () => {
-        if (deferredPrompt) {
-            deferredPrompt.prompt();
-            const { outcome } = await deferredPrompt.userChoice;
-            if (outcome === 'accepted') {
-                document.getElementById('kutucukSarmalayici').classList.remove('acik');
+        // 1. SADECE UYGULAMA İÇİNDEYKEN İNDİRME ALANLARINI KALDIR
+        function kontrolEtVeGizle() {
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+            if (isStandalone) {
+                const cekmece = document.getElementById('masaustuCekmece');
+                const mobilAlan = document.getElementById('mobilIndirAlani');
+                if (cekmece) cekmece.style.display = 'none';
+                if (mobilAlan) mobilAlan.style.display = 'none';
             }
-            deferredPrompt = null;
-        } else {
-            alert("Bookie zaten bilgisayarında yüklü! Adres çubuğundaki 'Uygulamada aç' butonundan veya masaüstünden açabilirsin. ✨");
         }
-    });
-</script>
+        kontrolEtVeGizle();
+
+        // 2. Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        }
+
+        // 3. Masaüstü Çekmece Aç/Kapat
+        const tabBtn = document.getElementById('cekmeceTab');
+        const sarmalayici = document.getElementById('kutucukSarmalayici');
+        if (tabBtn && sarmalayici) {
+            tabBtn.addEventListener('click', function () {
+                sarmalayici.classList.toggle('acik');
+            });
+        }
+
+        // 4. PWA Kurulum Olayı
+        let deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        // Kurulum tamamlandığı an kapat
+        window.addEventListener('appinstalled', () => {
+            if (sarmalayici) sarmalayici.classList.remove('acik');
+            deferredPrompt = null;
+        });
+
+        // 5. İndirme Tetikleyicisi (Hem Masaüstü Hem Mobil İçin Ortak)
+        async function indir() {
+            const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted' && sarmalayici) {
+                    sarmalayici.classList.remove('acik');
+                }
+                deferredPrompt = null;
+            } else if (isIos) {
+                alert(pwaLang.iosHint);
+            } else {
+                alert(pwaLang.generalHint);
+            }
+        }
+
+        const indirButonu = document.getElementById('indirButonu');
+        if (indirButonu) indirButonu.addEventListener('click', indir);
+
+        const mobilIndirBtn = document.getElementById('mobilIndirBtn');
+        if (mobilIndirBtn) mobilIndirBtn.addEventListener('click', indir);
+
+        // 6. Giriş Butonu Tıklandığında Anında Geri Bildirim
+        const loginForm = document.querySelector('form[action="/login"]');
+        if (loginForm) {
+            loginForm.addEventListener('submit', function () {
+                const submitBtn = loginForm.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.style.opacity = '0.75';
+                    submitBtn.style.cursor = 'wait';
+                    submitBtn.textContent = @json(__('logging in...'));
+                }
+            });
+        }
+    </script>
 </body>
 </html>
