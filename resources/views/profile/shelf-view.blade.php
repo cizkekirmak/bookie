@@ -631,78 +631,82 @@
     .transform-box.is-selected { border-color: #2d5a27; }
 
     @media (max-width: 1024px) {
-        .board-page-container {
-            padding: 0 4px 40px 4px;
-            margin: 5px auto;
-            width: 100%;
-            overflow-x: hidden;
-        }
-
-        .corkboard-main-wrapper { 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 14px; 
-            width: 100%;
-        }
-
-        .corkboard-frame { 
-            width: 100% !important;
-            max-width: 100% !important;
-            aspect-ratio: 16 / 10 !important;
-            border-radius: 12px; 
-            position: relative;
-            overflow: hidden !important;
-            touch-action: pan-y !important;
-        }
-
-        .cork-postit, .free-sticker-wrapper {
-            pointer-events: none !important;
-        }
-
-        .keychain-area-wrapper { 
-            width: 100%; 
-            margin-top: 6px; 
-        }
-
-        .keychain-grid-9 { 
-            display: flex; 
-            flex-direction: row; 
-            overflow-x: auto; 
-            width: 100%; 
-            justify-content: flex-start; 
-            padding: 10px 6px; 
-            gap: 12px; 
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .keychain-hook-unit { 
-            width: 56px; 
-            height: 78px; 
-            flex-shrink: 0; 
-        }
-
-        .keychain-collection-drawer { 
-            width: 92%; 
-            max-height: 70vh; 
-        }
-
-        .drawer-body { 
-            grid-template-columns: repeat(3, 1fr); 
-        }
-        
-        .board-bottom-bar { 
-            display: none !important; 
-        }
-        .mobile-edit-notice { 
-            display: inline-flex !important; 
-        }
-        .board-lock-badge {
-            display: none !important;
-        }
-        .handle-btn {
-            display: none !important;
-        }
+    .board-page-container {
+        padding: 0 4px 20px 4px;
+        margin: 5px auto;
+        width: 100%;
+        overflow-x: hidden;
     }
+
+    .corkboard-main-wrapper { 
+        flex-direction: column; 
+        align-items: center; 
+        gap: 12px; 
+        width: 100%;
+    }
+
+    .corkboard-frame { 
+        width: 100% !important;
+        max-width: 100% !important;
+        aspect-ratio: 16 / 10 !important;
+        border-radius: 12px; 
+        position: relative;
+        overflow: hidden !important;
+        touch-action: pan-y !important;
+    }
+
+    .cork-postit, .free-sticker-wrapper {
+        pointer-events: none !important;
+    }
+
+    .keychain-area-wrapper { 
+        width: 100%; 
+        margin-top: 4px; 
+    }
+
+    /* Kancaların parmakla akıcı yatay kayması için */
+    .keychain-grid-9 { 
+        display: flex; 
+        flex-direction: row; 
+        overflow-x: auto; 
+        width: 100%; 
+        justify-content: flex-start; 
+        padding: 6px 4px; 
+        gap: 10px; 
+        -webkit-overflow-scrolling: touch;
+        touch-action: pan-x !important;
+    }
+
+    .keychain-hook-unit { 
+        width: 56px; 
+        height: 78px; 
+        flex-shrink: 0;
+        cursor: default !important;
+    }
+
+    /* Kancaya tıklanıp popup açılmasını engeller, yatay kaydırmayı bozmaz */
+    .empty-hook-slot,
+    .keychain-plush-img {
+        pointer-events: none !important;
+    }
+
+    /* Mobilde dosya ikonunu ve popup çekmecesini tamamen kapat */
+    .folder-container,
+    .keychain-collection-drawer {
+        display: none !important;
+        pointer-events: none !important;
+    }
+    
+    .board-bottom-bar,
+    .board-lock-badge,
+    .handle-btn { 
+        display: none !important; 
+    }
+
+    .mobile-edit-notice { 
+        display: inline-flex !important; 
+    }
+}
 </style>
 
 @php

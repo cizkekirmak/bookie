@@ -406,10 +406,9 @@
             .profile-main-content {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: calc(100vh - 90px) !important;
-                height: calc(100dvh - 90px) !important;
-                max-height: calc(100dvh - 90px) !important;
-                padding: 14px 10px 10px 10px !important;
+                height: auto !important;
+                max-height: calc(100dvh - 86px) !important; /* Ekrandan taşmaz */
+                padding: 14px 10px 14px 10px !important;
                 border: 2px solid #4c7237 !important;
                 border-radius: 16px !important;
                 background-color: #f7faf5 !important;
@@ -425,7 +424,7 @@
                 flex-direction: row !important;
                 justify-content: space-between !important;
                 align-items: center !important;
-                margin-bottom: 10px !important;
+                margin-bottom: 8px !important;
                 flex-shrink: 0 !important;
             }
 
@@ -433,16 +432,16 @@
                 font-size: 19px !important;
             }
 
-            /* İKİ SEKMEYİ DE BEYAZ ALANIN İÇİNDE KAYDIRMA */
             #profile-list-view {
-                flex: 1 !important;
+                flex: 1 1 auto !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
                 min-height: 0 !important;
+                padding-bottom: 12px !important;
             }
 
             #profile-board-view {
-                flex: 1 !important;
+                flex: 1 1 auto !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
                 min-height: 0 !important;
