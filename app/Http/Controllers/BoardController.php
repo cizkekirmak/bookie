@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 
 class BoardController extends Controller
 {
+    /**
+     * İki kullanıcının onaylanmış arkadaş olup olmadığını kontrol eder
+     */
     private function checkFriendship($userA, $userB)
     {
         if (!$userA || !$userB) return false;
@@ -17,18 +20,51 @@ class BoardController extends Controller
         return DB::table('friendships')
             ->where('status', 'accepted')
             ->where(function ($q) use ($userA, $userB) {
-                $q->where(function($sub) use ($userA, $userB) {
+                $q->where(function ($sub) use ($userA, $userB) {
                     $sub->where('user_id', $userA->id)->where('friend_id', $userB->id);
-                })->orWhere(function($sub) use ($userA, $userB) {
+                })->orWhere(function ($sub) use ($userA, $userB) {
                     $sub->where('user_id', $userB->id)->where('friend_id', $userA->id);
                 });
             })
             ->exists();
     }
 
+    /**
+     * Kullanıcı adını hem ham hem normalize ederek veritabanında arar
+     */
+    private function findUserSafely($username)
+    {
+        $decoded = urldecode($username);
+        $clean = trim($decoded);
+
+        // Türkçe I/ı ve İ/i dönüşümü
+        $lower = str_replace(['I', 'İ'], ['ı', 'i'], $clean);
+        $lower = mb_strtolower($lower, 'UTF-8');
+
+        $user = User::where('username', $clean)->first();
+
+        if (!$user) {
+            $user = User::whereRaw('LOWER(username) = ?', [$lower])->first();
+        }
+
+        if (!$user) {
+            // Son çare veritabanındaki tüm kullanıcı adlarını esnek eşleştir
+            $user = User::all()->first(function ($u) use ($lower) {
+                $uLower = str_replace(['I', 'İ'], ['ı', 'i'], $u->username);
+                return mb_strtolower($uLower, 'UTF-8') === $lower;
+            });
+        }
+
+        if (!$user) {
+            abort(404, 'Kullanıcı bulunamadı.');
+        }
+
+        return $user;
+    }
+
     public function show($username)
     {
-        $user = User::where('username', $username)->firstOrFail();
+        $user = $this->findUserSafely($username);
 
         $board = UserBoard::firstOrCreate(
             ['user_id' => $user->id],
@@ -39,13 +75,18 @@ class BoardController extends Controller
             ]
         );
 
-        // KRİTİK: Sayfa yenilendiğinde Blade'e mutlaka saf dizi (array) gitmeli
-        if (is_string($board->board_items)) {
-            $board->board_items = json_decode($board->board_items, true) ?? [];
+        // Katmanlı JSON / String çözümlemesi
+        $items = $board->board_items;
+        while (is_string($items)) {
+            $items = json_decode($items, true);
         }
-        if (is_string($board->hook_slots)) {
-            $board->hook_slots = json_decode($board->hook_slots, true) ?? array_fill(0, 9, null);
+        $board->board_items = is_array($items) ? $items : [];
+
+        $hooks = $board->hook_slots;
+        while (is_string($hooks)) {
+            $hooks = json_decode($hooks, true);
         }
+        $board->hook_slots = is_array($hooks) ? $hooks : array_fill(0, 9, null);
 
         $currentUserId = auth()->id();
         $targetUserId = $user->id;
@@ -79,18 +120,16 @@ class BoardController extends Controller
 
     public function save(Request $request, $username)
     {
-        $user = User::where('username', $username)->firstOrFail();
+        $user = $this->findUserSafely($username);
         $currentUser = auth()->user();
         $isOwner = auth()->check() && (auth()->id() === $user->id);
 
         $board = UserBoard::firstOrCreate(['user_id' => $user->id]);
 
-        // Kilit kontrolü
         if ($board->is_locked && !$isOwner) {
             return response()->json(['error' => 'Bu pano kilitlenmiştir.'], 403);
         }
 
-        // Arkadaşlık kontrolü
         if (!$isOwner) {
             $isFriend = $this->checkFriendship($currentUser, $user);
             if (!$isFriend) {
@@ -98,26 +137,32 @@ class BoardController extends Controller
             }
         }
 
-        $incomingItems = $request->input('board_items', []);
+        // Gelen veriyi güvenle diziye dönüştür
+        $incoming = $request->input('board_items', []);
+        while (is_string($incoming)) {
+            $incoming = json_decode($incoming, true);
+        }
+        $board->board_items = is_array($incoming) ? $incoming : [];
 
         if ($isOwner) {
-            $board->board_items = $incomingItems;
             if ($request->has('hook_slots')) {
-                $board->hook_slots = $request->input('hook_slots');
+                $hooks = $request->input('hook_slots');
+                while (is_string($hooks)) {
+                    $hooks = json_decode($hooks, true);
+                }
+                $board->hook_slots = is_array($hooks) ? $hooks : array_fill(0, 9, null);
             }
             if ($request->has('is_locked')) {
                 $board->is_locked = $request->boolean('is_locked');
             }
-        } else {
-            $board->board_items = $incomingItems;
         }
 
-        $saved = $board->save();
+        $board->save();
 
         return response()->json([
-            'success' => $saved,
-            'count' => count($incomingItems),
-            'items' => $board->board_items
+            'success' => true,
+            'saved_count' => count($board->board_items),
+            'target_user_id' => $user->id
         ]);
     }
 }
