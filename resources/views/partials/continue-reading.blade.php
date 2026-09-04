@@ -70,34 +70,47 @@
         .continue-reading-card {
             width: 100% !important;
             height: 175px !important;
-            padding: 10px 8px !important;
+            padding: 10px 10px !important;
             border-radius: 14px !important;
-        }
-
-        .continue-book-cover {
-            width: 52px !important;
-            height: 80px !important;
-        }
-
-        .continue-book-info {
-            height: 80px !important;
             justify-content: space-between !important;
         }
 
+        .continue-reading-body {
+            align-items: center !important;
+            justify-content: center !important;
+            flex: 1 !important;
+            margin-top: -4px !important; /* Başlıkla dengelemek için ortalama */
+        }
+
+        .continue-book-cover {
+            width: 54px !important;
+            height: 84px !important;
+        }
+
+        .continue-book-info {
+            height: auto !important;
+            min-height: 84px !important;
+            justify-content: center !important;
+            gap: 4px !important;
+        }
+
         .continue-reading-card h4 {
-            font-size: 12px !important;
-            margin-bottom: 2px !important;
+            font-size: 13px !important;
+            margin-bottom: 0px !important;
+            line-height: 1.2 !important;
         }
 
         .continue-reading-card p {
-            font-size: 10px !important;
-            margin-bottom: 3px !important;
+            font-size: 11px !important;
+            margin-bottom: 2px !important;
+            line-height: 1.2 !important;
         }
 
         .continue-btn {
-            padding: 3px 8px !important;
+            padding: 3px 10px !important;
             font-size: 11px !important;
             border-radius: 8px !important;
+            margin-top: 2px !important;
         }
     }
 </style>
@@ -108,22 +121,23 @@
         font-family: 'Henny Penny', cursive;
         font-size: 15px;
         color: #1a3c11;
-        margin-bottom: 6px;
+        margin-bottom: 4px;
         display: block;
-        font-weight: normal;">
+        font-weight: normal;
+        flex-shrink: 0;">
         {{ __('continue?') }}
     </span>
 
-    <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
+    <div class="continue-reading-body" style="display: flex; gap: 10px; align-items: center; flex: 1;">
         @if($currentBook)
-            <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" style="flex-shrink: 0;">
+            <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" style="flex-shrink: 0; line-height: 0;">
                 @if(!empty($currentBook->cover_image))
                     <img src="{{ $currentBook->cover_image }}" 
                          alt="{{ $currentBook->title }}" 
                          loading="eager"
                          decoding="sync"
                          fetchpriority="high"
-                         referrerpolicy="no-referrer"
+                         referrerpolicy="no-referrer" 
                          class="continue-book-cover">
                 @else
                     <div class="continue-book-cover" style="display: flex; align-items: center; justify-content: center; font-size: 24px;">
@@ -138,18 +152,18 @@
                     <h4 style="color: #1a3c11; font-size: 15px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->title }}
                     </h4>
-                    <p style="color: #3b612d; font-size: 12px; margin: 0 0 6px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+                    <p style="color: #3b612d; font-size: 12px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->author }}
                     </p>
 
                     @if($hasPercentage)
-                        <div style="margin-bottom: 4px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
+                        <div style="margin-bottom: 2px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #1a3c11; font-weight: bold; margin-bottom: 1px;">
                                 <span>%{{ $pct }}</span>
                                 <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} {{ __('p.') }}</span>
                             </div>
-                            <div style="width: 95%; height: 5px; background-color: #eaf3e4; border: 1px solid #737e3d; border-radius: 6px; overflow: hidden;">
-                                <div style="width: {{ $pct }}%; height: 95%; background: #2d5a27; border-radius: 6px; transition: width 0.4s ease;"></div>
+                            <div style="width: 100%; height: 5px; background-color: #eaf3e4; border: 1px solid #737e3d; border-radius: 6px; overflow: hidden;">
+                                <div style="width: {{ $pct }}%; height: 100%; background: #2d5a27; border-radius: 6px; transition: width 0.4s ease;"></div>
                             </div>
                         </div>
                     @endif
