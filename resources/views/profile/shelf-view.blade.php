@@ -65,6 +65,7 @@
             overflow: hidden;
         }
 
+        /* 50PX BELİRGİN KİLİT SİMGESİ (locke.png / unlocked.png) */
         .board-lock-badge {
             position: absolute;
             top: 14px;
@@ -119,6 +120,7 @@
             background: #d8eed0;
             border-color: #4b813b;
             color: #1e4215;
+            font-weight: bold;
         }
         .btn-action:disabled {
             opacity: 0.6;
@@ -545,7 +547,7 @@
     $targetId = $user->id ?? 0;
     $isOwnProfile = auth()->check() && ($authId === $targetId);
 
-    // Veritabanındaki friendships tablosundan doğrudan kesin kontrol:
+    // Veritabanındaki friendships tablosundan doğrudan teyit:
     $isFriendUser = false;
     if (auth()->check() && !$isOwnProfile) {
         $isFriendUser = \DB::table('friendships')
@@ -605,7 +607,6 @@
                         $loggedUsername = auth()->user()->username ?? '';
                         $authorText = $item['author'] ?? '';
 
-                        // Türkçe I/ı ve İ/i duyarsızlaştırması
                         $normalize = function($str) {
                             $str = str_replace(['I', 'İ'], ['ı', 'i'], $str);
                             return mb_strtolower($str, 'UTF-8');
@@ -619,7 +620,6 @@
                             str_contains($cleanAuthor, $cleanLogged)
                         );
 
-                        // Profil sahibi her şeyi, notu yazan kişi de kendi notunu düzenleyebilir
                         $canManage = $isOwnProfile || ($isAuthor && !$isBoardLocked);
                         $scale = $item['scale'] ?? 0.65;
                         $rot = $item['rotation'] ?? 0;
@@ -693,6 +693,10 @@
 
         @if($canAddPostit)
             <button id="openPostitModalBtn" class="btn-action">📌 ADD POST-IT</button>
+            {{-- Arkadaşın yaptığı değişiklikleri kaydetmesi için SAVE butonu --}}
+            @if(!$isOwnProfile)
+                <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">💾 SAVE</button>
+            @endif
         @elseif($isBoardLocked)
             <button class="btn-action" disabled>🔒 BOARD LOCKED</button>
         @elseif(auth()->check() && !$isOwnProfile && !$isFriendUser)
@@ -786,7 +790,8 @@
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
-    const SAVE_URL = PROFILE_USERNAME ? `/u/${PROFILE_USERNAME}/board/save` : '';
+    // Rota URL'sini dinamik ve kesin bağlama
+    const SAVE_URL = @json(url('/u/' . $user->username . '/board/save'));
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
     const ACHIEVEMENTS_DATA = @json($achievements ?? []);
@@ -799,7 +804,6 @@
     const boardLockImg = document.getElementById('boardLockImg');
     const openPostitModalBtn = document.getElementById('openPostitModalBtn');
 
-    // Profil sahibi EDIT butonuna basınca aktif olur; ziyaretçi arkadaş ise doğrudan kendi notunu düzenleyebilir
     let isEditingModeActive = false;
 
     let globalMaxZIndex = 100;
@@ -808,8 +812,16 @@
         element.style.zIndex = globalMaxZIndex;
     }
 
+    function showFriendSaveButton() {
+        if (!IS_OWN_PROFILE) {
+            const btn = document.getElementById('friendSaveBtn');
+            if (btn) btn.style.display = 'inline-block';
+        }
+    }
+
+    // --- PROFİL SAHİBİ İÇİN EDIT / SAVE DÖNGÜSÜ ---
     if (toggleEditBtn && IS_OWN_PROFILE) {
-        toggleEditBtn.addEventListener('click', function() {
+        toggleEditBtn.addEventListener('click', async function() {
             isEditingModeActive = !isEditingModeActive;
             const grid = document.getElementById('keychainHooksGrid');
 
@@ -820,18 +832,24 @@
                 if (grid) grid.classList.add('is-editing-mode');
                 if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'inline-block';
             } else {
+                this.innerText = '⏳ Kaydediliyor...';
+                this.disabled = true;
+                
+                await saveBoardToDatabase();
+
                 this.innerText = '✏️ Edit Board';
+                this.disabled = false;
                 this.classList.remove('saving');
                 corkboard.classList.remove('is-editing-active');
                 if (grid) grid.classList.remove('is-editing-mode');
                 if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'none';
                 
                 document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
-                saveBoardToDatabase();
             }
         });
     }
 
+    // --- PANO KİLİTLEME ---
     if (boardLockBtn && IS_OWN_PROFILE) {
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
@@ -841,7 +859,13 @@
         });
     }
 
-    async function saveBoardToDatabase() {
+    // --- VERİTABANINA GERÇEK ASYNC KAYIT ---
+    async function saveBoardToDatabase(triggerBtn = null) {
+        if (triggerBtn) {
+            triggerBtn.innerText = '⏳ Kaydediliyor...';
+            triggerBtn.disabled = true;
+        }
+
         const boardItems = [];
         
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
@@ -881,25 +905,43 @@
             hookSlots.push(img ? img.dataset.key : null);
         });
 
-        localStorage.setItem(`bookie_board_backup_${@json($user->id ?? 0)}`, JSON.stringify({ boardItems, hookSlots, isBoardLocked }));
+        try {
+            const res = await fetch(SAVE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    board_items: boardItems,
+                    hook_slots: hookSlots,
+                    is_locked: isBoardLocked
+                })
+            });
 
-        if (SAVE_URL) {
-            try {
-                await fetch(SAVE_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': CSRF_TOKEN,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        board_items: boardItems,
-                        hook_slots: hookSlots,
-                        is_locked: isBoardLocked
-                    })
-                });
-            } catch (error) {
-                console.error('Kayıt hatası:', error);
+            const data = await res.json();
+            if (res.ok) {
+                if (triggerBtn) {
+                    triggerBtn.innerText = '✅ Kaydedildi!';
+                    setTimeout(() => {
+                        triggerBtn.style.display = 'none';
+                        triggerBtn.innerText = '💾 SAVE';
+                        triggerBtn.disabled = false;
+                    }, 1200);
+                }
+            } else {
+                alert('Kayıt başarısız: ' + (data.error || 'Bilinmeyen hata'));
+                if (triggerBtn) {
+                    triggerBtn.innerText = '💾 SAVE';
+                    triggerBtn.disabled = false;
+                }
+            }
+        } catch (error) {
+            console.error('Kayıt isteği hatası:', error);
+            if (triggerBtn) {
+                triggerBtn.innerText = '💾 SAVE';
+                triggerBtn.disabled = false;
             }
         }
     }
@@ -940,7 +982,7 @@
                 e.stopPropagation();
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 wrapper.remove();
-                saveBoardToDatabase();
+                if (!IS_OWN_PROFILE) showFriendSaveButton();
             };
         }
 
@@ -965,7 +1007,7 @@
                 function onStop() {
                     window.removeEventListener('mousemove', onResize);
                     window.removeEventListener('mouseup', onStop);
-                    saveBoardToDatabase();
+                    if (!IS_OWN_PROFILE) showFriendSaveButton();
                 }
 
                 window.addEventListener('mousemove', onResize);
@@ -995,7 +1037,7 @@
                 function onRotateStop() {
                     window.removeEventListener('mousemove', onRotate);
                     window.removeEventListener('mouseup', onRotateStop);
-                    saveBoardToDatabase();
+                    if (!IS_OWN_PROFILE) showFriendSaveButton();
                 }
 
                 window.addEventListener('mousemove', onRotate);
@@ -1362,7 +1404,10 @@
         previewSticker.src = '';
         fileInput.value = '';
 
-        saveBoardToDatabase();
+        // Arkadaş eklediyse SAVE butonunu çıkar
+        if (!IS_OWN_PROFILE) {
+            showFriendSaveButton();
+        }
     }
 
     function makeItemDraggable(element, isMyItem = false) {
@@ -1404,7 +1449,7 @@
             function onMouseUp() {
                 window.removeEventListener('mousemove', onMouseMove);
                 window.removeEventListener('mouseup', onMouseUp);
-                saveBoardToDatabase();
+                if (!IS_OWN_PROFILE) showFriendSaveButton();
             }
 
             window.addEventListener('mousemove', onMouseMove);

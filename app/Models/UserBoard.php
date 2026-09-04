@@ -13,11 +13,13 @@ class UserBoard extends Model
         'user_id',
         'board_items',
         'hook_slots',
+        'is_locked',
     ];
 
     protected $casts = [
         'board_items' => 'array',
-        'hook_slots' => 'array',
+        'hook_slots'  => 'array',
+        'is_locked'   => 'boolean',
     ];
 
     public function user()
