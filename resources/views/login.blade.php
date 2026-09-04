@@ -116,15 +116,21 @@
         .alt-linkler p { margin: 8px 0; color: #0f511e; }
         .alt-linkler a { color: #2e6f40; text-decoration: none; font-family: "Henny Penny", cursive; }
 
-        /* --- ÇİZDİĞİN DEFTER AYRACI --- */
+        /* --- DEFTER AYRACI --- */
         .postit-tab-container {
             position: absolute;
-            top: 45px;
-            right: -36px;
-            z-index: 2;
+            top: 40px;
+            right: 0;
+            z-index: 100;
             display: flex;
-            align-items: flex-start;
+            align-items: center;
+            transform: translateX(38px);
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Tıklanınca sağa fırlar */
+        .postit-tab-container.open {
+            transform: translateX(100%);
         }
 
         /* Kulakçık */
@@ -140,32 +146,28 @@
             justify-content: center;
             font-size: 18px;
             cursor: pointer;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.15);
+            flex-shrink: 0;
         }
 
-        /* Arkadan fırlayan not kağıdı */
+        /* Dışarı fırlayan kart */
         .postit-content {
-            width: 180px;
+            width: 170px;
             background: #fdf5a6;
             border: 2px solid #5a7d3b;
             border-radius: 12px;
-            padding: 12px;
+            padding: 12px 10px;
             text-align: center;
             font-family: 'Unkempt', cursive;
-            box-shadow: 2px 4px 10px rgba(0,0,0,0.15);
-            display: none;
+            box-shadow: 4px 4px 12px rgba(0,0,0,0.18);
             margin-left: 6px;
-        }
-
-        .postit-tab-container.open .postit-content {
-            display: block;
         }
 
         .btn-app-install {
             background: #2e6f40;
             color: #ffffff;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             padding: 6px 12px;
             font-size: 12px;
             font-weight: bold;
@@ -173,6 +175,17 @@
             cursor: pointer;
             margin-top: 8px;
             display: inline-block;
+        }
+
+        .btn-app-install:hover {
+            background: #235631;
+        }
+
+        /* Yüklü uygulamada ayracı tamamen gizle */
+        @media all and (display-mode: standalone) {
+            .postit-tab-container {
+                display: none !important;
+            }
         }
 
         .floating-lang-switch {
@@ -194,11 +207,27 @@
                 <form method="POST" action="/login">
                     @csrf
                     
+                    @if (session('status'))
+                        <p style="color: #2e6f40; font-size: 15px; font-family: 'Unkempt', cursive; text-align: center; margin-bottom: 15px;">
+                            {{ session('status') }}
+                        </p>
+                    @endif
+
                     <label for="loginname">{{ __('username or email:') }}</label>
                     <input type="text" id="loginname" name="loginname" value="{{ old('loginname') }}" required autocomplete="username">
+                    @error('loginname')
+                        <small style="color: #2e6433; font-size: 14px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 14px; text-align: center;">
+                            {{ $message }}
+                        </small>
+                    @enderror
 
                     <label for="password">{{ __('password:') }}</label>
                     <input type="password" id="password" name="password" required autocomplete="current-password">
+                    @error('password')
+                        <small style="color: #2e6433; font-size: 14px; font-family: 'Unkempt', cursive; display: block; margin-top: -12px; margin-bottom: 14px; text-align: center;">
+                            {{ $message }}
+                        </small>
+                    @enderror
 
                     <button type="submit">{{ __('log in') }}</button>
 
@@ -209,13 +238,13 @@
                 </form>
             </div>
 
-            {{-- KENARDAKİ POST-IT AYRAÇ --}}
+            {{-- DEFTER AYRACI --}}
             <div class="postit-tab-container" id="postitTab">
                 <div class="postit-handle" onclick="togglePostit(event)">
                     📲
                 </div>
                 <div class="postit-content">
-                    <div style="font-size: 13px; font-weight: bold; color: #1a562b;">
+                    <div style="font-size: 13px; font-weight: bold; color: #1a562b; line-height: 1.2;">
                         download the bookieapp !!
                     </div>
                     <button type="button" class="btn-app-install" onclick="installAppAction()">
@@ -233,6 +262,12 @@
     </div>
 
     <script>
+        // Yüklü uygulama kontrolü
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone) {
+            const tab = document.getElementById('postitTab');
+            if (tab) tab.style.display = 'none';
+        }
+
         function togglePostit(e) {
             e.stopPropagation();
             document.getElementById('postitTab').classList.toggle('open');
@@ -245,8 +280,26 @@
             }
         });
 
+        // Android / Chrome için PWA tetikleyici
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
         function installAppAction() {
-            alert("Bookie uygulamasını telefonuna eklemek için Safari/Chrome menüsünden 'Ana Ekrana Ekle' seçeneğine dokunabilirsin! ✨");
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        const tab = document.getElementById('postitTab');
+                        if (tab) tab.style.display = 'none';
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert("iPhone için: Safari'de alttaki 'Paylaş' simgesine basıp 'Ana Ekrana Ekle' diyebilirsin! ✨");
+            }
         }
     </script>
 </body>
