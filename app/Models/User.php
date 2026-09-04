@@ -132,7 +132,7 @@ class User extends Authenticatable
 
     public function friendshipStatusWith(User $user) 
     {
-        $friendship = \App\Models\Friendship::where(function($q) use ($user) {
+        $friendship = \App\Models\friendship::where(function($q) use ($user) {
             $q->where('user_id', $this->id)->where("friend_id", $user->id);
         })->orWhere(function($q) use ($user) {
             $q->where('user_id', $user->id)->where("friend_id", $this->id);
