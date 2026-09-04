@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\UserBook;
 use App\Models\User;
 use App\Models\friendship;
@@ -41,7 +42,36 @@ class ProfileController extends Controller
             ->where("status", "pending")
             ->get();
 
-        return view("profile", compact("user", "userBooks", "booksCount", "friendsCount", "pendingRequests", "friendship", "isOwnProfile"));
+        // --- YILLIK OKUMA HEDEFİ HESAPLAMALARI ---
+        $currentYear = (int) now()->format('Y');
+
+        $readingGoal = DB::table('reading_goals')
+            ->where('user_id', $user->id)
+            ->where('year', $currentYear)
+            ->first();
+
+        $readThisYear = DB::table('user_books')
+            ->where('user_id', $user->id)
+            ->where('status', 'read')
+            ->whereYear('updated_at', $currentYear)
+            ->count();
+
+        $goalTarget = $readingGoal ? $readingGoal->target_books : null;
+        $goalProgress = $goalTarget ? min(100, round(($readThisYear / $goalTarget) * 100)) : 0;
+
+        return view("profile", compact(
+            "user", 
+            "userBooks", 
+            "booksCount", 
+            "friendsCount", 
+            "pendingRequests", 
+            "friendship", 
+            "isOwnProfile",
+            "readingGoal",
+            "readThisYear",
+            "goalProgress",
+            "currentYear"
+        ));
     }
 
     public function settings()
