@@ -313,16 +313,17 @@
             }
 
             .profile-container {
-                height: auto !important;
-                min-height: calc(100vh - 68px) !important;
+                height: calc(100vh - 68px) !important;
+                height: calc(100dvh - 68px) !important;
                 min-height: calc(100dvh - 68px) !important;
                 border: none !important;
                 display: flex !important;
                 flex-direction: column !important;
                 align-items: center !important;
                 background-color: transparent !important;
-                padding: 12px 8px 80px 8px !important;
+                padding: 8px 8px 12px 8px !important;
                 overflow: hidden !important;
+                box-sizing: border-box !important;
             }
 
             .profile-sidebar-panel {
@@ -402,13 +403,13 @@
                 transform: rotate(-1.5deg);
             }
 
-            /* BEYAZ ALANIN MOBİLDE HER İKİ GÖRÜNÜMDE DE BOYUTUNU SABİTLEME */
             .profile-main-content {
                 width: 100% !important;
                 max-width: 100% !important;
-                height: auto !important;
-                max-height: calc(100dvh - 86px) !important; /* Ekrandan taşmaz */
-                padding: 14px 10px 14px 10px !important;
+                flex: 1 1 0% !important;
+                height: 100% !important;
+                max-height: 100% !important;
+                padding: 12px 10px 10px 10px !important;
                 border: 2px solid #4c7237 !important;
                 border-radius: 16px !important;
                 background-color: #f7faf5 !important;
@@ -416,14 +417,10 @@
                 display: flex !important;
                 flex-direction: column !important;
                 overflow: hidden !important;
-                flex: none !important;
+                box-sizing: border-box !important;
             }
 
             .profile-main-content > div:first-child {
-                display: flex !important;
-                flex-direction: row !important;
-                justify-content: space-between !important;
-                align-items: center !important;
                 margin-bottom: 8px !important;
                 flex-shrink: 0 !important;
             }
@@ -432,16 +429,10 @@
                 font-size: 19px !important;
             }
 
-            #profile-list-view {
-                flex: 1 1 auto !important;
-                overflow-y: auto !important;
-                -webkit-overflow-scrolling: touch;
-                min-height: 0 !important;
-                padding-bottom: 12px !important;
-            }
-
+            #profile-list-view,
             #profile-board-view {
-                flex: 1 1 auto !important;
+                flex: 1 1 0% !important;
+                height: 100% !important;
                 overflow-y: auto !important;
                 -webkit-overflow-scrolling: touch;
                 min-height: 0 !important;

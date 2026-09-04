@@ -35,8 +35,13 @@
             @include('profile.book-card', ['item' => $item])
         @empty
             <div style="text-align: center; color: #6c8c5a; padding: 40px 0; font-size: 15px;">
-                {{ __("You didn't save any books yet, you should start somewhere") }}
+                @if($isOwnProfile ?? false)
+                    {{ __("You didn't save any books yet, you should start somewhere") }}
+                @else
+                    {{ __("This user hasn't saved any books yet.") }}
+                @endif
             </div>
+        @endforelse
         @endforelse
     </div>
 
