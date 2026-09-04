@@ -736,23 +736,25 @@
             </div>
 
             <div class="studio-preview">
-                <div class="postit-inner-card size-square" id="previewPostitBox" style="background:#fdf5a6;">
+                <div class="postit-inner-card size-square" id="previewPostitBox" style="background:#fdf5a6; position: relative;">
                     <span class="postit-pin"></span>
                     
-                    <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:16px;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:18px; white-space:nowrap;">selam</div>
+                    <!-- METİN KATMANI -->
+                    <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10;">
+                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:18px; word-break: break-word; user-select: none;">selam</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <div id="stickerTransformBox" class="transform-box" style="display:none; top:55px; left:35px; width:70px; height:auto;">
-                        <img id="previewStickerLayer" class="postit-sticker-img" style="width:100%; height:auto; display:block;">
+                    <!-- STICKER KATMANI (Resim seçilene kadar display: none ile gizli) -->
+                    <div id="stickerTransformBox" class="transform-box" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;">
+                        <img id="previewStickerLayer" class="postit-sticker-img" src="" style="width:100%; height:auto; display:block; pointer-events: none;">
                         <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
                     </div>
 
-                    <div class="postit-author" id="previewAuthorLabel"></div>
+                    <div class="postit-author" id="previewAuthorLabel" style="position: absolute; bottom: 4px; left: 6px; font-size: 11px;"></div>
                 </div>
                 <span style="font-size:10px; color:#777;">*Köşelerden tutup döndür / boyutlandır</span>
             </div>
@@ -774,6 +776,7 @@
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
+    // Rota URL'sini ID bazlı güvenli tanımlama
     const SAVE_URL = @json(route('board.save', $user->id ?? auth()->id()));
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
@@ -1181,6 +1184,7 @@
 
     function setupStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
+        if (!box) return;
         const rotateBtn = box.querySelector('.handle-rotate');
         const resizeBtn = box.querySelector('.handle-resize');
 
@@ -1266,14 +1270,6 @@
     setupStoryTransformer('textTransformBox');
     setupStoryTransformer('stickerTransformBox');
 
-    document.getElementById('btnDeleteSticker').addEventListener('click', (e) => {
-        e.stopPropagation();
-        const sBox = document.getElementById('stickerTransformBox');
-        sBox.style.display = 'none';
-        document.getElementById('previewStickerLayer').src = '';
-        document.getElementById('studioFileInput').value = '';
-    });
-
     const modal = document.getElementById('postitStudioModal');
     const openModalBtn = document.getElementById('openPostitModalBtn');
     const textInput = document.getElementById('studioTextInput');
@@ -1283,18 +1279,32 @@
     const stickerBox = document.getElementById('stickerTransformBox');
     const textTransformBox = document.getElementById('textTransformBox');
     const fileInput = document.getElementById('studioFileInput');
+    const delStickerBtn = document.getElementById('btnDeleteSticker');
 
     let selectedColor = '#fdf5a6';
     let selectedShape = 'size-square';
 
+    // Metin değiştikçe önizlemeyi anlık güncelle
+    if (textInput && previewText) {
+        textInput.addEventListener('input', function() {
+            previewText.textContent = this.value.trim() !== '' ? this.value : 'selam';
+        });
+    }
+
+    // Modal açılışında yazarı hazırla
     if (openModalBtn) {
         openModalBtn.addEventListener('click', () => {
-            document.getElementById('previewAuthorLabel').innerText = '@' + CURRENT_USERNAME;
+            const authorLabel = document.getElementById('previewAuthorLabel');
+            if (authorLabel) {
+                authorLabel.innerText = '@' + CURRENT_USERNAME;
+            }
             modal.classList.add('active');
         });
     }
 
-    function closePostitModal() { modal.classList.remove('active'); }
+    function closePostitModal() { 
+        modal.classList.remove('active'); 
+    }
 
     document.querySelectorAll('.color-ball').forEach(b => {
         b.addEventListener('click', function() {
@@ -1314,36 +1324,44 @@
         });
     });
 
-    textInput.addEventListener('input', () => {
-        previewText.innerText = textInput.value || 'selam';
-        textTransformBox.style.width = 'fit-content';
-    });
+    // Resim/Sticker yükleme
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            const file = this.files[0];
+            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
+            if (file && validTypes.includes(file.type)) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const tempImg = new Image();
+                    tempImg.onload = function() {
+                        stickerAspectRatio = tempImg.naturalHeight / tempImg.naturalWidth;
+                        let initialW = 70;
+                        let initialH = initialW * stickerAspectRatio;
 
-    fileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-        if (file && validTypes.includes(file.type)) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                    stickerAspectRatio = tempImg.naturalHeight / tempImg.naturalWidth;
-                    let initialW = 70;
-                    let initialH = initialW * stickerAspectRatio;
+                        stickerBox.style.width = initialW + 'px';
+                        stickerBox.style.height = initialH + 'px';
+                        previewSticker.src = e.target.result;
+                        stickerBox.style.display = 'block';
 
-                    stickerBox.style.width = initialW + 'px';
-                    stickerBox.style.height = initialH + 'px';
-                    previewSticker.src = e.target.result;
-                    stickerBox.style.display = 'block';
-
-                    document.querySelectorAll('#postitStudioModal .transform-box').forEach(b => b.classList.remove('is-selected'));
-                    stickerBox.classList.add('is-selected');
+                        document.querySelectorAll('#postitStudioModal .transform-box').forEach(b => b.classList.remove('is-selected'));
+                        stickerBox.classList.add('is-selected');
+                    };
+                    tempImg.src = e.target.result;
                 };
-                tempImg.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
+                reader.readAsDataURL(file);
+            }
+        });
+    }
+
+    // Sticker silme butonu
+    if (delStickerBtn) {
+        delStickerBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            if (stickerBox) stickerBox.style.display = 'none';
+            if (previewSticker) previewSticker.src = '';
+            if (fileInput) fileInput.value = '';
+        });
+    }
 
     function pinNoteToBoard() {
         const postitWrapper = document.createElement('div');
@@ -1369,6 +1387,12 @@
             box.style.border = 'none';
         });
 
+        // Seçilmemişse gizli kalan boş sticker kutusunu panoya basmadan temizle
+        if (stickerBox.style.display === 'none') {
+            const emptySticker = clonedCard.querySelector('.postit-sticker-img')?.closest('.transform-box');
+            if (emptySticker) emptySticker.remove();
+        }
+
         postitWrapper.appendChild(clonedCard);
 
         postitWrapper.innerHTML += `
@@ -1383,7 +1407,7 @@
         closePostitModal();
 
         textInput.value = '';
-        previewText.innerText = 'selam';
+        previewText.textContent = 'selam';
         stickerBox.style.display = 'none';
         previewSticker.src = '';
         fileInput.value = '';
