@@ -174,7 +174,10 @@
 }
 
 @media (max-width: 1024px) {
-    about-bookie-card {
+    #about-postit-container,
+    #about-postit-tab,
+    .about-postit-container,
+    .about-postit-tab {
         display: none !important;
     }
 }
