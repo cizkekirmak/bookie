@@ -41,6 +41,16 @@
         overflow: hidden;
     }
 
+    /* MASAÜSTÜ & MOBİL EŞLEŞTİRME SAHNESİ */
+    .corkboard-stage {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 780px;
+        height: 487.5px;
+        transform-origin: 0 0;
+    }
+
     .board-lock-badge {
         position: absolute;
         top: 14px;
@@ -739,64 +749,67 @@
 
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
-            <div class="board-lock-badge" id="boardLockBtn" 
-                 title="{{ $isOwnProfile ? __('lock / unlock for visitors') : ($isBoardLocked ? __('board is locked') : __('board is open')) }}" 
-                 style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
-                <img id="boardLockImg" 
-                     src="{{ $isBoardLocked ? asset('images/locke.png') : asset('images/unlocked.png') }}" 
-                     alt="{{ __('lock status') }}" 
-                     onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
-            </div>
+            {{-- MASAÜSTÜ İLE BİREBİR ORANTILANAN SAHNE --}}
+            <div class="corkboard-stage" id="boardStage">
+                <div class="board-lock-badge" id="boardLockBtn" 
+                     title="{{ $isOwnProfile ? __('lock / unlock for visitors') : ($isBoardLocked ? __('board is locked') : __('board is open')) }}" 
+                     style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
+                    <img id="boardLockImg" 
+                         src="{{ $isBoardLocked ? asset('images/locke.png') : asset('images/unlocked.png') }}" 
+                         alt="{{ __('lock status') }}" 
+                         onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
+                </div>
 
-            @foreach($boardItems as $item)
-                @if(($item['type'] ?? '') === 'postit')
-                    @php
-                        $loggedUsername = auth()->user()->username ?? '';
-                        $authorText = $item['author'] ?? '';
+                @foreach($boardItems as $item)
+                    @if(($item['type'] ?? '') === 'postit')
+                        @php
+                            $loggedUsername = auth()->user()->username ?? '';
+                            $authorText = $item['author'] ?? '';
 
-                        $normalize = function($str) {
-                            $str = str_replace(['I', 'İ'], ['ı', 'i'], $str);
-                            return mb_strtolower($str, 'UTF-8');
-                        };
+                            $normalize = function($str) {
+                                $str = str_replace(['I', 'İ'], ['ı', 'i'], $str);
+                                return mb_strtolower($str, 'UTF-8');
+                            };
 
-                        $cleanLogged = $normalize($loggedUsername);
-                        $cleanAuthor = $normalize($authorText);
+                            $cleanLogged = $normalize($loggedUsername);
+                            $cleanAuthor = $normalize($authorText);
 
-                        $isAuthor = !empty($cleanLogged) && (
-                            str_contains($cleanAuthor, '@' . $cleanLogged) || 
-                            str_contains($cleanAuthor, $cleanLogged)
-                        );
+                            $isAuthor = !empty($cleanLogged) && (
+                                str_contains($cleanAuthor, '@' . $cleanLogged) || 
+                                str_contains($cleanAuthor, $cleanLogged)
+                            );
 
-                        $canManage = $isOwnProfile || ($isAuthor && !$isBoardLocked);
-                        $scale = $item['scale'] ?? 0.65;
-                        $rot = $item['rotation'] ?? 0;
-                    @endphp
-                    <div class="cork-postit {{ $canManage ? 'can-delete' : '' }}" 
-                        style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; z-index: {{ $item['zIndex'] ?? 10 }}; transform: scale({{ $scale }}) rotate({{ $rot }}deg);"
-                        data-scale="{{ $scale }}"
-                        data-rotation="{{ $rot }}"
-                        data-can-manage="{{ $canManage ? '1' : '0' }}">
-                        <div class="postit-inner-card {{ $item['shapeClass'] ?? 'size-square' }}" style="background-color: {{ $item['bg'] }};">
-                            {!! $item['html'] !!}
+                            $canManage = $isOwnProfile || ($isAuthor && !$isBoardLocked);
+                            $scale = $item['scale'] ?? 0.65;
+                            $rot = $item['rotation'] ?? 0;
+                        @endphp
+                        <div class="cork-postit {{ $canManage ? 'can-delete' : '' }}" 
+                            style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; z-index: {{ $item['zIndex'] ?? 10 }}; transform: scale({{ $scale }}) rotate({{ $rot }}deg);"
+                            data-scale="{{ $scale }}"
+                            data-rotation="{{ $rot }}"
+                            data-can-manage="{{ $canManage ? '1' : '0' }}">
+                            <div class="postit-inner-card {{ $item['shapeClass'] ?? 'size-square' }}" style="background-color: {{ $item['bg'] }};">
+                                {!! $item['html'] !!}
+                            </div>
+                            @if($canManage)
+                                <div class="handle-btn handle-delete postit-delete-btn" title="{{ __('delete') }}">✕</div>
+                                <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
+                                <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
+                            @endif
                         </div>
-                        @if($canManage)
-                            <div class="handle-btn handle-delete postit-delete-btn" title="{{ __('delete') }}">✕</div>
-                            <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
-                            <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
-                        @endif
-                    </div>
-                @elseif(($item['type'] ?? '') === 'free_sticker')
-                    <div class="free-sticker-wrapper" 
-                         style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; width: {{ $item['width'] ?? '80px' }}; height: {{ $item['height'] ?? '80px' }}; transform: {{ $item['transform'] ?? 'rotate(0deg)' }}; z-index: {{ $item['zIndex'] ?? 10 }};">
-                        <img src="{{ $item['src'] }}">
-                        @if($isOwnProfile)
-                            <div class="handle-btn handle-delete" title="{{ __('delete') }}">✕</div>
-                            <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
-                            <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
-                        @endif
-                    </div>
-                @endif
-            @endforeach
+                    @elseif(($item['type'] ?? '') === 'free_sticker')
+                        <div class="free-sticker-wrapper" 
+                             style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; width: {{ $item['width'] ?? '80px' }}; height: {{ $item['height'] ?? '80px' }}; transform: {{ $item['transform'] ?? 'rotate(0deg)' }}; z-index: {{ $item['zIndex'] ?? 10 }};">
+                            <img src="{{ $item['src'] }}">
+                            @if($isOwnProfile)
+                                <div class="handle-btn handle-delete" title="{{ __('delete') }}">✕</div>
+                                <div class="handle-btn handle-rotate" title="{{ __('rotate') }}">↻</div>
+                                <div class="handle-btn handle-resize" title="{{ __('resize') }}">⤡</div>
+                            @endif
+                        </div>
+                    @endif
+                @endforeach
+            </div>
         </div>
 
         <div class="keychain-area-wrapper">
@@ -972,6 +985,7 @@
     const FALLBACK_BADGE_SVG = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="18" r="8" fill="none" stroke="%23888" stroke-width="4"/><rect x="25" y="32" width="50" height="56" rx="14" fill="%23badfa0" stroke="%234b813b" stroke-width="3"/><circle cx="42" cy="54" r="4" fill="%232d5a27"/><circle cx="58" cy="54" r="4" fill="%232d5a27"/><path d="M 45 64 Q 50 68 55 64" fill="none" stroke="%232d5a27" stroke-width="3" stroke-linecap="round"/></svg>`;
 
     const corkboard = document.getElementById('corkboardArea');
+    const boardStage = document.getElementById('boardStage');
     const toggleEditBtn = document.getElementById('toggleEditBtn');
     const btnAddStickerBtn = document.getElementById('btnAddStickerBtn');
     const boardLockBtn = document.getElementById('boardLockBtn');
@@ -1035,52 +1049,31 @@
         });
     }
 
-    // --- MOBİLDE PANODAKİ TÜM ÖĞELERİ EKRAN GENİŞLİĞİNE GÖRE MİNYATÜRLEME ---
+    // --- MOBİLDE PANODAKİ TÜM SAHNEYİ BİREBİR ORANTILI KÜÇÜLTME ---
     function rescaleBoardForMobile() {
-        const board = document.getElementById('corkboardArea');
-        if (!board) return;
+        const frame = document.getElementById('corkboardArea');
+        const stage = document.getElementById('boardStage');
+        if (!frame || !stage) return;
 
         const originalWidth = 780;
-        const currentWidth = board.offsetWidth;
+        const currentWidth = frame.offsetWidth;
 
-        if (window.innerWidth <= 1024 && currentWidth > 0 && currentWidth < originalWidth) {
-            const ratio = currentWidth / originalWidth;
-
-            board.querySelectorAll('.cork-postit').forEach(item => {
-                const baseScale = parseFloat(item.dataset.scale) || 0.65;
-                const rot = parseFloat(item.dataset.rotation) || 0;
-                item.style.transform = `scale(${baseScale * ratio}) rotate(${rot}deg)`;
-            });
-
-            board.querySelectorAll('.free-sticker-wrapper').forEach(item => {
-                const rotMatch = (item.style.transform || '').match(/rotate\(([^)]+)\)/);
-                const rot = rotMatch ? rotMatch[1] : '0deg';
-                item.style.transform = `scale(${ratio}) rotate(${rot})`;
-            });
+        if (window.innerWidth <= 1024 && currentWidth > 0) {
+            const scale = currentWidth / originalWidth;
+            stage.style.transform = `scale(${scale})`;
         } else {
-            board.querySelectorAll('.cork-postit').forEach(item => {
-                const baseScale = parseFloat(item.dataset.scale) || 0.65;
-                const rot = parseFloat(item.dataset.rotation) || 0;
-                item.style.transform = `scale(${baseScale}) rotate(${rot}deg)`;
-            });
-            board.querySelectorAll('.free-sticker-wrapper').forEach(item => {
-                const rotMatch = (item.style.transform || '').match(/rotate\(([^)]+)\)/);
-                const rot = rotMatch ? rotMatch[1] : '0deg';
-                item.style.transform = `rotate(${rot})`;
-            });
+            stage.style.transform = 'none';
         }
     }
 
     window.addEventListener('resize', rescaleBoardForMobile);
     document.addEventListener('DOMContentLoaded', () => {
-        setTimeout(rescaleBoardForMobile, 100);
+        setTimeout(rescaleBoardForMobile, 60);
     });
 
-    const originalSwitchProfileView = window.switchProfileView;
+    const originalSwitch = window.switchProfileView;
     window.switchProfileView = function(mode) {
-        if (typeof originalSwitchProfileView === 'function') {
-            originalSwitchProfileView(mode);
-        }
+        if (typeof originalSwitch === 'function') originalSwitch(mode);
         if (mode === 'board') {
             setTimeout(rescaleBoardForMobile, 50);
         }
@@ -1285,8 +1278,9 @@
         const previewCard = document.getElementById('uniquePreviewCard');
         const sBox = document.getElementById('uniqueStickerBox');
         const txtInput = document.getElementById('uniqueTextInput');
+        const targetContainer = document.getElementById('boardStage') || corkboard;
         
-        if (!corkboard || !previewCard) return;
+        if (!targetContainer || !previewCard) return;
 
         const postitWrapper = document.createElement('div');
         postitWrapper.className = 'cork-postit can-delete';
@@ -1333,7 +1327,7 @@
 
         setupPostitControls(postitWrapper, true);
         makeItemDraggable(postitWrapper, true);
-        corkboard.appendChild(postitWrapper);
+        targetContainer.appendChild(postitWrapper);
 
         window.closeStudioModalSafe();
 
@@ -1444,6 +1438,7 @@
     }
 
     function createFreeStickerElement(src, top = '30%', left = '40%', width = '80px', height = '80px', transform = 'rotate(0deg)') {
+        const targetContainer = document.getElementById('boardStage') || corkboard;
         const wrap = document.createElement('div');
         wrap.className = 'free-sticker-wrapper';
         wrap.style.top = top;
@@ -1467,7 +1462,7 @@
             makeItemDraggable(wrap, true);
         }
 
-        corkboard.appendChild(wrap);
+        targetContainer.appendChild(wrap);
         return wrap;
     }
 
@@ -1605,7 +1600,8 @@
 
             let prevMouseX = e.clientX;
             let prevMouseY = e.clientY;
-            const boardRect = corkboard.getBoundingClientRect();
+            const stage = document.getElementById('boardStage') || corkboard;
+            const boardRect = stage.getBoundingClientRect();
 
             let curLeftPct = parseFloat(element.style.left) || 20;
             let curTopPct = parseFloat(element.style.top) || 20;
@@ -1646,7 +1642,7 @@
 
         const boardItems = [];
         
-        document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
+        document.querySelectorAll('#boardStage .cork-postit, #corkboardArea .cork-postit').forEach(item => {
             const authorText = item.querySelector('.postit-author') ? item.querySelector('.postit-author').innerText : '';
             const inner = item.querySelector('.postit-inner-card');
             boardItems.push({
@@ -1663,7 +1659,7 @@
             });
         });
 
-        document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
+        document.querySelectorAll('#boardStage .free-sticker-wrapper, #corkboardArea .free-sticker-wrapper').forEach(wrap => {
             const img = wrap.querySelector('img');
             boardItems.push({
                 type: 'free_sticker',
@@ -1869,13 +1865,13 @@
     });
 
     document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
+        document.querySelectorAll('#boardStage .cork-postit, #corkboardArea .cork-postit').forEach(wrapper => {
             const canManage = wrapper.dataset.canManage === '1';
             setupPostitControls(wrapper, canManage);
             makeItemDraggable(wrapper, canManage);
         });
 
-        document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
+        document.querySelectorAll('#boardStage .free-sticker-wrapper, #corkboardArea .free-sticker-wrapper').forEach(wrap => {
             if (IS_OWN_PROFILE) {
                 setupFreeStickerControls(wrap);
                 makeItemDraggable(wrap, true);
