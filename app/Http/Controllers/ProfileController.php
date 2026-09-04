@@ -83,10 +83,10 @@ class ProfileController extends Controller
 
         // --- 15 BAŞARIMIN DİNAMİK KONTROLLERİ ---
 
-        // 1. BURGER: Tek bir incelemeye 10+ beğeni
         $unlockedBurger = DB::table('review_likes')
             ->join('user_books', 'review_likes.review_id', '=', 'user_books.id')
             ->where('user_books.user_id', $targetUserId)
+            ->select('review_likes.review_id')
             ->groupBy('review_likes.review_id')
             ->havingRaw('COUNT(*) >= 10')
             ->exists();
