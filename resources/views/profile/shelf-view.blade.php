@@ -635,7 +635,6 @@
             width: 100%;
         }
 
-        /* Panoyu Masaüstü Oranında Sabitleyip Mobilde Orantılı Küçültme Alanı */
         .corkboard-frame { 
             width: 100% !important;
             max-width: 100% !important;
@@ -643,25 +642,11 @@
             border-radius: 12px; 
             position: relative;
             overflow: hidden !important;
+            touch-action: pan-y !important;
         }
 
-        /* Post-it'leri ve Çıkartmaları Ekran Genişliğine Göre Küçült */
-        /* Masaüstündeki 780px tahtaya göre mobilde yaklaşık 0.48x oranında minyatürleşir */
-        .cork-postit {
-            zoom: 0.50; /* Modern tarayıcılarda tüm post-it öğelerini ve fontlarını oranlar */
+        .cork-postit, .free-sticker-wrapper {
             pointer-events: none !important;
-        }
-
-        .free-sticker-wrapper {
-            zoom: 0.50;
-            pointer-events: none !important;
-        }
-
-        /* Safari ve zoom desteklemeyen mobil tarayıcılar için yedekleme */
-        @supports not (zoom: 0.5) {
-            .cork-postit, .free-sticker-wrapper {
-                transform: scale(calc(var(--mobile-scale, 1) * 0.52)) !important;
-            }
         }
 
         .keychain-area-wrapper { 
@@ -695,7 +680,6 @@
             grid-template-columns: repeat(3, 1fr); 
         }
         
-        /* Mobilde buton barını ve kilitleri gizle, sadece uyarıyı göster */
         .board-bottom-bar { 
             display: none !important; 
         }
@@ -1013,6 +997,95 @@
         }
     }
 
+    // --- İSTEMCİ TARAFI GÖRSEL SIKIŞTIRMA (CANVAS) ---
+    function compressImageClientSide(file, maxWidth = 300, maxHeight = 300, quality = 0.75) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function () {
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
+                    }
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                    resolve({ base64: compressedBase64, width, height });
+                };
+            };
+        });
+    }
+
+    // --- MOBİLDE PANODAKİ TÜM ÖĞELERİ EKRAN GENİŞLİĞİNE GÖRE MİNYATÜRLEME ---
+    function rescaleBoardForMobile() {
+        const board = document.getElementById('corkboardArea');
+        if (!board) return;
+
+        const originalWidth = 780;
+        const currentWidth = board.offsetWidth;
+
+        if (window.innerWidth <= 1024 && currentWidth > 0 && currentWidth < originalWidth) {
+            const ratio = currentWidth / originalWidth;
+
+            board.querySelectorAll('.cork-postit').forEach(item => {
+                const baseScale = parseFloat(item.dataset.scale) || 0.65;
+                const rot = parseFloat(item.dataset.rotation) || 0;
+                item.style.transform = `scale(${baseScale * ratio}) rotate(${rot}deg)`;
+            });
+
+            board.querySelectorAll('.free-sticker-wrapper').forEach(item => {
+                const rotMatch = (item.style.transform || '').match(/rotate\(([^)]+)\)/);
+                const rot = rotMatch ? rotMatch[1] : '0deg';
+                item.style.transform = `scale(${ratio}) rotate(${rot})`;
+            });
+        } else {
+            board.querySelectorAll('.cork-postit').forEach(item => {
+                const baseScale = parseFloat(item.dataset.scale) || 0.65;
+                const rot = parseFloat(item.dataset.rotation) || 0;
+                item.style.transform = `scale(${baseScale}) rotate(${rot}deg)`;
+            });
+            board.querySelectorAll('.free-sticker-wrapper').forEach(item => {
+                const rotMatch = (item.style.transform || '').match(/rotate\(([^)]+)\)/);
+                const rot = rotMatch ? rotMatch[1] : '0deg';
+                item.style.transform = `rotate(${rot})`;
+            });
+        }
+    }
+
+    window.addEventListener('resize', rescaleBoardForMobile);
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(rescaleBoardForMobile, 100);
+    });
+
+    const originalSwitchProfileView = window.switchProfileView;
+    window.switchProfileView = function(mode) {
+        if (typeof originalSwitchProfileView === 'function') {
+            originalSwitchProfileView(mode);
+        }
+        if (mode === 'board') {
+            setTimeout(rescaleBoardForMobile, 50);
+        }
+    };
+
     // --- MODAL YÖNETİMİ ---
     window.handleStudioTextInput = function(val) {
         const modal = document.getElementById('postitStudioModalUnique');
@@ -1068,37 +1141,31 @@
         modal.classList.remove('active');
     };
 
-    window.handleStudioImageUpload = function(input) {
+    window.handleStudioImageUpload = async function(input) {
         if (!input.files || !input.files[0]) return;
         const file = input.files[0];
         const sBox = document.getElementById('uniqueStickerBox');
 
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const img = new Image();
-            img.onload = function() {
-                studioStickerRatio = img.naturalHeight / img.naturalWidth;
-                const w = 70;
-                const h = Math.round(w * studioStickerRatio);
+        const { base64, width, height } = await compressImageClientSide(file, 300, 300, 0.75);
 
-                if (sBox) {
-                    sBox.style.width = w + 'px';
-                    sBox.style.height = h + 'px';
-                    sBox.innerHTML = `
-                        <img class="postit-sticker-img" src="${e.target.result}" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none;">
-                        <div class="handle-btn handle-delete" title="${I18N.handleDelete}" onclick="deleteStudioImage(event)">✕</div>
-                        <div class="handle-btn handle-rotate" title="${I18N.handleRotate}">↻</div>
-                        <div class="handle-btn handle-resize" title="${I18N.handleResize}">⤡</div>
-                    `;
-                    sBox.style.display = 'block';
+        studioStickerRatio = height / width;
+        const w = 70;
+        const h = Math.round(w * studioStickerRatio);
 
-                    document.querySelectorAll('#postitStudioModalUnique .transform-box').forEach(b => b.classList.remove('is-selected'));
-                    sBox.classList.add('is-selected');
-                }
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
+        if (sBox) {
+            sBox.style.width = w + 'px';
+            sBox.style.height = h + 'px';
+            sBox.innerHTML = `
+                <img class="postit-sticker-img" src="${base64}" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none;">
+                <div class="handle-btn handle-delete" title="${I18N.handleDelete}" onclick="deleteStudioImage(event)">✕</div>
+                <div class="handle-btn handle-rotate" title="${I18N.handleRotate}">↻</div>
+                <div class="handle-btn handle-resize" title="${I18N.handleResize}">⤡</div>
+            `;
+            sBox.style.display = 'block';
+
+            document.querySelectorAll('#postitStudioModalUnique .transform-box').forEach(b => b.classList.remove('is-selected'));
+            sBox.classList.add('is-selected');
+        }
     };
 
     window.deleteStudioImage = function(e) {
@@ -1487,23 +1554,18 @@
 
     const freeStickerInput = document.getElementById('freeStickerUploadInput');
     if (freeStickerInput) {
-        freeStickerInput.addEventListener('change', function() {
+        freeStickerInput.addEventListener('change', async function() {
             const file = this.files[0];
             const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
             if (file && validTypes.includes(file.type)) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => {
-                        let w = 80;
-                        let h = (img.naturalHeight / img.naturalWidth) * 80;
-                        const newElem = createFreeStickerElement(e.target.result, '30%', '40%', w + 'px', h + 'px');
-                        document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
-                        newElem.classList.add('is-selected');
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
+                const { base64, width, height } = await compressImageClientSide(file, 320, 320, 0.75);
+
+                let w = 80;
+                let h = (height / width) * 80;
+                const newElem = createFreeStickerElement(base64, '30%', '40%', w + 'px', h + 'px');
+                document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(w => w.classList.remove('is-selected'));
+                newElem.classList.add('is-selected');
+
                 this.value = '';
             }
         });
