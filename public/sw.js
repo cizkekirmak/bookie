@@ -1,3 +1,7 @@
-self.addEventListener('fetch', function(event) {
-    // Tarayıcının Bookie'yi uygulama olarak tanıması için servis devrede
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+});
+
+self.addEventListener('activate', (event) => {
+    event.waitUntil(clients.claim());
 });
