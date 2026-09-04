@@ -211,7 +211,7 @@
     .transform-box.is-selected .handle-btn,
     .is-editing-active .free-sticker-wrapper.is-selected .handle-btn,
     .cork-postit.can-delete.is-selected .handle-btn {
-        display: flex;
+        display: flex !important;
         align-items: center;
         justify-content: center;
     }
@@ -338,7 +338,7 @@
         transition: all 0.2s ease-out;
     }
     .keychain-collection-drawer.active {
-        display: flex;
+        display: flex !important;
         transform: translate(-50%, -50%) scale(1);
         opacity: 1;
     }
@@ -404,7 +404,7 @@
         align-items: center;
         justify-content: center;
     }
-    .modal-overlay.active { display: flex; }
+    .modal-overlay.active { display: flex !important; }
 
     .studio-modal-box {
         background: #fdfcf8;
@@ -676,7 +676,7 @@
         @endif
 
         @if($canAddPostit)
-            <button id="openPostitModalBtn" class="btn-action">📌 ADD POST-IT</button>
+            <button id="openPostitModalBtn" class="btn-action" onclick="openStudioModalSafe()">📌 ADD POST-IT</button>
             @if(!$isOwnProfile)
                 <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">💾 SAVE</button>
             @endif
@@ -699,8 +699,8 @@
 
 </div>
 
-<!-- POST-IT MİNİ STÜDYO MODAL (ORİJİNAL ÇALIŞAN TEMİZ HTML YAPISI) -->
-<div class="modal-overlay" id="postitStudioModal">
+<!-- POST-IT MİNİ STÜDYO MODAL -->
+<div class="modal-overlay" id="postitStudioModalUnique">
     <div class="studio-modal-box">
         <h3 style="margin: 0; font-size: 16px; color: #1e4215;">✨ Create Your Note</h3>
         
@@ -726,40 +726,41 @@
                     </div>
                 </div>
 
-                <textarea id="studioTextInput" class="studio-input-box" placeholder="Write something cozy..." maxlength="120"></textarea>
+                <!-- Çift ID çakışmasını engellemek için doğrudan oninput ile bağlı -->
+                <textarea id="uniqueTextInput" 
+                          class="studio-input-box" 
+                          placeholder="Write something cozy..." 
+                          maxlength="120"
+                          oninput="var txt = document.getElementById('uniqueTextLayer'); if(txt){ txt.textContent = this.value.trim() !== '' ? this.value : 'selam'; var b = document.getElementById('uniqueTextBox'); if(b) b.style.width = 'auto'; }"></textarea>
 
                 <label class="btn-gentle-upload">
                     Resim / Sticker Ekle
-                    <input type="file" id="studioFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;">
+                    <input type="file" id="uniqueFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;" onchange="handleStudioImageUpload(this)">
                 </label>
             </div>
 
             <div class="studio-preview">
-                <div class="postit-inner-card size-square" id="previewPostitBox" style="background:#fdf5a6;">
+                <div class="postit-inner-card size-square" id="uniquePreviewCard" style="background:#fdf5a6; position: relative;">
                     <span class="postit-pin"></span>
                     
-                    <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:16px;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:18px; white-space:nowrap;">selam</div>
+                    <div id="uniqueTextBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10;">
+                        <div class="postit-text-content" id="uniqueTextLayer" style="position:relative; font-size:18px; line-height: 1.2; word-break: break-word; white-space: pre-wrap; pointer-events: none;">selam</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <div id="stickerTransformBox" class="transform-box" style="display:none; top:55px; left:35px; width:70px; height:auto;">
-                        <img id="previewStickerLayer" class="postit-sticker-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" style="width:100%; height:auto; display:block;">
-                        <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
-                        <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                        <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
-                    </div>
+                    <!-- Kırık resim çıkmaması için içi tamamen boş başlar, resim seçilince dolar -->
+                    <div id="uniqueStickerBox" class="transform-box" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;"></div>
 
-                    <div class="postit-author" id="previewAuthorLabel"></div>
+                    <div class="postit-author" id="uniqueAuthorLayer" style="position: absolute; bottom: 4px; left: 6px; font-size: 11px;"></div>
                 </div>
                 <span style="font-size:10px; color:#777;">*Köşelerden tutup döndür / boyutlandır</span>
             </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 4px;">
-            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closePostitModal()">Cancel</button>
-            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinNoteToBoard()">OK!</button>
+            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closeStudioModalSafe()">Cancel</button>
+            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinStudioNoteSafe()">OK!</button>
         </div>
     </div>
 </div>
@@ -772,8 +773,6 @@
 
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
-
-    // URL'yi hem username hem ID kabul eden dinamik rotaya yönlendiriyoruz
     const SAVE_URL = @json(url('/u/' . $targetUsername . '/board/save'));
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
@@ -785,10 +784,10 @@
     const btnAddStickerBtn = document.getElementById('btnAddStickerBtn');
     const boardLockBtn = document.getElementById('boardLockBtn');
     const boardLockImg = document.getElementById('boardLockImg');
-    const openPostitModalBtn = document.getElementById('openPostitModalBtn');
 
     let isEditingModeActive = false;
     let globalMaxZIndex = 100;
+    let studioStickerRatio = 1;
 
     function bringToFront(element) {
         globalMaxZIndex++;
@@ -802,164 +801,97 @@
         }
     }
 
-    // --- PROFİL SAHİBİ İÇİN EDIT / SAVE DÖNGÜSÜ ---
-    if (toggleEditBtn && IS_OWN_PROFILE) {
-        toggleEditBtn.addEventListener('click', async function() {
-            isEditingModeActive = !isEditingModeActive;
-            const grid = document.getElementById('keychainHooksGrid');
+    // --- MODAL YÖNETİMİ ---
+    window.openStudioModalSafe = function() {
+        const modal = document.getElementById('postitStudioModalUnique');
+        const authLbl = document.getElementById('uniqueAuthorLayer');
+        const txt = document.getElementById('uniqueTextInput');
+        const txtLayer = document.getElementById('uniqueTextLayer');
+        const sBox = document.getElementById('uniqueStickerBox');
+        const fInput = document.getElementById('uniqueFileInput');
+        const textBox = document.getElementById('uniqueTextBox');
 
-            if (isEditingModeActive) {
-                this.innerText = '💾 SAVE';
-                this.classList.add('saving');
-                corkboard.classList.add('is-editing-active');
-                if (grid) grid.classList.add('is-editing-mode');
-                if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'inline-block';
-            } else {
-                this.innerText = '⏳ Kaydediliyor...';
-                this.disabled = true;
-                
-                await saveBoardToDatabase(this);
+        if (authLbl) authLbl.innerText = '@' + CURRENT_USERNAME;
+        if (txt) txt.value = '';
+        if (txtLayer) txtLayer.textContent = 'selam';
+        if (fInput) fInput.value = '';
 
-                this.innerText = '✏️ Edit Board';
-                this.disabled = false;
-                this.classList.remove('saving');
-                corkboard.classList.remove('is-editing-active');
-                if (grid) grid.classList.remove('is-editing-mode');
-                if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'none';
-                
-                document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
-            }
-        });
-    }
-
-    // --- PANO KİLİTLEME ---
-    if (boardLockBtn && IS_OWN_PROFILE) {
-        boardLockBtn.addEventListener('click', () => {
-            isBoardLocked = !isBoardLocked;
-            boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
-            boardLockBtn.title = isBoardLocked ? 'Pano Ziyaretçilere Kilitli' : 'Pano Ziyaretçilere Açık';
-            saveBoardToDatabase(null);
-        });
-    }
-
-    // --- VERİTABANINA ASYNC KAYIT (GÜNCEL SAĞLAM MANTIK) ---
-    async function saveBoardToDatabase(triggerBtn = null) {
-        if (triggerBtn) {
-            triggerBtn.innerText = '⏳ Kaydediliyor...';
-            triggerBtn.disabled = true;
+        if (sBox) {
+            sBox.style.display = 'none';
+            sBox.innerHTML = '';
+            sBox.classList.remove('is-selected');
         }
 
-        const boardItems = [];
-        
-        document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
-            const authorText = item.querySelector('.postit-author') ? item.querySelector('.postit-author').innerText : '';
-            const inner = item.querySelector('.postit-inner-card');
-            boardItems.push({
-                type: 'postit',
-                bg: inner.style.backgroundColor,
-                shapeClass: inner.classList.contains('size-portrait') ? 'size-portrait' : (inner.classList.contains('size-landscape') ? 'size-landscape' : 'size-square'),
-                top: item.style.top,
-                left: item.style.left,
-                scale: item.dataset.scale || '0.65',
-                rotation: item.dataset.rotation || '0',
-                zIndex: item.style.zIndex || 10,
-                html: inner.innerHTML,
-                author: authorText
-            });
-        });
-
-        document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
-            const img = wrap.querySelector('img');
-            boardItems.push({
-                type: 'free_sticker',
-                src: img ? img.src : '',
-                top: wrap.style.top,
-                left: wrap.style.left,
-                width: wrap.style.width,
-                height: wrap.style.height,
-                transform: wrap.style.transform,
-                zIndex: wrap.style.zIndex || 10
-            });
-        });
-
-        const hookSlots = [];
-        document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
-            const img = hook.querySelector('.keychain-plush-img');
-            hookSlots.push(img ? img.dataset.key : null);
-        });
-
-        try {
-            const res = await fetch(SAVE_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': CSRF_TOKEN,
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify({
-                    board_items: boardItems,
-                    hook_slots: hookSlots,
-                    is_locked: isBoardLocked
-                })
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                if (triggerBtn) {
-                    triggerBtn.innerText = '✅ Kaydedildi!';
-                    setTimeout(() => {
-                        if (!IS_OWN_PROFILE) triggerBtn.style.display = 'none';
-                        triggerBtn.innerText = IS_OWN_PROFILE ? '✏️ Edit Board' : '💾 SAVE';
-                        triggerBtn.disabled = false;
-                    }, 1200);
-                }
-            } else {
-                alert('Kayıt başarısız: ' + (data.error || 'Bilinmeyen hata'));
-                if (triggerBtn) {
-                    triggerBtn.innerText = '💾 SAVE';
-                    triggerBtn.disabled = false;
-                }
-            }
-        } catch (error) {
-            console.error('Kayıt isteği hatası:', error);
-            if (triggerBtn) {
-                triggerBtn.innerText = '💾 SAVE';
-                triggerBtn.disabled = false;
-            }
+        if (textBox) {
+            textBox.style.width = 'auto';
+            textBox.classList.add('is-selected');
         }
-    }
 
-    // --- SENİN İLK ATTIGIN ÇALIŞAN POST-IT STÜDYO DÜZENEĞİ ---
-    const modal = document.getElementById('postitStudioModal');
-    const textInput = document.getElementById('studioTextInput');
-    const previewBox = document.getElementById('previewPostitBox');
-    const previewText = document.getElementById('previewTextLayer');
-    const previewSticker = document.getElementById('previewStickerLayer');
-    const stickerBox = document.getElementById('stickerTransformBox');
-    const textTransformBox = document.getElementById('textTransformBox');
-    const fileInput = document.getElementById('studioFileInput');
+        if (modal) modal.classList.add('active');
+        if (txt) setTimeout(() => txt.focus(), 50);
+    };
 
-    let selectedColor = '#fdf5a6';
-    let selectedShape = 'size-square';
-    let stickerAspectRatio = 1;
+    window.closeStudioModalSafe = function() {
+        const modal = document.getElementById('postitStudioModalUnique');
+        if (modal) modal.classList.remove('active');
+    };
 
-    if (openPostitModalBtn) {
-        openPostitModalBtn.addEventListener('click', () => {
-            document.getElementById('previewAuthorLabel').innerText = '@' + CURRENT_USERNAME;
-            modal.classList.add('active');
-        });
-    }
+    // Resim seçilince DOM'a temiz basma
+    window.handleStudioImageUpload = function(input) {
+        if (!input.files || !input.files[0]) return;
+        const file = input.files[0];
+        const sBox = document.getElementById('uniqueStickerBox');
 
-    function closePostitModal() { 
-        modal.classList.remove('active'); 
-    }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                studioStickerRatio = img.naturalHeight / img.naturalWidth;
+                const w = 70;
+                const h = Math.round(w * studioStickerRatio);
 
+                if (sBox) {
+                    sBox.style.width = w + 'px';
+                    sBox.style.height = h + 'px';
+                    sBox.innerHTML = `
+                        <img class="postit-sticker-img" src="${e.target.result}" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none;">
+                        <div class="handle-btn handle-delete" title="Sil" onclick="deleteStudioImage(event)">✕</div>
+                        <div class="handle-btn handle-rotate" title="Döndür">↻</div>
+                        <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
+                    `;
+                    sBox.style.display = 'block';
+
+                    document.querySelectorAll('#postitStudioModalUnique .transform-box').forEach(b => b.classList.remove('is-selected'));
+                    sBox.classList.add('is-selected');
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    window.deleteStudioImage = function(e) {
+        if (e) e.stopPropagation();
+        const sBox = document.getElementById('uniqueStickerBox');
+        const fInput = document.getElementById('uniqueFileInput');
+        const textBox = document.getElementById('uniqueTextBox');
+
+        if (sBox) {
+            sBox.style.display = 'none';
+            sBox.innerHTML = '';
+            sBox.classList.remove('is-selected');
+        }
+        if (fInput) fInput.value = '';
+        if (textBox) textBox.classList.add('is-selected');
+    };
+
+    // Renk ve Şekil
     document.querySelectorAll('.color-ball').forEach(b => {
         b.addEventListener('click', function() {
             document.querySelectorAll('.color-ball').forEach(x => x.classList.remove('selected'));
             this.classList.add('selected');
-            selectedColor = this.dataset.c;
-            previewBox.style.backgroundColor = selectedColor;
+            const card = document.getElementById('uniquePreviewCard');
+            if (card) card.style.backgroundColor = this.dataset.c;
         });
     });
 
@@ -967,64 +899,20 @@
         b.addEventListener('click', function() {
             document.querySelectorAll('.shape-btn').forEach(x => x.classList.remove('active'));
             this.classList.add('active');
-            selectedShape = this.dataset.shape;
-            previewBox.className = 'postit-inner-card ' + selectedShape;
+            const card = document.getElementById('uniquePreviewCard');
+            if (card) card.className = 'postit-inner-card ' + this.dataset.shape;
         });
     });
 
-    // Senin çalışan orijinal input dinleyicin
-    textInput.addEventListener('input', () => {
-        previewText.innerText = textInput.value || 'selam';
-        textTransformBox.style.width = 'fit-content';
-    });
-
-    // Senin çalışan orijinal resim yükleyicin
-    fileInput.addEventListener('change', function() {
-        const file = this.files[0];
-        const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-        if (file && validTypes.includes(file.type)) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                    stickerAspectRatio = tempImg.naturalHeight / tempImg.naturalWidth;
-                    let initialW = 70;
-                    let initialH = initialW * stickerAspectRatio;
-
-                    stickerBox.style.width = initialW + 'px';
-                    stickerBox.style.height = initialH + 'px';
-                    previewSticker.src = e.target.result;
-                    stickerBox.style.display = 'block';
-
-                    document.querySelectorAll('#postitStudioModal .transform-box').forEach(b => b.classList.remove('is-selected'));
-                    stickerBox.classList.add('is-selected');
-                };
-                tempImg.src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-    });
-
-    // Senin çalışan orijinal silme butonu dinleyicin
-    document.getElementById('btnDeleteSticker').addEventListener('click', (e) => {
-        e.stopPropagation();
-        stickerBox.style.display = 'none';
-        previewSticker.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-        fileInput.value = '';
-    });
-
-    // Modal içindeki boyutlandırma ve döndürme fonksiyonu
-    function setupStoryTransformer(boxId) {
+    // Modal İçi Boyutlandırma / Döndürme
+    function setupModalStoryTransformer(boxId) {
         const box = document.getElementById(boxId);
-        const rotateBtn = box.querySelector('.handle-rotate');
-        const resizeBtn = box.querySelector('.handle-resize');
+        if (!box) return;
 
-        box.addEventListener('mousedown', (e) => {
-            document.querySelectorAll('#postitStudioModal .transform-box').forEach(b => b.classList.remove('is-selected'));
+        box.addEventListener('mousedown', function(e) {
+            document.querySelectorAll('#postitStudioModalUnique .transform-box').forEach(b => b.classList.remove('is-selected'));
             box.classList.add('is-selected');
-        });
 
-        box.addEventListener('mousedown', (e) => {
             if (e.target.classList.contains('handle-btn')) return;
             e.preventDefault();
             let startX = e.clientX - box.offsetLeft;
@@ -1042,28 +930,26 @@
             window.addEventListener('mouseup', stop);
         });
 
-        if (resizeBtn) {
-            resizeBtn.addEventListener('mousedown', (e) => {
+        box.addEventListener('mousedown', function(e) {
+            const resBtn = e.target.closest('.handle-resize');
+            const rotBtn = e.target.closest('.handle-rotate');
+
+            if (resBtn) {
                 e.stopPropagation();
                 e.preventDefault();
                 let startX = e.clientX;
                 let startWidth = box.offsetWidth;
-                const textElement = box.querySelector('.postit-text-content');
-                let initialFontSize = textElement ? parseFloat(window.getComputedStyle(textElement).fontSize) : 18;
+                const txt = box.querySelector('.postit-text-content');
+                let initFs = txt ? parseFloat(window.getComputedStyle(txt).fontSize) : 18;
 
                 function resize(ev) {
-                    let delta = ev.clientX - startX;
-                    let newWidth = Math.max(20, startWidth + delta);
-                    box.style.width = newWidth + 'px';
-
-                    if (boxId === 'stickerTransformBox') {
-                        box.style.height = (newWidth * stickerAspectRatio) + 'px';
+                    let newW = Math.max(20, startWidth + (ev.clientX - startX));
+                    box.style.width = newW + 'px';
+                    if (boxId === 'uniqueStickerBox') {
+                        box.style.height = (newW * studioStickerRatio) + 'px';
                     }
-
-                    if (textElement) {
-                        let scaleRatio = newWidth / Math.max(startWidth, 20);
-                        let newFontSize = Math.max(8, Math.min(56, initialFontSize * scaleRatio));
-                        textElement.style.fontSize = newFontSize + 'px';
+                    if (txt) {
+                        txt.style.fontSize = Math.max(8, Math.min(56, initFs * (newW / startWidth))) + 'px';
                     }
                 }
                 function stop() {
@@ -1072,21 +958,18 @@
                 }
                 window.addEventListener('mousemove', resize);
                 window.addEventListener('mouseup', stop);
-            });
-        }
+            }
 
-        if (rotateBtn) {
-            rotateBtn.addEventListener('mousedown', (e) => {
+            if (rotBtn) {
                 e.stopPropagation();
                 e.preventDefault();
+                const rect = box.getBoundingClientRect();
+                const cx = rect.left + rect.width / 2;
+                const cy = rect.top + rect.height / 2;
 
                 function rotate(ev) {
-                    const rect = box.getBoundingClientRect();
-                    const centerX = rect.left + rect.width / 2;
-                    const centerY = rect.top + rect.height / 2;
-                    const rad = Math.atan2(ev.clientX - centerX, -(ev.clientY - centerY));
-                    let rotation = rad * (180 / Math.PI);
-                    box.style.transform = `rotate(${rotation}deg)`;
+                    const rad = Math.atan2(ev.clientX - cx, -(ev.clientY - cy));
+                    box.style.transform = 'rotate(' + Math.round(rad * (180 / Math.PI)) + 'deg)';
                 }
                 function stop() {
                     window.removeEventListener('mousemove', rotate);
@@ -1094,15 +977,19 @@
                 }
                 window.addEventListener('mousemove', rotate);
                 window.addEventListener('mouseup', stop);
-            });
-        }
+            }
+        });
     }
 
-    setupStoryTransformer('textTransformBox');
-    setupStoryTransformer('stickerTransformBox');
+    setupModalStoryTransformer('uniqueTextBox');
+    setupModalStoryTransformer('uniqueStickerBox');
 
-    // Senin orijinal çalışan panoya asma fonksiyonun
-    function pinNoteToBoard() {
+    // Panoya Notu Sabitle
+    window.pinStudioNoteSafe = function() {
+        const previewCard = document.getElementById('uniquePreviewCard');
+        const sBox = document.getElementById('uniqueStickerBox');
+        if (!corkboard || !previewCard) return;
+
         const postitWrapper = document.createElement('div');
         postitWrapper.className = 'cork-postit can-delete';
         postitWrapper.style.top = '25%';
@@ -1116,7 +1003,7 @@
         postitWrapper.style.transform = `scale(${initialScale}) rotate(${rot}deg)`;
         bringToFront(postitWrapper);
 
-        const clonedCard = previewBox.cloneNode(true);
+        const clonedCard = previewCard.cloneNode(true);
         clonedCard.removeAttribute('id');
 
         clonedCard.querySelectorAll('.handle-btn').forEach(btn => btn.remove());
@@ -1126,16 +1013,13 @@
             box.style.border = 'none';
         });
 
-        // Eğer resim eklenmediyse boş kutuyu panoya kopyalama
-        if (stickerBox.style.display === 'none') {
-            const sImg = clonedCard.querySelector('.postit-sticker-img');
-            if (sImg && sImg.closest('.transform-box')) {
-                sImg.closest('.transform-box').remove();
-            }
+        // Resim eklenmediyse boş kutuyu panoya kopyalama
+        if (sBox && (sBox.style.display === 'none' || sBox.innerHTML.trim() === '')) {
+            const emptySticker = clonedCard.querySelector('.postit-sticker-img')?.closest('.transform-box');
+            if (emptySticker) emptySticker.remove();
         }
 
         postitWrapper.appendChild(clonedCard);
-
         postitWrapper.innerHTML += `
             <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
             <div class="handle-btn handle-rotate" title="Döndür">↻</div>
@@ -1145,18 +1029,10 @@
         setupPostitControls(postitWrapper, true);
         makeItemDraggable(postitWrapper, true);
         corkboard.appendChild(postitWrapper);
-        closePostitModal();
+        window.closeStudioModalSafe();
 
-        textInput.value = '';
-        previewText.innerText = 'selam';
-        stickerBox.style.display = 'none';
-        previewSticker.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-        fileInput.value = '';
-
-        if (!IS_OWN_PROFILE) {
-            showFriendSaveButton();
-        }
-    }
+        showFriendSaveButton();
+    };
 
     // --- PANODAKİ NOT VE SERBEST STICKER KONTROLLERİ ---
     function setupPostitControls(wrapper, canEdit) {
@@ -1180,7 +1056,7 @@
                 e.stopPropagation();
                 if (IS_OWN_PROFILE && !isEditingModeActive) return;
                 wrapper.remove();
-                if (!IS_OWN_PROFILE) showFriendSaveButton();
+                showFriendSaveButton();
             };
         }
 
@@ -1205,7 +1081,7 @@
                 function onStop() {
                     window.removeEventListener('mousemove', onResize);
                     window.removeEventListener('mouseup', onStop);
-                    if (!IS_OWN_PROFILE) showFriendSaveButton();
+                    showFriendSaveButton();
                 }
 
                 window.addEventListener('mousemove', onResize);
@@ -1235,7 +1111,7 @@
                 function onRotateStop() {
                     window.removeEventListener('mousemove', onRotate);
                     window.removeEventListener('mouseup', onRotateStop);
-                    if (!IS_OWN_PROFILE) showFriendSaveButton();
+                    showFriendSaveButton();
                 }
 
                 window.addEventListener('mousemove', onRotate);
@@ -1438,6 +1314,134 @@
         };
     }
 
+    // --- VERİTABANINA ASYNC KAYIT ---
+    async function saveBoardToDatabase(triggerBtn = null) {
+        if (triggerBtn) {
+            triggerBtn.innerText = '⏳ Kaydediliyor...';
+            triggerBtn.disabled = true;
+        }
+
+        const boardItems = [];
+        
+        document.querySelectorAll('#corkboardArea .cork-postit').forEach(item => {
+            const authorText = item.querySelector('.postit-author') ? item.querySelector('.postit-author').innerText : '';
+            const inner = item.querySelector('.postit-inner-card');
+            boardItems.push({
+                type: 'postit',
+                bg: inner.style.backgroundColor,
+                shapeClass: inner.classList.contains('size-portrait') ? 'size-portrait' : (inner.classList.contains('size-landscape') ? 'size-landscape' : 'size-square'),
+                top: item.style.top,
+                left: item.style.left,
+                scale: item.dataset.scale || '0.65',
+                rotation: item.dataset.rotation || '0',
+                zIndex: item.style.zIndex || 10,
+                html: inner.innerHTML,
+                author: authorText
+            });
+        });
+
+        document.querySelectorAll('#corkboardArea .free-sticker-wrapper').forEach(wrap => {
+            const img = wrap.querySelector('img');
+            boardItems.push({
+                type: 'free_sticker',
+                src: img ? img.src : '',
+                top: wrap.style.top,
+                left: wrap.style.left,
+                width: wrap.style.width,
+                height: wrap.style.height,
+                transform: wrap.style.transform,
+                zIndex: wrap.style.zIndex || 10
+            });
+        });
+
+        const hookSlots = [];
+        document.querySelectorAll('.keychain-hook-unit').forEach(hook => {
+            const img = hook.querySelector('.keychain-plush-img');
+            hookSlots.push(img ? img.dataset.key : null);
+        });
+
+        try {
+            const res = await fetch(SAVE_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': CSRF_TOKEN,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    board_items: boardItems,
+                    hook_slots: hookSlots,
+                    is_locked: isBoardLocked
+                })
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                if (triggerBtn) {
+                    triggerBtn.innerText = '✅ Kaydedildi!';
+                    setTimeout(() => {
+                        if (!IS_OWN_PROFILE) triggerBtn.style.display = 'none';
+                        triggerBtn.innerText = IS_OWN_PROFILE ? '✏️ Edit Board' : '💾 SAVE';
+                        triggerBtn.disabled = false;
+                    }, 1200);
+                }
+            } else {
+                alert('Kayıt başarısız: ' + (data.error || 'Bilinmeyen hata'));
+                if (triggerBtn) {
+                    triggerBtn.innerText = '💾 SAVE';
+                    triggerBtn.disabled = false;
+                }
+            }
+        } catch (error) {
+            console.error('Kayıt isteği hatası:', error);
+            if (triggerBtn) {
+                triggerBtn.innerText = '💾 SAVE';
+                triggerBtn.disabled = false;
+            }
+        }
+    }
+
+    // --- PROFİL SAHİBİ EDIT / SAVE DÖNGÜSÜ ---
+    if (toggleEditBtn && IS_OWN_PROFILE) {
+        toggleEditBtn.addEventListener('click', async function() {
+            isEditingModeActive = !isEditingModeActive;
+            const grid = document.getElementById('keychainHooksGrid');
+
+            if (isEditingModeActive) {
+                this.innerText = '💾 SAVE';
+                this.classList.add('saving');
+                corkboard.classList.add('is-editing-active');
+                if (grid) grid.classList.add('is-editing-mode');
+                if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'inline-block';
+            } else {
+                this.innerText = '⏳ Kaydediliyor...';
+                this.disabled = true;
+                
+                await saveBoardToDatabase(this);
+
+                this.innerText = '✏️ Edit Board';
+                this.disabled = false;
+                this.classList.remove('saving');
+                corkboard.classList.remove('is-editing-active');
+                if (grid) grid.classList.remove('is-editing-mode');
+                if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'none';
+                
+                document.querySelectorAll('.cork-postit, .free-sticker-wrapper').forEach(el => el.classList.remove('is-selected'));
+            }
+        });
+    }
+
+    // --- PANO KİLİTLEME ---
+    if (boardLockBtn && IS_OWN_PROFILE) {
+        boardLockBtn.addEventListener('click', () => {
+            isBoardLocked = !isBoardLocked;
+            boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
+            boardLockBtn.title = isBoardLocked ? 'Pano Ziyaretçilere Kilitli' : 'Pano Ziyaretçilere Açık';
+            saveBoardToDatabase(null);
+        });
+    }
+
+    // --- KEYCHAIN / ÇANTA ---
     const drawer = document.getElementById('collectionDrawer');
     const drawerList = document.getElementById('drawerBadgesList');
 
@@ -1529,7 +1533,7 @@
         };
     });
 
-    // Sayfa yüklendiğinde var olan notları bağla
+    // Sayfa Yüklendiğinde Panodakileri Aktifleştir
     document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('#corkboardArea .cork-postit').forEach(wrapper => {
             const canManage = wrapper.dataset.canManage === '1';
