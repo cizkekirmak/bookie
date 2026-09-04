@@ -503,7 +503,6 @@
     }
     .transform-box.is-selected { border-color: #2d5a27; }
     
-    /* Resim yüklenmediği sürece kesinlikle görünmez */
     #stickerTransformBox.is-hidden { display: none !important; }
 
     @media (max-width: 1024px) {
@@ -707,12 +706,11 @@
                     </div>
                 </div>
 
-                <!-- Anlık yazı yazımı için doğrudan çalışan inline oninput -->
-                <textarea id="studioTextInput" class="studio-input-box" placeholder="Write something cozy..." maxlength="120" oninput="var el = document.getElementById('previewTextLayer'); if(el) { el.innerText = this.value.trim() !== '' ? this.value : 'selam'; var tb = document.getElementById('textTransformBox'); if(tb) tb.style.width = 'fit-content'; }"></textarea>
+                <textarea id="studioTextInput" class="studio-input-box" placeholder="Write something cozy..." maxlength="120"></textarea>
 
                 <label class="btn-gentle-upload">
                     Resim / Sticker Ekle
-                    <input type="file" id="studioFileInput" accept="image/*" style="display:none;" onchange="handleStudioSticker(this)">
+                    <input type="file" id="studioFileInput" accept="image/*" style="display:none;">
                 </label>
             </div>
 
@@ -720,16 +718,15 @@
                 <div class="postit-inner-card size-square" id="previewPostitBox" style="background:#fdf5a6; position: relative;">
                     <span class="postit-pin"></span>
                     
-                    <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10;">
-                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:18px; word-break: break-word; user-select: none;">selam</div>
+                    <div id="textTransformBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10; min-width: 50px;">
+                        <div class="postit-text-content" id="previewTextLayer" style="position:relative; font-size:18px; line-height: 1.2; word-break: break-word; white-space: pre-wrap; pointer-events: none;">selam</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
                     </div>
 
-                    <!-- Resim yokken display: none ile tamamen kapalı -->
                     <div id="stickerTransformBox" class="transform-box is-hidden" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;">
                         <img id="previewStickerLayer" class="postit-sticker-img" src="" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none;">
-                        <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil" onclick="handleDeleteStudioSticker(event)">✕</div>
+                        <div class="handle-btn handle-delete" id="btnDeleteSticker" title="Sil">✕</div>
                         <div class="handle-btn handle-rotate" title="Döndür">↻</div>
                         <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
                     </div>
@@ -786,6 +783,16 @@
     var previewSticker = document.getElementById('previewStickerLayer');
     var stickerBox = document.getElementById('stickerTransformBox');
     var textTransformBox = document.getElementById('textTransformBox');
+    var delStickerBtn = document.getElementById('btnDeleteSticker');
+
+    function syncPreviewText(val) {
+        if (previewText) {
+            previewText.textContent = (val && val.trim() !== '') ? val : 'selam';
+        }
+        if (textTransformBox) {
+            textTransformBox.style.width = 'auto';
+        }
+    }
 
     window.openPostitModal = function() {
         if (!modal) return;
@@ -793,9 +800,8 @@
         if (authorLabel) authorLabel.innerText = '@' + CURRENT_USERNAME;
 
         if (textInput) textInput.value = '';
-        if (previewText) previewText.innerText = 'selam';
-        
-        // Modal açıldığında sticker kutusunu tamamen gizle ve sıfırla
+        syncPreviewText('');
+
         if (stickerBox) {
             stickerBox.style.display = 'none';
             stickerBox.classList.add('is-hidden');
@@ -803,67 +809,26 @@
         }
         if (previewSticker) previewSticker.src = '';
         if (fileInput) fileInput.value = '';
-        
+
         if (textTransformBox) {
-            textTransformBox.style.width = 'fit-content';
+            textTransformBox.style.width = 'auto';
             textTransformBox.classList.add('is-selected');
         }
 
         modal.classList.add('active');
+        if (textInput) setTimeout(function() { textInput.focus(); }, 50);
     };
 
     window.closePostitModal = function() {
         if (modal) modal.classList.remove('active');
     };
 
-    // Resim Yükleme (Sticker)
-    window.handleStudioSticker = function(input) {
-        if (!input.files || !input.files[0]) return;
-        var file = input.files[0];
+    if (textInput) {
+        textInput.addEventListener('input', function() { syncPreviewText(this.value); });
+        textInput.addEventListener('keyup', function() { syncPreviewText(this.value); });
+        textInput.addEventListener('change', function() { syncPreviewText(this.value); });
+    }
 
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var img = new Image();
-            img.onload = function() {
-                stickerAspectRatio = img.naturalHeight / img.naturalWidth;
-                var w = 70;
-                var h = Math.round(w * stickerAspectRatio);
-
-                if (stickerBox && previewSticker) {
-                    stickerBox.style.width = w + 'px';
-                    stickerBox.style.height = h + 'px';
-                    previewSticker.src = e.target.result;
-                    previewSticker.style.width = '100%';
-                    previewSticker.style.height = '100%';
-
-                    stickerBox.style.display = 'block';
-                    stickerBox.classList.remove('is-hidden');
-
-                    document.querySelectorAll('#postitStudioModal .transform-box').forEach(function(b) {
-                        b.classList.remove('is-selected');
-                    });
-                    stickerBox.classList.add('is-selected');
-                }
-            };
-            img.src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    };
-
-    // Modal Sticker Silme
-    window.handleDeleteStudioSticker = function(e) {
-        if (e) e.stopPropagation();
-        if (stickerBox) {
-            stickerBox.style.display = 'none';
-            stickerBox.classList.add('is-hidden');
-            stickerBox.classList.remove('is-selected');
-        }
-        if (previewSticker) previewSticker.src = '';
-        if (fileInput) fileInput.value = '';
-        if (textTransformBox) textTransformBox.classList.add('is-selected');
-    };
-
-    // Renk ve Şekil Seçimleri
     document.querySelectorAll('.color-ball').forEach(function(b) {
         b.onclick = function() {
             document.querySelectorAll('.color-ball').forEach(function(x) { x.classList.remove('selected'); });
@@ -879,6 +844,51 @@
             if (previewBox) previewBox.className = 'postit-inner-card ' + this.getAttribute('data-shape');
         };
     });
+
+    if (fileInput && previewSticker && stickerBox) {
+        fileInput.onchange = function() {
+            var file = this.files[0];
+            if (!file) return;
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var img = new Image();
+                img.onload = function() {
+                    stickerAspectRatio = img.naturalHeight / img.naturalWidth;
+                    var w = 70;
+                    var h = Math.round(w * stickerAspectRatio);
+
+                    stickerBox.style.width = w + 'px';
+                    stickerBox.style.height = h + 'px';
+                    previewSticker.src = e.target.result;
+                    previewSticker.style.width = '100%';
+                    previewSticker.style.height = '100%';
+
+                    stickerBox.style.display = 'block';
+                    stickerBox.classList.remove('is-hidden');
+
+                    document.querySelectorAll('#postitStudioModal .transform-box').forEach(function(b) {
+                        b.classList.remove('is-selected');
+                    });
+                    stickerBox.classList.add('is-selected');
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+    }
+
+    if (delStickerBtn && stickerBox && previewSticker && fileInput) {
+        delStickerBtn.onclick = function(e) {
+            e.stopPropagation();
+            stickerBox.style.display = 'none';
+            stickerBox.classList.add('is-hidden');
+            stickerBox.classList.remove('is-selected');
+            previewSticker.src = '';
+            fileInput.value = '';
+            if (textTransformBox) textTransformBox.classList.add('is-selected');
+        };
+    }
 
     // Modal İçi Boyutlandırma ve Döndürme
     function setupModalTransformer(boxId) {
@@ -989,7 +999,6 @@
             b.style.border = 'none';
         });
 
-        // Resim eklenmediyse boş sticker kutusunu temizle
         if (stickerBox && (stickerBox.classList.contains('is-hidden') || stickerBox.style.display === 'none')) {
             var sEl = clonedCard.querySelector('.postit-sticker-img');
             if (sEl && sEl.closest('.transform-box')) {
@@ -1011,7 +1020,7 @@
         showFriendSaveButton();
     };
 
-    // --- PANODAKİ NOT VE STICKERLARI YÖNETME (TUTAMAÇLAR + SÜRÜKLEME) ---
+    // --- PANODAKİ NOT VE STICKERLARI YÖNETME ---
     function setupBoardElement(wrapper, canManage) {
         wrapper.ondragstart = function() { return false; };
 
@@ -1056,7 +1065,6 @@
 
         if (!canManage) return;
 
-        // Sil butonu
         var delBtn = wrapper.querySelector('.handle-delete');
         if (delBtn) {
             delBtn.addEventListener('click', function(e) {
@@ -1067,7 +1075,6 @@
             });
         }
 
-        // Boyutlandırma butonu
         var resBtn = wrapper.querySelector('.handle-resize');
         if (resBtn) {
             resBtn.addEventListener('mousedown', function(e) {
@@ -1106,6 +1113,7 @@
                     function onStopS() {
                         window.removeEventListener('mousemove', onResizeS);
                         window.removeEventListener('mouseup', onStopS);
+                        showFriendSaveButton();
                     }
                     window.addEventListener('mousemove', onResizeS);
                     window.addEventListener('mouseup', onStopS);
@@ -1113,7 +1121,6 @@
             });
         }
 
-        // Döndürme butonu
         var rotBtn = wrapper.querySelector('.handle-rotate');
         if (rotBtn) {
             rotBtn.addEventListener('mousedown', function(e) {
