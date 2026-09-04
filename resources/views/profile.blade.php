@@ -583,7 +583,7 @@
                         align-items: center; 
                         justify-content: space-between; 
                         background-color: #deeaa5; 
-                        background-image: url('{{ asset('images/friends-bg.jpg') }}');
+                        background-image: url('{{ asset('images/goal-bg.jpg') }}');
                         background-size: cover;
                         background-position: center;
                         border: 1.5px solid #2d5a27; 
