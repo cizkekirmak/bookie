@@ -159,13 +159,44 @@ class ProfileController extends Controller
             }
         }
 
-        // 8. KITAP: Aktif admin önerilerinden en az 1 kitap eklemek
-        $unlockedKitap = DB::table('user_books')
-            ->join('books', 'user_books.book_id', '=', 'books.id')
-            ->join('admin_recommendations', 'books.google_book_id', '=', 'admin_recommendations.book_key')
-            ->where('user_books.user_id', $targetUserId)
-            ->where('admin_recommendations.is_active', 1)
-            ->exists();
+        // 8. KITAP: Aktif admin önerilerinden en az 1 kitap eklemek (Google & Open Library tam uyumlu)
+        $activeAdminRecs = DB::table('admin_recommendations')
+            ->where(function ($q) {
+                $q->where('is_active', 1)->orWhere('is_active', true);
+            })
+            ->pluck('book_key')
+            ->filter()
+            ->toArray();
+
+        // Key'leri hem ham halleriyle hem de OL_ / GB_ ön ekleri temizlenmiş varyasyonlarıyla toplayalım
+        $searchKeys = [];
+        foreach ($activeAdminRecs as $k) {
+            $cleanK = trim($k);
+            $searchKeys[] = $cleanK;
+            // Eğer başında OL_ varsa hem OL_ halini hem de OL_ olmadan halini ekle
+            if (str_starts_with($cleanK, 'OL_')) {
+                $searchKeys[] = substr($cleanK, 3);
+            } else {
+                $searchKeys[] = 'OL_' . $cleanK;
+            }
+            // Eğer Google Books için GB_ formatı varsa
+            if (str_starts_with($cleanK, 'GB_')) {
+                $searchKeys[] = substr($cleanK, 3);
+            }
+        }
+        $searchKeys = array_unique(array_filter($searchKeys));
+
+        $unlockedKitap = false;
+        if (!empty($searchKeys)) {
+            $unlockedKitap = DB::table('user_books')
+                ->join('books', 'user_books.book_id', '=', 'books.id')
+                ->where('user_books.user_id', $targetUserId)
+                ->where(function ($q) use ($searchKeys) {
+                    $q->whereIn('books.open_library_key', $searchKeys)
+                      ->orWhereIn('books.google_book_id', $searchKeys);
+                })
+                ->exists();
+        }
 
         // 9. ELMA: Yıllık hedefi tamamlama
         $unlockedElma = ($goalTarget && $goalTarget > 0 && $readThisYear >= $goalTarget);
