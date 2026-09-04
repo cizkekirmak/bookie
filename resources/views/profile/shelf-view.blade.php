@@ -84,6 +84,7 @@
         cursor: pointer;
         box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
+        text-transform: lowercase;
     }
     .btn-action:hover {
         transform: translateY(-1px);
@@ -316,6 +317,7 @@
         text-align: center;
         line-height: 1.1;
         margin-top: 2px;
+        text-transform: lowercase;
     }
 
     .keychain-collection-drawer {
@@ -351,7 +353,12 @@
         background: #f4f9f0;
         border-bottom: 1.5px solid #bddbb0;
     }
-    .drawer-header h4 { margin: 0; font-size: 15px; color: #1a3c11; }
+    .drawer-header h4 { 
+        margin: 0; 
+        font-size: 15px; 
+        color: #1a3c11; 
+        text-transform: lowercase;
+    }
     .drawer-close-btn { background: none; border: none; font-size: 18px; font-weight: bold; color: #2d5a27; cursor: pointer; }
 
     .drawer-body {
@@ -392,6 +399,7 @@
         line-height: 1.15;
         max-width: 72px;
         word-break: break-word;
+        text-transform: lowercase;
     }
 
     .modal-overlay {
@@ -444,6 +452,7 @@
         color: #355726;
         cursor: pointer;
         transition: all 0.15s ease;
+        text-transform: lowercase;
     }
     .shape-btn.active {
         background: #3e682e;
@@ -452,10 +461,14 @@
         box-shadow: 0 2px 6px rgba(0,0,0,0.12);
     }
 
-    .color-selector { display: flex; gap: 8px; }
+    .color-selector { 
+        display: flex; 
+        flex-wrap: wrap; 
+        gap: 7px; 
+    }
     .color-ball {
-        width: 26px;
-        height: 26px;
+        width: 24px;
+        height: 24px;
         border-radius: 50%;
         border: 1.5px solid rgba(0,0,0,0.12);
         cursor: pointer;
@@ -491,6 +504,7 @@
         color: #2d5a27;
         transition: background 0.15s;
         display: block;
+        text-transform: lowercase;
     }
     .btn-gentle-upload:hover { background: #e5f1df; }
 
@@ -554,21 +568,21 @@
     $hookSlots = is_array($rawHooks) ? $rawHooks : array_fill(0, 9, null);
 
     $achievements = $achievements ?? [
-        'ask'       => ['title' => 'Aşk',       'file' => 'aşk.png',       'unlocked' => true],
-        'ayicik'    => ['title' => 'Ayıcık',    'file' => 'ayıcık.png',    'unlocked' => true],
-        'burger'    => ['title' => 'Burger',    'file' => 'burger.png',    'unlocked' => false],
-        'cilek'     => ['title' => 'Çilek',     'file' => 'çilek.png',     'unlocked' => true],
-        'elma'      => ['title' => 'Elma',      'file' => 'elma.png',      'unlocked' => false],
-        'geyik'     => ['title' => 'Geyik',     'file' => 'geyik.png',     'unlocked' => false],
-        'jake'      => ['title' => 'Jake',      'file' => 'jake.png',      'unlocked' => true],
-        'kedi'      => ['title' => 'Kedi',      'file' => 'kedi.png',      'unlocked' => false],
-        'kitap'     => ['title' => 'Kitap',     'file' => 'kitap.png',     'unlocked' => true],
-        'kruvasan'  => ['title' => 'Kruvasan',  'file' => 'kruvasan.png',  'unlocked' => false],
-        'maymun'    => ['title' => 'Maymun',    'file' => 'maymun.png',    'unlocked' => true],
-        'tama'      => ['title' => 'Tama',      'file' => 'tama.png',      'unlocked' => false],
-        'usagi'     => ['title' => 'Usagi',     'file' => 'usagi.png',     'unlocked' => true],
-        'yengec'    => ['title' => 'Yengeç',    'file' => 'yengeç.png',    'unlocked' => false],
-        'yonca'     => ['title' => 'Yonca',     'file' => 'yonca.png',     'unlocked' => false],
+        'ask'       => ['title' => 'love',       'file' => 'aşk.png',       'unlocked' => true],
+        'ayicik'    => ['title' => 'teddy bear', 'file' => 'ayıcık.png',    'unlocked' => true],
+        'burger'    => ['title' => 'burger',     'file' => 'burger.png',    'unlocked' => false],
+        'cilek'     => ['title' => 'strawberry', 'file' => 'çilek.png',     'unlocked' => true],
+        'elma'      => ['title' => 'apple',      'file' => 'elma.png',      'unlocked' => false],
+        'geyik'     => ['title' => 'deer',       'file' => 'geyik.png',     'unlocked' => false],
+        'jake'      => ['title' => 'jake',       'file' => 'jake.png',      'unlocked' => true],
+        'kedi'      => ['title' => 'cat',        'file' => 'kedi.png',      'unlocked' => false],
+        'kitap'     => ['title' => 'book',       'file' => 'kitap.png',     'unlocked' => true],
+        'kruvasan'  => ['title' => 'croissant',  'file' => 'kruvasan.png',  'unlocked' => false],
+        'maymun'    => ['title' => 'monkey',     'file' => 'maymun.png',    'unlocked' => true],
+        'tama'      => ['title' => 'tama',       'file' => 'tama.png',      'unlocked' => false],
+        'usagi'     => ['title' => 'usagi',      'file' => 'usagi.png',     'unlocked' => true],
+        'yengec'    => ['title' => 'crab',       'file' => 'yengeç.png',    'unlocked' => false],
+        'yonca'     => ['title' => 'clover',     'file' => 'yonca.png',     'unlocked' => false],
     ];
 @endphp
 
@@ -577,11 +591,11 @@
     <div class="corkboard-main-wrapper">
         <div class="corkboard-frame" id="corkboardArea">
             <div class="board-lock-badge" id="boardLockBtn" 
-                 title="{{ $isOwnProfile ? 'Ziyaretçilere Kilitle / Aç' : ($isBoardLocked ? 'Pano Kilitli' : 'Pano Açık') }}" 
+                 title="{{ $isOwnProfile ? __('board.lock_toggle_title') : ($isBoardLocked ? __('board.status_locked') : __('board.status_open')) }}" 
                  style="{{ (!$isOwnProfile && !$isBoardLocked) ? 'display:none;' : '' }}">
                 <img id="boardLockImg" 
                      src="{{ $isBoardLocked ? asset('images/locke.png') : asset('images/unlocked.png') }}" 
-                     alt="Lock Status" 
+                     alt="{{ __('board.lock_status_alt') }}" 
                      onerror="this.onerror=null; this.src='{{ asset('images/lock.png') }}';">
             </div>
 
@@ -617,9 +631,9 @@
                             {!! $item['html'] !!}
                         </div>
                         @if($canManage)
-                            <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
-                            <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                            <div class="handle-btn handle-resize" title="Post-it'i Büyüt / Küçült">⤡</div>
+                            <div class="handle-btn handle-delete postit-delete-btn" title="{{ __('board.handle_delete') }}">✕</div>
+                            <div class="handle-btn handle-rotate" title="{{ __('board.handle_rotate') }}">↻</div>
+                            <div class="handle-btn handle-resize" title="{{ __('board.handle_resize') }}">⤡</div>
                         @endif
                     </div>
                 @elseif(($item['type'] ?? '') === 'free_sticker')
@@ -627,9 +641,9 @@
                          style="top: {{ $item['top'] }}; left: {{ $item['left'] }}; width: {{ $item['width'] ?? '80px' }}; height: {{ $item['height'] ?? '80px' }}; transform: {{ $item['transform'] ?? 'rotate(0deg)' }}; z-index: {{ $item['zIndex'] ?? 10 }};">
                         <img src="{{ $item['src'] }}">
                         @if($isOwnProfile)
-                            <div class="handle-btn handle-delete" title="Sil">✕</div>
-                            <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                            <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
+                            <div class="handle-btn handle-delete" title="{{ __('board.handle_delete') }}">✕</div>
+                            <div class="handle-btn handle-rotate" title="{{ __('board.handle_rotate') }}">↻</div>
+                            <div class="handle-btn handle-resize" title="{{ __('board.handle_resize') }}">⤡</div>
                         @endif
                     </div>
                 @endif
@@ -652,16 +666,16 @@
                                  title="{{ $badge['title'] }}"
                                  onerror="this.src='{{ asset('images/badges/maymun.png') }}';">
                         @else
-                            <div class="empty-hook-slot" title="{{ $isOwnProfile ? 'Boş kanca' : '' }}"></div>
+                            <div class="empty-hook-slot" title="{{ $isOwnProfile ? __('board.empty_hook_title') : '' }}"></div>
                         @endif
                     </div>
                 @endfor
             </div>
 
             @if($isOwnProfile)
-            <div class="folder-container" onclick="toggleCollectionDrawer()" title="All Keychains">
-                <img src="{{ asset('images/dosya.png') }}" alt="Folder" class="folder-img" onerror="this.onerror=null; this.src='{{ asset('images/folder.png') }}';">
-                <span class="folder-label">all keychains u own</span>
+            <div class="folder-container" onclick="toggleCollectionDrawer()" title="{{ __('board.all_keychains_title') }}">
+                <img src="{{ asset('images/dosya.png') }}" alt="{{ __('board.folder_alt') }}" class="folder-img" onerror="this.onerror=null; this.src='{{ asset('images/folder.png') }}';">
+                <span class="folder-label">{{ __('board.all_keychains_label') }}</span>
             </div>
             @endif
         </div>
@@ -670,27 +684,27 @@
     <!-- ALT BUTON BARI -->
     <div class="board-bottom-bar">
         @if($isOwnProfile)
-            <button id="toggleEditBtn" class="btn-action desktop-only-action">✏️ Edit Board</button>
-            <button type="button" id="btnAddStickerBtn" class="btn-action" style="display:none;" onclick="document.getElementById('freeStickerUploadInput').click()">🖼️ ADD STICKER</button>
+            <button id="toggleEditBtn" class="btn-action desktop-only-action">{{ __('board.btn_edit_board') }}</button>
+            <button type="button" id="btnAddStickerBtn" class="btn-action" style="display:none;" onclick="document.getElementById('freeStickerUploadInput').click()">{{ __('board.btn_add_sticker') }}</button>
             <input type="file" id="freeStickerUploadInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;">
         @endif
 
         @if($canAddPostit)
-            <button id="openPostitModalBtn" class="btn-action" onclick="openStudioModalSafe()">📌 ADD POST-IT</button>
+            <button id="openPostitModalBtn" class="btn-action" onclick="openStudioModalSafe()">{{ __('board.btn_add_note') }}</button>
             @if(!$isOwnProfile)
-                <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">💾 SAVE</button>
+                <button id="friendSaveBtn" class="btn-action saving" style="display:none;" onclick="saveBoardToDatabase(this)">{{ __('board.btn_save') }}</button>
             @endif
         @elseif($isBoardLocked)
-            <button class="btn-action" disabled>🔒 BOARD LOCKED</button>
+            <button class="btn-action" disabled>{{ __('board.msg_board_locked') }}</button>
         @elseif(auth()->check() && !$isOwnProfile && !$isFriendUser)
-            <button class="btn-action" disabled title="Bu panoya yalnızca arkadaşlar not bırakabilir.">👥 SADECE ARKADAŞLAR</button>
+            <button class="btn-action" disabled title="{{ __('board.msg_only_friends_title') }}">{{ __('board.msg_only_friends_btn') }}</button>
         @endif
     </div>
 
     @if($isOwnProfile)
     <div class="keychain-collection-drawer" id="collectionDrawer">
         <div class="drawer-header">
-            <h4>🎒 Keychain Bag (Tutup kancaya bırak)</h4>
+            <h4>{{ __('board.drawer_title') }}</h4>
             <button type="button" class="drawer-close-btn" onclick="toggleCollectionDrawer()">✕</button>
         </div>
         <div class="drawer-body" id="drawerBadgesList"></div>
@@ -702,38 +716,45 @@
 <!-- POST-IT MİNİ STÜDYO MODAL -->
 <div class="modal-overlay" id="postitStudioModalUnique">
     <div class="studio-modal-box">
-        <h3 style="margin: 0; font-size: 16px; color: #1e4215;">✨ Create Your Note</h3>
+        <h3 style="margin: 0; font-size: 16px; color: #1e4215; text-transform: lowercase;">{{ __('board.studio_title') }}</h3>
         
         <div class="studio-columns">
             <div class="studio-tools">
                 <div>
-                    <label style="font-size: 13px; color: #2c441b;">Color:</label>
+                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('board.label_color') }}</label>
                     <div class="color-selector" style="margin-top: 4px;">
+                        <!-- Orijinal 5 pastel renk -->
                         <div class="color-ball selected" style="background:#fdf5a6;" data-c="#fdf5a6"></div>
                         <div class="color-ball" style="background:#ffd1dc;" data-c="#ffd1dc"></div>
                         <div class="color-ball" style="background:#c6e085;" data-c="#c6e085"></div>
                         <div class="color-ball" style="background:#b5e2fa;" data-c="#b5e2fa"></div>
                         <div class="color-ball" style="background:#dfccf1;" data-c="#dfccf1"></div>
+                        <!-- Yeni 5 pastel renk -->
+                        <div class="color-ball" style="background:#ffe2b3;" data-c="#ffe2b3"></div>
+                        <div class="color-ball" style="background:#b8f2e6;" data-c="#b8f2e6"></div>
+                        <div class="color-ball" style="background:#fcd5ce;" data-c="#fcd5ce"></div>
+                        <div class="color-ball" style="background:#d8e2dc;" data-c="#d8e2dc"></div>
+                        <div class="color-ball" style="background:#fff1e6;" data-c="#fff1e6"></div>
                     </div>
                 </div>
 
                 <div>
-                    <label style="font-size: 13px; color: #2c441b;">Shape:</label>
+                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('board.label_shape') }}</label>
                     <div class="shape-btn-group" style="margin-top: 4px;">
-                        <button type="button" class="shape-btn active" data-shape="size-square">Square</button>
-                        <button type="button" class="shape-btn" data-shape="size-portrait">Portrait</button>
-                        <button type="button" class="shape-btn" data-shape="size-landscape">Landscape</button>
+                        <button type="button" class="shape-btn active" data-shape="size-square">{{ __('board.shape_square') }}</button>
+                        <button type="button" class="shape-btn" data-shape="size-portrait">{{ __('board.shape_portrait') }}</button>
+                        <button type="button" class="shape-btn" data-shape="size-landscape">{{ __('board.shape_landscape') }}</button>
                     </div>
                 </div>
 
                 <textarea id="uniqueTextInput" 
                           class="studio-input-box" 
-                          placeholder="Write something cozy..." 
-                          maxlength="120"
+                          placeholder="{{ __('board.input_placeholder') }}" 
+                          maxlength="120" 
                           oninput="handleStudioTextInput(this.value)"></textarea>
 
                 <label class="btn-gentle-upload">
-                    Resim / Sticker Ekle
+                    {{ __('board.btn_upload_image') }}
                     <input type="file" id="uniqueFileInput" accept="image/png, image/jpeg, image/jpg, image/webp" style="display:none;" onchange="handleStudioImageUpload(this)">
                 </label>
             </div>
@@ -743,22 +764,22 @@
                     <span class="postit-pin"></span>
                     
                     <div id="uniqueTextBox" class="transform-box is-selected" style="top:25px; left:16px; position: absolute; z-index: 10; width: auto; max-width: 85%;">
-                        <div class="postit-text-content" id="uniqueTextLayer" style="position:relative; font-size:18px; line-height: 1.2; word-break: break-word; white-space: pre-wrap; pointer-events: none;">selam</div>
-                        <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                        <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
+                        <div class="postit-text-content" id="uniqueTextLayer" style="position:relative; font-size:18px; line-height: 1.2; word-break: break-word; white-space: pre-wrap; pointer-events: none;">haii</div>
+                        <div class="handle-btn handle-rotate" title="{{ __('board.handle_rotate') }}">↻</div>
+                        <div class="handle-btn handle-resize" title="{{ __('board.handle_resize') }}">⤡</div>
                     </div>
 
                     <div id="uniqueStickerBox" class="transform-box" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;"></div>
 
                     <div class="postit-author" id="uniqueAuthorLayer" style="position: absolute; bottom: 4px; left: 6px; font-size: 11px;"></div>
                 </div>
-                <span style="font-size:10px; color:#777;">*Köşelerden tutup döndür / boyutlandır</span>
+                <span style="font-size:10px; color:#777; text-transform: lowercase;">{{ __('board.hint_drag') }}</span>
             </div>
         </div>
 
         <div style="display:flex; justify-content:flex-end; gap:10px; margin-top: 4px;">
-            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closeStudioModalSafe()">Cancel</button>
-            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinStudioNoteSafe()">OK!</button>
+            <button type="button" class="btn-action" style="background:#f0f0f0; border-color:#ccc;" onclick="closeStudioModalSafe()">{{ __('board.btn_cancel') }}</button>
+            <button type="button" class="btn-action" style="background:#e3f2dc; border-color:#7ea863;" onclick="pinStudioNoteSafe()">{{ __('board.btn_ok') }}</button>
         </div>
     </div>
 </div>
@@ -768,6 +789,23 @@
     const PROFILE_USERNAME = @json($user->username ?? '');
     const IS_OWN_PROFILE = @json($isOwnProfile);
     let isBoardLocked = @json($isBoardLocked);
+
+    const I18N = {
+        saving: @json(__('board.js_saving')),
+        saved: @json(__('board.js_saved')),
+        editBoard: @json(__('board.btn_edit_board')),
+        save: @json(__('board.btn_save')),
+        saveFailed: @json(__('board.js_save_failed')),
+        hooksFull: @json(__('board.js_hooks_full')),
+        lockClosedTitle: @json(__('board.status_locked')),
+        lockOpenTitle: @json(__('board.status_open')),
+        handleDelete: @json(__('board.handle_delete')),
+        handleRotate: @json(__('board.handle_rotate')),
+        handleResize: @json(__('board.handle_resize')),
+        dragMove: @json(__('board.js_drag_move')),
+        lockedBadge: @json(__('board.js_locked_badge')),
+        defaultText: @json(__('board.js_default_text'))
+    };
 
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
@@ -804,12 +842,11 @@
         const modal = document.getElementById('postitStudioModalUnique');
         if (!modal) return;
 
-        // Sadece modalın içindeki metin alanını güncelle
         const textLayer = modal.querySelector('.postit-text-content');
         const textBox = modal.querySelector('#uniqueTextBox');
 
         if (textLayer) {
-            textLayer.textContent = (val && val.trim() !== '') ? val : 'selam';
+            textLayer.textContent = (val && val.trim() !== '') ? val : I18N.defaultText;
         }
         if (textBox) {
             textBox.style.width = 'auto';
@@ -871,9 +908,9 @@
                     sBox.style.height = h + 'px';
                     sBox.innerHTML = `
                         <img class="postit-sticker-img" src="${e.target.result}" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none;">
-                        <div class="handle-btn handle-delete" title="Sil" onclick="deleteStudioImage(event)">✕</div>
-                        <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                        <div class="handle-btn handle-resize" title="Büyüt">⤡</div>
+                        <div class="handle-btn handle-delete" title="${I18N.handleDelete}" onclick="deleteStudioImage(event)">✕</div>
+                        <div class="handle-btn handle-rotate" title="${I18N.handleRotate}">↻</div>
+                        <div class="handle-btn handle-resize" title="${I18N.handleResize}">⤡</div>
                     `;
                     sBox.style.display = 'block';
 
@@ -998,7 +1035,6 @@
     setupModalStoryTransformer('uniqueTextBox');
     setupModalStoryTransformer('uniqueStickerBox');
 
-    // Panoya Notu Sabitle (Tekrar tekrar eklendiğinde ID çakışması olmaması için klondan ID'leri temizler)
     window.pinStudioNoteSafe = function() {
         const modal = document.getElementById('postitStudioModalUnique');
         const previewCard = document.getElementById('uniquePreviewCard');
@@ -1020,7 +1056,6 @@
         postitWrapper.style.transform = `scale(${initialScale}) rotate(${rot}deg)`;
         bringToFront(postitWrapper);
 
-        // Klonu al ve İÇİNDEKİ TÜM ID'LERİ KALDIR (Böylece bir sonraki post-it ile asla karışmaz)
         const clonedCard = previewCard.cloneNode(true);
         clonedCard.removeAttribute('id');
         clonedCard.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
@@ -1046,9 +1081,9 @@
 
         postitWrapper.appendChild(clonedCard);
         postitWrapper.innerHTML += `
-            <div class="handle-btn handle-delete postit-delete-btn" title="Sil">✕</div>
-            <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-            <div class="handle-btn handle-resize" title="Post-it'i Büyüt / Küçült">⤡</div>
+            <div class="handle-btn handle-delete postit-delete-btn" title="${I18N.handleDelete}">✕</div>
+            <div class="handle-btn handle-rotate" title="${I18N.handleRotate}">↻</div>
+            <div class="handle-btn handle-resize" title="${I18N.handleResize}">⤡</div>
         `;
 
         setupPostitControls(postitWrapper, true);
@@ -1057,11 +1092,10 @@
 
         window.closeStudioModalSafe();
 
-        // Modalı bir sonraki post-it için sıfırla
         if (txtInput) txtInput.value = '';
         if (modal) {
             const modalText = modal.querySelector('.postit-text-content');
-            if (modalText) modalText.textContent = 'selam';
+            if (modalText) modalText.textContent = I18N.defaultText;
         }
         
         if (sBox) {
@@ -1075,7 +1109,6 @@
         showFriendSaveButton();
     };
 
-    // --- PANODAKİ NOT VE SERBEST STICKER KONTROLLERİ ---
     function setupPostitControls(wrapper, canEdit) {
         wrapper.addEventListener('mousedown', () => {
             if (IS_OWN_PROFILE && !isEditingModeActive) return;
@@ -1174,9 +1207,9 @@
         wrap.innerHTML = `
             <img src="${src}">
             ${IS_OWN_PROFILE ? `
-                <div class="handle-btn handle-delete" title="Sil">✕</div>
-                <div class="handle-btn handle-rotate" title="Döndür">↻</div>
-                <div class="handle-btn handle-resize" title="Büyüt / Küçült">⤡</div>
+                <div class="handle-btn handle-delete" title="${I18N.handleDelete}">✕</div>
+                <div class="handle-btn handle-rotate" title="${I18N.handleRotate}">↻</div>
+                <div class="handle-btn handle-resize" title="${I18N.handleResize}">⤡</div>
             ` : ''}
         `;
 
@@ -1358,7 +1391,7 @@
     // --- VERİTABANINA ASYNC KAYIT ---
     async function saveBoardToDatabase(triggerBtn = null) {
         if (triggerBtn) {
-            triggerBtn.innerText = '⏳ Kaydediliyor...';
+            triggerBtn.innerText = I18N.saving;
             triggerBtn.disabled = true;
         }
 
@@ -1419,24 +1452,24 @@
             const data = await res.json();
             if (res.ok) {
                 if (triggerBtn) {
-                    triggerBtn.innerText = '✅ Kaydedildi!';
+                    triggerBtn.innerText = I18N.saved;
                     setTimeout(() => {
                         if (!IS_OWN_PROFILE) triggerBtn.style.display = 'none';
-                        triggerBtn.innerText = IS_OWN_PROFILE ? '✏️ Edit Board' : '💾 SAVE';
+                        triggerBtn.innerText = IS_OWN_PROFILE ? I18N.editBoard : I18N.save;
                         triggerBtn.disabled = false;
                     }, 1200);
                 }
             } else {
-                alert('Kayıt başarısız: ' + (data.error || 'Bilinmeyen hata'));
+                alert(I18N.saveFailed + ': ' + (data.error || 'unknown error'));
                 if (triggerBtn) {
-                    triggerBtn.innerText = '💾 SAVE';
+                    triggerBtn.innerText = I18N.save;
                     triggerBtn.disabled = false;
                 }
             }
         } catch (error) {
-            console.error('Kayıt isteği hatası:', error);
+            console.error('save request error:', error);
             if (triggerBtn) {
-                triggerBtn.innerText = '💾 SAVE';
+                triggerBtn.innerText = I18N.save;
                 triggerBtn.disabled = false;
             }
         }
@@ -1448,18 +1481,18 @@
             const grid = document.getElementById('keychainHooksGrid');
 
             if (isEditingModeActive) {
-                this.innerText = '💾 SAVE';
+                this.innerText = I18N.save;
                 this.classList.add('saving');
                 corkboard.classList.add('is-editing-active');
                 if (grid) grid.classList.add('is-editing-mode');
                 if (btnAddStickerBtn) btnAddStickerBtn.style.display = 'inline-block';
             } else {
-                this.innerText = '⏳ Kaydediliyor...';
+                this.innerText = I18N.saving;
                 this.disabled = true;
                 
                 await saveBoardToDatabase(this);
 
-                this.innerText = '✏️ Edit Board';
+                this.innerText = I18N.editBoard;
                 this.disabled = false;
                 this.classList.remove('saving');
                 corkboard.classList.remove('is-editing-active');
@@ -1475,7 +1508,7 @@
         boardLockBtn.addEventListener('click', () => {
             isBoardLocked = !isBoardLocked;
             boardLockImg.src = isBoardLocked ? LOCK_ICON_PATH : UNLOCKED_ICON_PATH;
-            boardLockBtn.title = isBoardLocked ? 'Pano Ziyaretçilere Kilitli' : 'Pano Ziyaretçilere Açık';
+            boardLockBtn.title = isBoardLocked ? I18N.lockClosedTitle : I18N.lockOpenTitle;
             saveBoardToDatabase(null);
         });
     }
@@ -1498,7 +1531,7 @@
 
             const wrap = document.createElement('div');
             wrap.className = `bag-badge-item ${isUnlocked ? 'unlocked' : 'locked'}`;
-            wrap.title = isUnlocked ? 'Tıkla veya kancaya sürükle' : 'Kilitli';
+            wrap.title = isUnlocked ? I18N.dragMove : I18N.lockedBadge;
 
             wrap.innerHTML = `
                 <img src="/images/badges/${item.file}" class="bag-badge-img" alt="${item.title}" onerror="this.onerror=null; this.src='${FALLBACK_BADGE_SVG}';">
@@ -1532,7 +1565,7 @@
                 return;
             }
         }
-        alert('Tüm 9 kanca dolu! Birini boşaltmak için Edit modunda tıkla.');
+        alert(I18N.hooksFull);
     }
 
     function hangBadgeToSlot(slotElem, key, iconUrl, title) {
