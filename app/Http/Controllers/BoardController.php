@@ -101,7 +101,6 @@ class BoardController extends Controller
             }
         }
 
-        // Gelen veriyi çöz
         $incoming = $request->input('board_items', []);
         while (is_string($incoming)) {
             $incoming = json_decode($incoming, true);
@@ -127,37 +126,6 @@ class BoardController extends Controller
             'success' => true,
             'saved_count' => count($board->board_items),
             'target_user_id' => $user->id
-        ]);
-    }
-
-    public function saveMyBoard(Request $request)
-    {
-        $user = auth()->user();
-        $board = UserBoard::firstOrCreate(['user_id' => $user->id]);
-
-        $incoming = $request->input('board_items', []);
-        while (is_string($incoming)) {
-            $incoming = json_decode($incoming, true);
-        }
-        $board->board_items = is_array($incoming) ? $incoming : [];
-
-        if ($request->has('hook_slots')) {
-            $hooks = $request->input('hook_slots');
-            while (is_string($hooks)) {
-                $hooks = json_decode($hooks, true);
-            }
-            $board->hook_slots = is_array($hooks) ? $hooks : array_fill(0, 9, null);
-        }
-
-        if ($request->has('is_locked')) {
-            $board->is_locked = $request->boolean('is_locked');
-        }
-
-        $board->save();
-
-        return response()->json([
-            'success' => true,
-            'saved_count' => count($board->board_items)
         ]);
     }
 }

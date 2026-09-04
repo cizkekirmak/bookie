@@ -351,6 +351,4 @@ Route::get('/lang/{locale}', function (Request $request, $locale) {
     return redirect()->to($referer);
 })->name('lang.switch');
 
-Route::get('/u/{username}/board', [BoardController::class, 'show'])->name('board.show');
-Route::post('/u/{username}/board/save', [BoardController::class, 'save'])->middleware('auth')->name('board.save');
-Route::post('/board/save-my-board', [BoardController::class, 'saveMyBoard'])->middleware('auth')->name('board.save.own');
+Route::post('/board/save/{user}', [BoardController::class, 'save'])->middleware('auth')->name('board.save');

@@ -774,9 +774,7 @@
     const LOCK_ICON_PATH = '{{ asset("images/locke.png") }}';
     const UNLOCKED_ICON_PATH = '{{ asset("images/unlocked.png") }}';
 
-    const SAVE_URL = IS_OWN_PROFILE 
-        ? @json(route('board.save.own')) 
-        : @json(url('/u/' . ($user->username ?? '') . '/board/save'));
+    const SAVE_URL = @json(route('board.save', $user->id ?? auth()->id()));
     const CSRF_TOKEN = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '';
     
     const ACHIEVEMENTS_DATA = @json($achievements ?? []);
