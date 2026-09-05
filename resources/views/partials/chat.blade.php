@@ -416,7 +416,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let shiftX, shiftY;
     let lastLoadedMessagesCount = 0;
     let blockInChatSound = false;
-    let lastUnreadTotal = 0;
+    let lastUnreadTotal = null; // İlk kontrolü anlamak için null başlatıldı
+    let isInitialCheck = true;   // Sayfa ilk yüklendiğinde ses çalmasını önleyen kilit
     let pollInterval = null;
 
     function getAvatarSrc(avatar) {
@@ -547,8 +548,6 @@ document.addEventListener('DOMContentLoaded', () => {
         messageInput.disabled = false;
         sendBtn.disabled = false;
         messageInput.focus();
-
-        lastUnreadTotal = 0;
 
         document.querySelectorAll('.chat-friend-item').forEach(el => el.classList.remove('active'));
 
@@ -681,15 +680,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 unreadDot.style.display = (currentCount > 0) ? 'block' : 'none';
             }
 
-            if (!isPopupOpen && currentCount > lastUnreadTotal) {
+            // Sadece sayfa ilk açılışı bittiyse ve GERÇEKTEN yeni bir mesaj sayısı arttıysa ses çal
+            if (!isInitialCheck && !isPopupOpen && currentCount > 0 && currentCount > (lastUnreadTotal ?? 0)) {
                 playSound('closed');
             }
+
             lastUnreadTotal = currentCount;
+            isInitialCheck = false; // İlk kontrol tamamlandı, kilit açıldı
 
             if (isPopupOpen && activeFriendId) {
                 loadMessages(false);
             }
-        } catch (e) {}
+        } catch (e) {
+            isInitialCheck = false;
+        }
     }
 
     function startPolling() {
