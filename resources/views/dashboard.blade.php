@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
+    <meta name="view-transition" content="same-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Bookie - {{ __('Dashboard') }}</title>
@@ -43,6 +44,15 @@
             background-attachment: fixed;
             background-repeat: no-repeat;
             font-family: 'Unkempt', cursive;
+        }
+        @view-transition {
+            navigation: auto;
+        }
+,
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.25s;
+            animation-timing-function: ease-in-out;
         }
 
         .site-header-outer {

@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <link rel="manifest" href="{{ asset('manifest.json') }}">
+    <meta name="view-transition" content="same-origin">
     <meta name="theme-color" content="#2e6f40">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -25,6 +26,14 @@
             font-weight: 400;
             font-style: normal;
             font-display: swap;
+        }
+        @view-transition {
+        navigation: auto;
+        }
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.25s;
+            animation-timing-function: ease-in-out;
         }
 
         body { 

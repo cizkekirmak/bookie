@@ -2,6 +2,7 @@
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="UTF-8">
+    <meta name="view-transition" content="same-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ __('join us!') }} - Bookie</title>
 
@@ -24,6 +25,14 @@
     font-style: normal;
     font-display: swap;
 }
+@view-transition {
+        navigation: auto;
+        }
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.25s;
+            animation-timing-function: ease-in-out;
+        }
         body { 
             font-family: "Mystery Quest" , system-ui;
             display: flex;

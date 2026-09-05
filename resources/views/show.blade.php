@@ -4,6 +4,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="view-transition" content="same-origin">
     <title>{{ $title ?? __('Book Details') }} - Bookie</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -25,6 +26,14 @@
             font-weight: 400;
             font-style: normal;
             font-display: swap;
+        }
+        @view-transition {
+        navigation: auto;
+        }
+        ::view-transition-old(root),
+        ::view-transition-new(root) {
+            animation-duration: 0.25s;
+            animation-timing-function: ease-in-out;
         }
 
         * {
