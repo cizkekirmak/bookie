@@ -88,7 +88,7 @@
             font-display: swap;
         }
         @view-transition {
-        navigation: auto;
+            navigation: auto;
         }
         ::view-transition-old(root),
         ::view-transition-new(root) {
@@ -178,20 +178,24 @@
             flex-shrink: 0;
         }
 
-        .header-icon-box {
-            width: 52px;
-            height: 52px;
-            max-width: 52px;
-            max-height: 52px;
+        /* Üçlü Buton Grubu: Büyütüldü & BORDER TAMAMEN SIFIRLANDI */
+        .header-icon-box,
+        .notification-icon-img {
+            width: 60px !important;
+            height: 60px !important;
+            max-width: 60px !important;
+            max-height: 60px !important;
             object-fit: contain;
-            border: 1.5px solid #4b813b;
+            border: none !important;
+            outline: none !important;
             display: block;
             cursor: pointer;
             transition: transform 0.2s ease;
         }
 
-        .header-icon-box:hover {
-            transform: scale(1.1);
+        .header-icon-box:hover,
+        .notification-icon-img:hover {
+            transform: scale(1.08);
         }
 
         .profile-container {
@@ -303,15 +307,16 @@
                 gap: 8px !important;
             }
 
+            /* Mobilde Üçlü Buton Grubu: Büyütüldü & BORDER TAMAMEN SIFIRLANDI */
             .header-icon-box,
             .notification-icon-img,
             .header-actions-wrap img {
-                width: 44px !important;
-                height: 44px !important;
-                max-width: 44px !important;
-                max-height: 44px !important;
-                border: 2px solid #4b813b !important;
-                border-radius: 10px !important;
+                width: 50px !important;
+                height: 50px !important;
+                max-width: 50px !important;
+                max-height: 50px !important;
+                border: none !important;
+                outline: none !important;
                 display: block !important;
             }
 
