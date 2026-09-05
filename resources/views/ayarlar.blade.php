@@ -343,11 +343,11 @@
                 @include('partials.lang-switch')
 
                 <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}" class="header-icon-box">
+                    <img src="{{ asset('images/profile.png') }}" alt="{{ __('Profile') }}" class="header-icon-box">
                 </a>
                 
                 <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/dash.jpg') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
+                    <img src="{{ asset('images/dash.png') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
                 </a>
             </div>
 
@@ -380,7 +380,7 @@
                 {{-- Avatar Önizleme --}}
                 @php
                     $currentAvatar = auth()->user()->avatar;
-                    $defaultAvatar = asset('images/profile.jpg');
+                    $defaultAvatar = asset('images/profile.png');
                     $avatarSrc = (!empty($currentAvatar) && str_starts_with($currentAvatar, 'http'))
                         ? $currentAvatar
                         : $defaultAvatar;

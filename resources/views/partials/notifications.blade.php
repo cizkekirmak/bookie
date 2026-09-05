@@ -7,7 +7,7 @@
 <div class="notification-container" onmouseenter="openNotificationPanel()" onmouseleave="closeNotificationPanel()">
     
     <button type="button" class="notification-trigger-btn" onclick="toggleNotificationPanel(event)">
-        <img src="{{ asset('images/bildirim.jpg') }}" alt="{{ __('Notifications') }}" class="notification-icon-img"
+        <img src="{{ asset('images/bildirim.png') }}" alt="{{ __('Notifications') }}" class="notification-icon-img"
              onmouseenter="this.style.transform='scale(1.1)'; this.style.filter='drop-shadow(0px 6px 8px rgba(0, 0, 0, 0.4))';"
              onmouseleave="this.style.transform='scale(1)'; this.style.filter='none';">
         @if($totalCount > 0)

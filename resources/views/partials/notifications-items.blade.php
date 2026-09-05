@@ -2,7 +2,7 @@
     @foreach($pendingList as $req)
         @php
             $sender = $req->sender ?? null;
-            $defaultAvatar = asset('images/profile.jpg');
+            $defaultAvatar = asset('images/profile.png');
             
             $avatarSrc = (!empty($sender?->avatar) && str_starts_with($sender->avatar, 'http'))
                 ? $sender->avatar
@@ -46,7 +46,7 @@
             $notifData = $notification->data ?? [];
             $senderId = $notifData['sender_id'] ?? ($notifData['user_id'] ?? null);
             $notifUser = $senderId ? \App\Models\User::find($senderId) : null;
-            $defaultAvatar = asset('images/profile.jpg');
+            $defaultAvatar = asset('images/profile.png');
             
             $notifAvatarSrc = (!empty($notifUser?->avatar) && str_starts_with($notifUser->avatar, 'http'))
                 ? $notifUser->avatar

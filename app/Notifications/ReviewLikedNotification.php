@@ -43,7 +43,7 @@ class ReviewLikedNotification extends Notification
         'type'          => 'review_liked',
         'sender_id'     => $this->liker->id,
         'sender_name'   => $this->liker->username ?? $this->liker->name ?? 'Anonim',
-        'sender_avatar' => $this->liker->avatar ?? 'profile.jpg',
+        'sender_avatar' => $this->liker->avatar ?? 'profile.png',
         'review_id'     => $this->review->id,
         'book_id'       => $bookIdentifier, 
         'message'       => 'liked your review.'

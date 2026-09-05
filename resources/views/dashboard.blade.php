@@ -530,16 +530,16 @@
                 </div>
 
                 <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="{{ __('Settings') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                    <img src="{{ asset('images/ayarlar-2.png') }}" alt="{{ __('Settings') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
                 </a>
                 
                 <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                    <img src="{{ asset('images/profile.png') }}" alt="{{ __('Profile') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
                 </a>
             </div>
 
             <div class="mobile-menu-trigger" id="mobileMenuBtn">
-                <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}">
+                <img src="{{ asset('images/profile.png') }}" alt="{{ __('Profile') }}">
             </div>
 
             <div class="mobile-dropdown-menu hidden" id="mobileDropdownMenu">
@@ -549,10 +549,10 @@
                     </div>
                 @endauth
                 <a href="{{ route('ayarlar') }}" class="mobile-icon-box">
-                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="{{ __('Settings') }}">
+                    <img src="{{ asset('images/ayarlar-2.png') }}" alt="{{ __('Settings') }}">
                 </a>
                 <a href="{{ route('profile') }}" class="mobile-icon-box">
-                    <img src="{{ asset('images/profile.jpg') }}" alt="{{ __('Profile') }}">
+                    <img src="{{ asset('images/profile.png') }}" alt="{{ __('Profile') }}">
                 </a>
             </div>
 
@@ -882,7 +882,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (userSearchInput && userSearchResults) {
         let debounceTimer;
-        const defaultAvatar = "{{ asset('images/profile.jpg') }}";
+        const defaultAvatar = "{{ asset('images/profile.png') }}";
 
         const textUserNotFound = @json(__('no user was found, are u sure u spelt that correctly?'));
         const textUserSearchError = @json(__('An error occurred.'));

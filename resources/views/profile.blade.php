@@ -457,11 +457,11 @@
                 </div>
 
                 <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/ayarlar.jpg') }}" alt="{{ __('Settings') }}" class="header-icon-box">
+                    <img src="{{ asset('images/ayarlar-2.png') }}" alt="{{ __('Settings') }}" class="header-icon-box">
                 </a>
 
                 <a href="{{ route('dashboard') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
-                    <img src="{{ asset('images/dash.jpg') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
+                    <img src="{{ asset('images/dash.png') }}" alt="{{ __('Dashboard') }}" class="header-icon-box">
                 </a>
             </div>
 
@@ -477,7 +477,7 @@
             <button type="button" class="profile-close-btn" id="closeProfileDrawerBtn">&times;</button>
 
             @php
-                $defaultAvatar = asset('images/profile.jpg');
+                $defaultAvatar = asset('images/profile.png');
                 $userAvatar = (!empty($user->avatar) && str_starts_with($user->avatar, 'http')) 
                     ? $user->avatar 
                     : $defaultAvatar;
@@ -870,7 +870,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 @php
                     $friendAvatarUrl = (!empty($friend->avatar) && str_starts_with($friend->avatar, 'http'))
                         ? $friend->avatar
-                        : asset('images/profile.jpg');
+                        : asset('images/profile.png');
                 @endphp
                 <div 
                     onclick="window.location.href='/profile/{{ $friend->id }}'" 
@@ -916,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                  alt="{{ $friend->username ?? 'Profile' }}" 
                                  referrerpolicy="no-referrer" 
                                  style="width: 100%; height: 100%; border-radius: 50%; display: block; object-fit: cover;"
-                                 onerror="this.onerror=null; this.src='{{ asset('images/profile.jpg') }}';">
+                                 onerror="this.onerror=null; this.src='{{ asset('images/profile.png') }}';">
                         </div>
 
                         <div>

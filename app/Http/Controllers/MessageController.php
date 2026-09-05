@@ -34,7 +34,7 @@ class MessageController extends Controller
             if ($friend->avatar && str_starts_with($friend->avatar, 'http')) {
                 $avatar = $friend->avatar;
             } else {
-                $avatar = asset('images/profile.jpg');
+                $avatar = asset('images/profile.png');
             }
 
             $data[] = [
