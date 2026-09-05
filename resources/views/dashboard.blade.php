@@ -48,7 +48,7 @@
         @view-transition {
             navigation: auto;
         }
-,
+
         ::view-transition-old(root),
         ::view-transition-new(root) {
             animation-duration: 0.25s;
@@ -144,6 +144,26 @@
             gap: 16px;
             flex-shrink: 0;
             z-index: 10001;
+        }
+
+        /* PC Butonları: 65px & Bordersız */
+        .header-desktop-actions .header-action-btn,
+        .header-desktop-actions .notification-icon-img {
+            width: 65px !important;
+            height: 65px !important;
+            max-width: 65px !important;
+            max-height: 65px !important;
+            object-fit: contain;
+            border: none !important;
+            outline: none !important;
+            display: block;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .header-desktop-actions .header-action-btn:hover,
+        .header-desktop-actions .notification-icon-img:hover {
+            transform: scale(1.08);
         }
 
         .mobile-menu-trigger,
@@ -288,23 +308,25 @@
                 z-index: 1000005 !important;
             }
 
+            /* Mobil Menü Trigger: 52px & Bordersız */
             .mobile-menu-trigger {
                 display: flex !important;
                 align-items: center;
                 justify-content: center;
-                width: 42px !important;
-                height: 42px !important;
-                background: #f4fbf0;
-                border: 2px solid #4b813b;
-                border-radius: 10px !important;
+                width: 52px !important;
+                height: 52px !important;
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
                 cursor: pointer;
                 flex-shrink: 0;
             }
 
             .mobile-menu-trigger img {
-                width: 34px !important;
-                height: 34px !important;
-                border-radius: 6px !important;
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: contain !important;
+                border-radius: 8px !important;
             }
 
             .mobile-dropdown-menu {
@@ -312,13 +334,13 @@
                 position: absolute;
                 top: 70px !important;
                 right: 8px !important;
-                width: 68px !important;
+                width: 74px !important;
                 background: #c6e085;
                 border: 2px solid #4b813b;
                 border-radius: 14px !important;
                 padding: 8px !important;
                 flex-direction: column;
-                gap: 8px !important;
+                gap: 10px !important;
                 box-shadow: 0 8px 24px rgba(0,0,0,0.3);
                 z-index: 100000;
                 align-items: center;
@@ -328,12 +350,13 @@
                 display: none !important;
             }
 
+            /* Mobil Açılır Menü Butonları: 52px & Bordersız */
             .mobile-icon-box {
-                width: 48px !important;
-                height: 48px !important;
-                background: #f4fbf0;
-                border: 1.5px solid #6b9c56;
-                border-radius: 10px !important;
+                width: 52px !important;
+                height: 52px !important;
+                background: transparent !important;
+                border: none !important;
+                outline: none !important;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -343,11 +366,13 @@
                 position: relative !important; 
             }
 
-            .mobile-icon-box img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                border-radius: 8px !important; 
+            .mobile-icon-box img,
+            .mobile-icon-box .notification-icon-img {
+                width: 100% !important;
+                height: 100% !important;
+                object-fit: contain !important;
+                border: none !important;
+                outline: none !important;
                 display: block;
             }
 
@@ -539,12 +564,12 @@
                     @endauth
                 </div>
 
-                <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/ayarlar-2.png') }}" alt="{{ __('Settings') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                <a href="{{ route('ayarlar') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
+                    <img src="{{ asset('images/ayarlar-2.png') }}" alt="{{ __('Settings') }}" class="header-action-btn">
                 </a>
                 
-                <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0; transition: transform 0.2s ease;">
-                    <img src="{{ asset('images/profile.png') }}" alt="{{ __('Profile') }}" style="width: 52px; height: 52px; object-fit: contain; border: 1.5px solid #4b813b; display: block; cursor: pointer;" onmouseenter="this.style.transform='scale(1.1)';" onmouseleave="this.style.transform='scale(1)';">
+                <a href="{{ route('profile') }}" style="display: inline-block; line-height: 0; text-decoration: none; flex-shrink: 0;">
+                    <img src="{{ asset('images/profile.png') }}" alt="{{ __('Profile') }}" class="header-action-btn">
                 </a>
             </div>
 
@@ -651,7 +676,7 @@
                         ->take(10)
                         ->get();
 
-                    $ratingColors = [     
+                    $ratingColors = [    
                         1 => '#d43b82',
                         2 => '#e67e22',
                         3 => '#fee16c',

@@ -181,10 +181,10 @@
         /* Üçlü Buton Grubu: Büyütüldü & BORDER TAMAMEN SIFIRLANDI */
         .header-icon-box,
         .notification-icon-img {
-            width: 60px !important;
-            height: 60px !important;
-            max-width: 60px !important;
-            max-height: 60px !important;
+            width: 65px !important;
+            height: 65px !important;
+            max-width: 65px !important;
+            max-height: 65px !important;
             object-fit: contain;
             border: none !important;
             outline: none !important;

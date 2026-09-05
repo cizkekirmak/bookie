@@ -13,23 +13,23 @@
 
     <style>
         @font-face {
-    font-family: 'Unkempt';
-    src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-    }
+            font-family: 'Unkempt';
+            src: url('{{ asset('fonts/Unkempt-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-    @font-face {
-        font-family: 'Henny Penny';
-        src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
-        font-weight: 400;
-        font-style: normal;
-        font-display: swap;
-    }
+        @font-face {
+            font-family: 'Henny Penny';
+            src: url('{{ asset('fonts/HennyPenny-Regular.ttf') }}') format('truetype');
+            font-weight: 400;
+            font-style: normal;
+            font-display: swap;
+        }
 
-    @view-transition {
-        navigation: auto;
+        @view-transition {
+            navigation: auto;
         }
         ::view-transition-old(root),
         ::view-transition-new(root) {
@@ -41,19 +41,19 @@
             box-sizing: border-box;
         }
 
-          * {
-                -webkit-tap-highlight-color: transparent !important;
-            }
+        * {
+            -webkit-tap-highlight-color: transparent !important;
+        }
 
-            button,
-            a,
-            label,
-            span,
-            img {
-                user-select: none !important;
-                -webkit-user-select: none !important;
-                -webkit-touch-callout: none !important;
-            }
+        button,
+        a,
+        label,
+        span,
+        img {
+            user-select: none !important;
+            -webkit-user-select: none !important;
+            -webkit-touch-callout: none !important;
+        }
 
         html, body {
             margin: 0;
@@ -115,18 +115,22 @@
             text-decoration: none;
         }
 
+        /* Masaüstü Butonları: 65px & Bordersız */
         .header-icon-box {
-            width: 52px;
-            height: 52px;
+            width: 65px !important;
+            height: 65px !important;
+            max-width: 65px !important;
+            max-height: 65px !important;
             object-fit: contain;
-            border: 1.5px solid #4b813b;
+            border: none !important;
+            outline: none !important;
             display: block;
             cursor: pointer;
             transition: transform 0.2s ease;
         }
 
         .header-icon-box:hover {
-            transform: scale(1.1);
+            transform: scale(1.08);
         }
 
         .settings-main-area {
@@ -286,11 +290,15 @@
                 margin-top: 0 !important;
             }
 
+            /* Mobilde Butonlar: 52px & Bordersız */
             .header-icon-box {
-                width: 44px !important;
-                height: 44px !important;
-                border: 2px solid #4b813b !important;
-                border-radius: 10px !important;
+                width: 52px !important;
+                height: 52px !important;
+                max-width: 52px !important;
+                max-height: 52px !important;
+                border: none !important;
+                outline: none !important;
+                display: block !important;
             }
 
             .settings-main-area {
