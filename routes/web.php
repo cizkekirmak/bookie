@@ -280,9 +280,21 @@ Route::middleware(['auth'])->group(function () {
             session()->setPreviousUrl($request->headers->get('referer'));
         }
         $user = auth()->user();
-        $pendingList = $user->pendingFriendRequests()->with('sender')->get();
-        $notifications = $user->notifications;
-        $totalCount = $pendingList->count() + $user->unreadNotifications()->count();
+
+        // Bekleyen istekleri friendships tablosundan doğrudan çek
+        $pendingList = friendship::where('friend_id', $user->id)
+            ->where('status', 'pending')
+            ->get();
+
+        // Her isteğe gönderen kullanıcı bilgilerini bağla
+        $pendingList->transform(function ($item) {
+            $item->sender = User::find($item->user_id);
+            return $item;
+        });
+
+        $notifications = $user->notifications ?? collect([]);
+        $unreadNotifCount = $user->unreadNotifications ? $user->unreadNotifications->count() : 0;
+        $totalCount = $pendingList->count() + $unreadNotifCount;
 
         $html = view("partials.notifications-items", compact("pendingList", "notifications", "totalCount"))->render();
 
