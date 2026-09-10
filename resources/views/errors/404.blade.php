@@ -9,7 +9,7 @@
             margin: 0;
             padding: 20px;
             box-sizing: border-box;
-            background-color: #d6e8d2; /* Bookie pastel yeşili */
+            background-color: #fdfdfd; /* Bookie pastel yeşili */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -23,7 +23,6 @@
         }
         .error-link:hover {
             transform: scale(1.02);
-            filter: drop-shadow(0 10px 25px rgba(0,0,0,0.15));
         }
         .error-img {
             width: 100%;
