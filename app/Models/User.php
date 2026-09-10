@@ -165,7 +165,7 @@ class User extends Authenticatable
         return match (true) {
             $count >= 100 => ['name' => 'almost a bookie admin', 'icon' => '👑', 'bg' => '#fff4d6', 'border' => '#e0b84c', 'color' => '#8d5b12'],
             $count >= 50  => ['name' => 'touched grass',          'icon' => '🔮', 'bg' => '#f5e8ff', 'border' => '#b382d9', 'color' => '#5e2a84'],
-            $count >= 25  => ['name' => 'xX_bookieLover67_Xx',    'icon' => '📜', 'bg' => '#faede0', 'border' => '#c2a178', 'color' => '#574127'],
+            $count >= 25  => ['name' => 'xX_bookieLover_Xx',    'icon' => '📜', 'bg' => '#faede0', 'border' => '#c2a178', 'color' => '#574127'],
             $count >= 10  => ['name' => 'bookshelf cat',          'icon' => '🐾', 'bg' => '#e6f4dc', 'border' => '#7bb35c', 'color' => '#1a3c11'],
             $count >= 5   => ['name' => 'curious worm',            'icon' => '🕯️', 'bg' => '#e1effa', 'border' => '#6ba2cc', 'color' => '#1f3c5a'],
             $count >= 3   => ['name' => 'just getting started',   'icon' => '☕', 'bg' => '#fceddf', 'border' => '#cca17a', 'color' => '#633d1b'],
@@ -180,7 +180,7 @@ class User extends Authenticatable
             ['req' => 3,   'name' => 'just getting started',   'icon' => '☕', 'desc' => 'did you like what u read?'],
             ['req' => 5,   'name' => 'curious worm',           'icon' => '🕯️', 'desc' => 'alreading reading more than average'],
             ['req' => 10,  'name' => 'bookshelf cat',          'icon' => '🐾', 'desc' => 'meow meow'],
-            ['req' => 25,  'name' => 'xX_bookieLover67_Xx',    'icon' => '📜', 'desc' => 'sorry for being so edgy'],
+            ['req' => 25,  'name' => 'xX_bookieLover_Xx',    'icon' => '📜', 'desc' => 'sorry for being so edgy'],
             ['req' => 50,  'name' => 'touched grass',          'icon' => '🔮', 'desc' => 'escaping the bottom of the pyramid'],
             ['req' => 100, 'name' => 'almost a bookie admin',  'icon' => '👑', 'desc' => 'shoot me an email, i might help..'],
         ];
