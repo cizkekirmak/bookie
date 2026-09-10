@@ -397,7 +397,7 @@ if (!window.notifInitialized) {
             const triggerBtns = document.querySelectorAll('.notification-trigger-btn');
             const badges = document.querySelectorAll('.notification-badge');
 
-            if (data.has_unread && data.total > 0) {
+            if (data.total > 0) {
                 badges.forEach(badge => { badge.innerText = data.total; });
                 if (badges.length === 0) {
                     triggerBtns.forEach(btn => {
@@ -426,6 +426,6 @@ if (!window.notifInitialized) {
         .catch(err => console.error('Bildirim kontrol hatası:', err));
     };
 
-    setInterval(window.checkNewNotifications, 15000);
+    setInterval(window.checkNewNotifications, 5000);
 }
 </script>
