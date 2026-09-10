@@ -6,7 +6,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 220px;
+        height: 222px;
         width: 620px;
         box-sizing: border-box;
     }

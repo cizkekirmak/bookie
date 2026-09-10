@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 220px;
+        height: 222px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -92,7 +92,7 @@
         }
 
         .admin-card-title {
-            font-size: 14px !important;
+            font-size: 15px !important;
             margin-bottom: 6px !important;
             line-height: 1.1 !important;
             white-space: nowrap !important;
