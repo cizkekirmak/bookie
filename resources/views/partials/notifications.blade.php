@@ -83,7 +83,7 @@
     align-items: center;
     justify-content: center;
     line-height: 1;
-    border: 1.5px solid #fff; /* Yeşil arkaplanda ve zarfın üstünde net ayrışması için */
+    border: 1.5px solid #fff3f3; /* Yeşil arkaplanda ve zarfın üstünde net ayrışması için */
     box-sizing: border-box;
     pointer-events: none;
 }
