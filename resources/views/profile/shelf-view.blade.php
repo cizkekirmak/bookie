@@ -87,7 +87,7 @@
         border-radius: 20px;
         padding: 7px 20px;
         font-family: 'Unkempt', cursive;
-        font-size: 14px;
+        font-size: 14.5px; /* 14px -> 14.5px */
         font-weight: 600;
         color: #2b461c;
         cursor: pointer;
@@ -124,7 +124,7 @@
         color: #2b461c;
         padding: 8px 18px;
         border-radius: 16px;
-        font-size: 13px;
+        font-size: 14px; /* 13px -> 14px */
         box-shadow: 0 2px 6px rgba(0,0,0,0.06);
         text-align: center;
     }
@@ -195,8 +195,8 @@
         position: absolute;
         bottom: 4px;
         left: 6px;
-        font-size: 11px;
-        color: rgba(0,0,0,0.55);
+        font-size: 12px; /* 11px -> 12px */
+        color: rgba(0,0,0,0.65);
         pointer-events: none;
         z-index: 10;
     }
@@ -365,12 +365,12 @@
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
     }
     .folder-label {
-        font-size: 11px;
+        font-size: 12.5px; /* 11px -> 12.5px */
         color: #1f5117;
         font-weight: bold;
         text-align: center;
-        line-height: 1.1;
-        margin-top: 2px;
+        line-height: 1.15;
+        margin-top: 3px;
         text-transform: lowercase;
     }
 
@@ -380,7 +380,7 @@
         left: 50%;
         transform: translate(-50%, -50%) scale(0.95);
         width: 90%;
-        max-width: 520px;
+        max-width: 540px;
         max-height: 80vh;
         background: #fdfaf3;
         border: 2px solid #7ea863;
@@ -403,18 +403,18 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 12px 18px;
+        padding: 14px 20px;
         background: #f4f9f0;
         border-bottom: 1.5px solid #bddbb0;
         border-radius: 20px 20px 0 0;
     }
     .drawer-header h4 { 
         margin: 0; 
-        font-size: 16px; 
+        font-size: 18px; /* 16px -> 18px */
         color: #1a3c11; 
         text-transform: lowercase;
     }
-    .drawer-close-btn { background: none; border: none; font-size: 20px; font-weight: bold; color: #2d5a27; cursor: pointer; }
+    .drawer-close-btn { background: none; border: none; font-size: 22px; font-weight: bold; color: #2d5a27; cursor: pointer; }
 
     .drawer-body {
         padding: 18px 14px;
@@ -435,7 +435,7 @@
         background: transparent;
         border: none;
         user-select: none;
-        width: 90px;
+        width: 95px;
     }
     .bag-badge-item.unlocked { cursor: grab; }
     .bag-badge-item.unlocked:active { cursor: grabbing; }
@@ -443,8 +443,8 @@
 
     .bag-badge-img-box {
         position: relative;
-        width: 58px;
-        height: 58px;
+        width: 60px;
+        height: 60px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -467,19 +467,19 @@
         position: absolute;
         bottom: -2px;
         right: 0px;
-        font-size: 13px;
+        font-size: 14px;
         line-height: 1;
         filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
     }
 
     .bag-badge-title {
         font-family: 'Unkempt', cursive;
-        font-size: 11px;
+        font-size: 12.5px; /* 11px -> 12.5px */
         font-weight: bold;
         color: #1a3c11;
         margin-top: 5px;
         line-height: 1.15;
-        max-width: 85px;
+        max-width: 90px;
         word-break: break-word;
         text-transform: lowercase;
     }
@@ -487,24 +487,25 @@
         color: #888888;
     }
 
+    /* GÜNCELLENMİŞ: GENİŞLETİLMİŞ VE OKUNAKLI TOOLTIP */
     .bag-badge-tooltip {
         visibility: hidden;
         opacity: 0;
         position: absolute;
-        bottom: calc(100% + 8px);
+        bottom: calc(100% + 10px);
         left: 50%;
         transform: translateX(-50%);
         background-color: #255719;
         color: #ffffff;
         text-align: center;
-        padding: 6px 10px;
-        border-radius: 10px;
-        font-size: 11px;
+        padding: 8px 12px;
+        border-radius: 12px;
+        font-size: 12.5px; /* 10px -> 12.5px */
         font-family: 'Unkempt', cursive;
         white-space: normal;
-        width: 140px;
+        width: 175px; /* 140px -> 175px */
         z-index: 100005;
-        box-shadow: 0 6px 16px rgba(0,0,0,0.3);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.32);
         pointer-events: none;
         transition: opacity 0.2s ease, transform 0.2s ease;
     }
@@ -514,8 +515,8 @@
         position: absolute;
         top: 100%;
         left: 50%;
-        margin-left: -5px;
-        border-width: 5px;
+        margin-left: -6px;
+        border-width: 6px;
         border-style: solid;
         border-color: #255719 transparent transparent transparent;
     }
@@ -528,7 +529,7 @@
 
     .bag-badge-item:nth-child(-n+4) .bag-badge-tooltip {
         bottom: auto;
-        top: calc(100% + 8px);
+        top: calc(100% + 10px);
     }
 
     .bag-badge-item:nth-child(-n+4) .bag-badge-tooltip::after {
@@ -584,9 +585,9 @@
         background: #ffffff;
         border: 1px solid #bddbb0;
         border-radius: 14px;
-        padding: 6px 4px;
+        padding: 7px 4px;
         font-family: 'Unkempt', cursive;
-        font-size: 13px;
+        font-size: 14px; /* 13px -> 14px */
         font-weight: bold;
         color: #355726;
         cursor: pointer;
@@ -620,27 +621,28 @@
 
     .studio-input-box {
         width: 100%;
-        height: 54px;
+        height: 56px;
         font-family: 'Unkempt';
         padding: 8px 10px;
         resize: none;
-        border: 1px solid #c8debf;
+        border: 1.5px solid #c8debf;
         border-radius: 12px;
         outline: none;
         background: #ffffff;
-        font-size: 13px;
+        font-size: 14.5px; /* 13px -> 14.5px */
     }
     .studio-input-box:focus { border-color: #5a7d3b; }
 
     .btn-gentle-upload {
         background: #f1f7ed;
         border: 1px dashed #7ea863;
-        padding: 7px;
+        padding: 8px;
         text-align: center;
         border-radius: 12px;
-        font-size: 13px;
+        font-size: 14px; /* 13px -> 14px */
         cursor: pointer;
         color: #2d5a27;
+        font-weight: 500;
         transition: background 0.15s;
         display: block;
         text-transform: lowercase;
@@ -658,79 +660,79 @@
     .transform-box.is-selected { border-color: #2d5a27; }
 
     @media (max-width: 1024px) {
-    .board-page-container {
-        padding: 0 4px 20px 4px;
-        margin: 5px auto;
-        width: 100%;
-        overflow-x: hidden;
-    }
+        .board-page-container {
+            padding: 0 4px 20px 4px;
+            margin: 5px auto;
+            width: 100%;
+            overflow-x: hidden;
+        }
 
-    .corkboard-main-wrapper { 
-        flex-direction: column; 
-        align-items: center; 
-        gap: 12px; 
-        width: 100%;
-    }
+        .corkboard-main-wrapper { 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            width: 100%;
+        }
 
-    .corkboard-frame { 
-        width: 100% !important; 
-        max-width: 100% !important; 
-        aspect-ratio: 16 / 10 !important; 
-        border-radius: 12px; 
-        position: relative; 
-        overflow: hidden !important; 
-        touch-action: pan-y !important; 
-    }
+        .corkboard-frame { 
+            width: 100% !important; 
+            max-width: 100% !important; 
+            aspect-ratio: 16 / 10 !important; 
+            border-radius: 12px; 
+            position: relative; 
+            overflow: hidden !important; 
+            touch-action: pan-y !important; 
+        }
 
-    .cork-postit, .free-sticker-wrapper { 
-        pointer-events: none !important; 
-    }
+        .cork-postit, .free-sticker-wrapper { 
+            pointer-events: none !important; 
+        }
 
-    .keychain-area-wrapper { 
-        width: 100%; 
-        margin-top: 4px; 
-    }
+        .keychain-area-wrapper { 
+            width: 100%; 
+            margin-top: 4px; 
+        }
 
-    .keychain-grid-9 { 
-        display: flex; 
-        flex-direction: row; 
-        overflow-x: auto; 
-        width: 100%; 
-        justify-content: flex-start; 
-        padding: 6px 4px; 
-        gap: 10px; 
-        -webkit-overflow-scrolling: touch;
-        touch-action: pan-x !important; 
-    }
+        .keychain-grid-9 { 
+            display: flex; 
+            flex-direction: row; 
+            overflow-x: auto; 
+            width: 100%; 
+            justify-content: flex-start; 
+            padding: 6px 4px; 
+            gap: 10px; 
+            -webkit-overflow-scrolling: touch;
+            touch-action: pan-x !important; 
+        }
 
-    .keychain-hook-unit { 
-        width: 56px; 
-        height: 78px; 
-        flex-shrink: 0; 
-        cursor: default !important; 
-    }
+        .keychain-hook-unit { 
+            width: 56px; 
+            height: 78px; 
+            flex-shrink: 0; 
+            cursor: default !important; 
+        }
 
-    .empty-hook-slot,
-    .keychain-plush-img { 
-        pointer-events: none !important; 
-    }
+        .empty-hook-slot,
+        .keychain-plush-img { 
+            pointer-events: none !important; 
+        }
 
-    .folder-container,
-    .keychain-collection-drawer { 
-        display: none !important; 
-        pointer-events: none !important; 
-    }
-    
-    .board-bottom-bar,
-    .board-lock-badge,
-    .handle-btn { 
-        display: none !important; 
-    }
+        .folder-container,
+        .keychain-collection-drawer { 
+            display: none !important; 
+            pointer-events: none !important; 
+        }
+        
+        .board-bottom-bar,
+        .board-lock-badge,
+        .handle-btn { 
+            display: none !important; 
+        }
 
-    .mobile-edit-notice { 
-        display: inline-flex !important; 
+        .mobile-edit-notice { 
+            display: inline-flex !important; 
+        }
     }
-}
 </style>
 
 @php
@@ -929,12 +931,12 @@
 
 <div class="modal-overlay" id="postitStudioModalUnique">
     <div class="studio-modal-box">
-        <h3 style="margin: 0; font-size: 16px; color: #1e4215; text-transform: lowercase;">{{ __('create your note !') }}</h3>
+        <h3 style="margin: 0; font-size: 18px; color: #1e4215; text-transform: lowercase;">{{ __('create your note !') }}</h3>
         
         <div class="studio-columns">
             <div class="studio-tools">
                 <div>
-                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('color:') }}</label>
+                    <label style="font-size: 14.5px; color: #2c441b; text-transform: lowercase; font-weight: bold;">{{ __('color:') }}</label>
                     <div class="color-selector" style="margin-top: 4px;">
                         <div class="color-ball selected" style="background:#fdf5a6;" data-c="#fdf5a6"></div>
                         <div class="color-ball" style="background:#ffd1dc;" data-c="#ffd1dc"></div>
@@ -950,7 +952,7 @@
                 </div>
 
                 <div>
-                    <label style="font-size: 13px; color: #2c441b; text-transform: lowercase;">{{ __('shape:') }}</label>
+                    <label style="font-size: 14.5px; color: #2c441b; text-transform: lowercase; font-weight: bold;">{{ __('shape:') }}</label>
                     <div class="shape-btn-group" style="margin-top: 4px;">
                         <button type="button" class="shape-btn active" data-shape="size-square">{{ __('square') }}</button>
                         <button type="button" class="shape-btn" data-shape="size-portrait">{{ __('portrait') }}</button>
@@ -982,9 +984,9 @@
 
                     <div id="uniqueStickerBox" class="transform-box" style="display: none; top:55px; left:35px; width:70px; height:auto; position: absolute; z-index: 11;"></div>
 
-                    <div class="postit-author" id="uniqueAuthorLayer" style="position: absolute; bottom: 4px; left: 6px; font-size: 11px;"></div>
+                    <div class="postit-author" id="uniqueAuthorLayer" style="position: absolute; bottom: 4px; left: 6px; font-size: 12px;"></div>
                 </div>
-                <span style="font-size:10px; color:#777; text-transform: lowercase;">{{ __('*drag to move') }}</span>
+                <span style="font-size:11.5px; color:#777; text-transform: lowercase;">{{ __('*drag to move') }}</span>
             </div>
         </div>
 
@@ -1851,10 +1853,10 @@
                 <span class="bag-badge-title">${titleText}</span>
                 
                 <div class="bag-badge-tooltip">
-                    <div style="font-weight: bold; margin-bottom: 3px; font-size: 11px;">
+                    <div style="font-weight: bold; margin-bottom: 4px; font-size: 13px;">
                         ${isUnlocked ? '✨ ' + I18N.unlockedStatus : '🔒 ' + I18N.howToUnlock}
                     </div>
-                    <div style="font-size: 10px; opacity: 0.95; line-height: 1.2;">
+                    <div style="font-size: 12px; opacity: 0.95; line-height: 1.35;">
                         ${descText}
                     </div>
                 </div>
@@ -1942,7 +1944,6 @@
 
             plush.classList.remove('swing-right', 'swing-left');
 
-            // Mouse giriş noktası merkezin solunda mı sağında mı?
             if (e.clientX < centerX) {
                 plush.classList.add('swing-right');
             } else {

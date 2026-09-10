@@ -97,12 +97,12 @@
         {{-- Başlık + Durum Rozeti + Mobil Buton --}}
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; width: 100%;">
             <div style="min-width: 0; flex: 1;">
-                <h4 style="margin: 0 0 3px 0; font-size: 16.5px; font-family: 'Unkempt', cursive; font-weight: bold; color: #1a3c11; line-height: 1.25; word-break: break-word;">
+                <h4 style="margin: 0 0 3px 0; font-size: 17px; font-family: 'Unkempt', cursive; font-weight: bold; color: #1a3c11; line-height: 1.25; word-break: break-word;">
                     <a href="{{ route('show', $bookKey) }}" style="text-decoration: none; color: inherit;">
                         {{ $book->title ?? __('Unknown Book') }}
                     </a>
                 </h4>
-                <span style="font-size: 13.5px; font-family: 'Unkempt', cursive; color: #527943; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <span style="font-size: 14.5px; font-family: 'Unkempt', cursive; color: #527943; display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                     {{ $book->author ?? __('Unknown Author') }}
                 </span>
             </div>
@@ -118,7 +118,7 @@
                 </button>
 
                 {{-- Renkli Durum Rozeti --}}
-                <span style="font-size: 12px; font-family: 'Unkempt', cursive; padding: 3px 9px; border-radius: 12px; font-weight: bold; background: {{ $theme['badge_bg'] }}; color: {{ $theme['badge_color'] }}; border: 1.5px solid {{ $theme['badge_border'] }}; white-space: nowrap;">
+                <span style="font-size: 13px; font-family: 'Unkempt', cursive; padding: 3px 9px; border-radius: 12px; font-weight: bold; background: {{ $theme['badge_bg'] }}; color: {{ $theme['badge_color'] }}; border: 1.5px solid {{ $theme['badge_border'] }}; white-space: nowrap;">
                     @if($item->status === 'reading') {{ __('okunuyor') }}
                     @elseif($item->status === 'read') {{ __('okundu') }}
                     @elseif($item->status === 'toRead' || $item->status === 'want_to_read') {{ __('okunacak') }}
@@ -131,10 +131,10 @@
         {{-- İlerleme Çubuğu --}}
         @if($hasProgress)
             <div style="width: 100%; max-width: 240px; margin-top: 3px; margin-bottom: 2px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-family: 'Unkempt', cursive; color: #3b612d; font-weight: bold; margin-bottom: 3px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-family: 'Unkempt', cursive; color: #3b612d; font-weight: bold; margin-bottom: 3px;">
                     @if($pct !== null)
                         <span>%{{ $pct }}</span>
-                        <span style="font-weight: normal; color: #666; font-size: 11.5px;">{{ $currentPage }} / {{ $totalPages }} {{ __('p.') }}</span>
+                        <span style="font-weight: normal; color: #666; font-size: 12.5px;">{{ $currentPage }} / {{ $totalPages }} {{ __('p.') }}</span>
                     @else
                         <span>{{ __('p.') }} {{ $currentPage }}</span>
                     @endif
@@ -159,7 +159,7 @@
                     default => '#e5a00d',
                 };
             @endphp
-            <div style="font-size: 15px; display: flex; align-items: center; gap: 2px; line-height: 1; margin-top: 3px;">
+            <div style="font-size: 15.5px; display: flex; align-items: center; gap: 2px; line-height: 1; margin-top: 3px;">
                 @for($i = 1; $i <= 5; $i++)
                     <span style="color: {{ $i <= $item->rating ? $starColor : '#e0e0e0' }};">
                         ★
@@ -170,14 +170,14 @@
 
         {{-- Yorum (Alıntı) --}}
         @if(!empty($item->review))
-            <div class="custom-review-scroll" style="margin: 5px 0 0 0; font-family: 'Unkempt', cursive; font-size: 13.5px; color: #333; line-height: 1.4; background: #fafaf7; padding: 7px 10px; border-radius: 8px; border-left: 3.5px solid {{ $theme['badge_border'] }}; max-height: 65px; overflow-y: auto; word-break: break-word;">
+            <div class="custom-review-scroll" style="margin: 5px 0 0 0; font-family: 'Unkempt', cursive; font-size: 14.5px; color: #333; line-height: 1.4; background: #fafaf7; padding: 7px 10px; border-radius: 8px; border-left: 3.5px solid {{ $theme['badge_border'] }}; max-height: 68px; overflow-y: auto; word-break: break-word;">
                 "{{ $item->review }}"
             </div>
         @endif
 
         {{-- Mobilde Açılan Renkli Not Kağıdı --}}
         <div id="{{ $uniqueId }}_mobile" class="mobile-date-slip" style="display: none; margin-top: 10px; width: 100%;">
-            <div style="position: relative; background: {{ $theme['slip_bg'] }}; border: 1.5px dashed {{ $theme['slip_border'] }}; border-radius: 10px; padding: 9px 13px; font-size: 12.5px; font-family: 'Unkempt', cursive; color: {{ $theme['text_color'] }}; box-shadow: 0 2px 5px rgba(0,0,0,0.03); background-image: repeating-linear-gradient(transparent, transparent 18px, {{ $theme['slip_line'] }} 19px);">
+            <div style="position: relative; background: {{ $theme['slip_bg'] }}; border: 1.5px dashed {{ $theme['slip_border'] }}; border-radius: 10px; padding: 9px 13px; font-size: 13.5px; font-family: 'Unkempt', cursive; color: {{ $theme['text_color'] }}; box-shadow: 0 2px 5px rgba(0,0,0,0.03); background-image: repeating-linear-gradient(transparent, transparent 18px, {{ $theme['slip_line'] }} 19px);">
                 <span style="position: absolute; top: -10px; right: 12px; font-size: 16px; line-height: 1; transform: rotate(15deg);">
                     📎
                 </span>
@@ -197,7 +197,7 @@
 
     {{-- Masaüstü İçin Sağ Taraftaki Sabit Ataşlı Not Kağıdı --}}
     <div class="desktop-date-slip" style="flex-shrink: 0; width: 165px; align-self: center; margin-right: 4px;">
-        <div style="position: relative; background: {{ $theme['slip_bg'] }}; border: 1.5px dashed {{ $theme['slip_border'] }}; border-radius: 10px; padding: 10px 12px; font-size: 12.5px; font-family: 'Unkempt', cursive; color: {{ $theme['text_color'] }}; box-shadow: 1px 3px 8px rgba(0,0,0,0.04); transform: rotate(1deg); line-height: 1.6; background-image: repeating-linear-gradient(transparent, transparent 18px, {{ $theme['slip_line'] }} 19px);">
+        <div style="position: relative; background: {{ $theme['slip_bg'] }}; border: 1.5px dashed {{ $theme['slip_border'] }}; border-radius: 10px; padding: 10px 12px; font-size: 13.5px; font-family: 'Unkempt', cursive; color: {{ $theme['text_color'] }}; box-shadow: 1px 3px 8px rgba(0,0,0,0.04); transform: rotate(1deg); line-height: 1.6; background-image: repeating-linear-gradient(transparent, transparent 18px, {{ $theme['slip_line'] }} 19px);">
             <span style="position: absolute; top: -9px; right: 10px; font-size: 17px; line-height: 1; transform: rotate(-12deg); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.12));">
                 📎
             </span>

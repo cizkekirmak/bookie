@@ -115,7 +115,7 @@
             text-decoration: none;
         }
 
-        /* Masaüstü Butonları: 65px & Bordersız */
+        /* Masaüstü Butonları */
         .header-icon-box {
             width: 65px !important;
             height: 65px !important;
@@ -146,9 +146,9 @@
             background: #cae28c;
             border: 2px solid #5a8c69;
             border-radius: 18px;
-            padding: 28px 32px;
+            padding: 30px 32px;
             width: 100%;
-            max-width: 460px;
+            max-width: 470px;
             box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
             display: flex;
             flex-direction: column;
@@ -157,15 +157,15 @@
 
         .settings-title {
             font-family: 'Henny Penny', cursive;
-            font-size: 26px;
+            font-size: 28px; /* 26px -> 28px */
             color: #1a3c11;
             margin: 0 0 18px 0;
             text-align: center;
         }
 
         .avatar-preview-wrap {
-            width: 110px;
-            height: 110px;
+            width: 112px;
+            height: 112px;
             border-radius: 50%;
             border: 2px solid #2d5a27;
             background: #ffffff;
@@ -181,8 +181,8 @@
         .avatar-preview-img {
             width: 100%;
             height: 100%;
-            max-width: 110px;
-            max-height: 110px;
+            max-width: 112px;
+            max-height: 112px;
             object-fit: cover;
             display: block;
         }
@@ -191,12 +191,13 @@
             background: #ffffff;
             border: 1.5px solid #4c7237;
             border-radius: 16px;
-            padding: 5px 14px;
+            padding: 6px 16px;
             font-family: 'Unkempt', cursive;
-            font-size: 13px;
+            font-size: 14.5px; /* 13px -> 14.5px */
             color: #1a3c11;
+            font-weight: bold;
             cursor: pointer;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             transition: all 0.15s ease;
         }
 
@@ -211,14 +212,14 @@
             align-items: center;
             width: 100%;
             margin-bottom: 6px;
-            font-size: 14px;
+            font-size: 15.5px; /* 14px -> 15.5px */
             color: #1a3c11;
             font-weight: bold;
         }
 
         .bio-char-counter {
-            font-size: 12px;
-            color: #555;
+            font-size: 13.5px; /* 12px -> 13.5px */
+            color: #3b582a;
             font-weight: normal;
         }
 
@@ -229,11 +230,11 @@
             border: 1.5px solid #4c7237;
             background: #ffffff;
             font-family: 'Unkempt', cursive;
-            font-size: 14px;
+            font-size: 15px; /* 14px -> 15px */
             color: #1a3c11;
             resize: none;
             outline: none;
-            margin-bottom: 18px;
+            margin-bottom: 20px;
             box-sizing: border-box;
             line-height: 1.4;
         }
@@ -243,10 +244,10 @@
             background: #255719;
             color: #ffffff;
             border: none;
-            padding: 11px;
+            padding: 12px;
             border-radius: 10px;
             font-family: 'Unkempt', cursive;
-            font-size: 16px;
+            font-size: 17.5px; /* 16px -> 17.5px */
             font-weight: bold;
             cursor: pointer;
             transition: all 0.15s ease;
@@ -259,11 +260,12 @@
 
         .alert-box {
             width: 100%;
-            padding: 8px 12px;
+            padding: 9px 14px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 14px; /* 13px -> 14px */
             margin-bottom: 14px;
             text-align: center;
+            font-family: 'Unkempt', cursive;
         }
         .alert-success {
             background-color: #d4edda;
@@ -290,7 +292,6 @@
                 margin-top: 0 !important;
             }
 
-            /* Mobilde Butonlar: 52px & Bordersız */
             .header-icon-box {
                 width: 52px !important;
                 height: 52px !important;
@@ -315,7 +316,7 @@
             }
 
             .settings-title {
-                font-size: 24px !important;
+                font-size: 25px !important;
                 margin-bottom: 14px !important;
             }
 
@@ -330,19 +331,19 @@
             }
 
             .choose-pic-btn {
-                padding: 5px 12px !important;
-                font-size: 12px !important;
-                margin-bottom: 14px !important;
+                padding: 6px 14px !important;
+                font-size: 13.5px !important; /* 12px -> 13.5px */
+                margin-bottom: 16px !important;
             }
 
             .bio-textarea {
-                font-size: 13px !important;
+                font-size: 14.5px !important; /* 13px -> 14.5px */
                 margin-bottom: 16px !important;
             }
 
             .save-btn {
-                padding: 10px !important;
-                font-size: 15px !important;
+                padding: 11px !important;
+                font-size: 16.5px !important; /* 15px -> 16.5px */
             }
         }
     </style>

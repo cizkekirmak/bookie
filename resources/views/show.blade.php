@@ -144,8 +144,9 @@
             border-radius: 8px;
             padding: 7px 14px;
             cursor: pointer;
-            font-size: 15px;
+            font-size: 15.5px; /* 15px -> 15.5px */
             color: #1f5117;
+            font-weight: 500;
             transition: background 0.15s ease;
         }
 
@@ -176,7 +177,7 @@
             border-radius: 6px;
             border: 1.5px solid #2d5a27;
             font-family: 'Unkempt', cursive;
-            font-size: 15px;
+            font-size: 15.5px;
             text-align: center;
             outline: none;
             color: #1f5117;
@@ -205,7 +206,7 @@
 
             .back-link {
                 margin-bottom: 12px;
-                font-size: 14px;
+                font-size: 15px; /* 14px -> 15px */
             }
 
             .book-main-flex {
@@ -228,17 +229,17 @@
             }
 
             .book-title-heading {
-                font-size: 18px !important;
+                font-size: 20px !important; /* 18px -> 20px */
                 line-height: 1.2;
             }
 
             .book-author-text {
-                font-size: 13px !important;
+                font-size: 14px !important; /* 13px -> 14px */
                 margin-bottom: 4px !important;
             }
 
             .book-desc-text {
-                font-size: 13px !important;
+                font-size: 14px !important; /* 13px -> 14px */
                 max-height: 85px !important;
                 margin-bottom: 12px !important;
                 padding-bottom: 8px !important;
@@ -250,8 +251,8 @@
             }
 
             .radio-label {
-                padding: 5px 8px !important;
-                font-size: 12px !important;
+                padding: 5px 9px !important;
+                font-size: 13.5px !important; /* 12px -> 13.5px */
                 border-radius: 6px !important;
             }
 
@@ -262,9 +263,9 @@
             }
 
             .page-input {
-                width: 55px !important;
+                width: 60px !important;
                 padding: 3px 5px !important;
-                font-size: 13px !important;
+                font-size: 14px !important;
             }
 
             .star-btn {
@@ -273,8 +274,8 @@
 
             .review-submit-btn {
                 width: 100% !important;
-                padding: 9px 14px !important;
-                font-size: 15px !important;
+                padding: 10px 14px !important;
+                font-size: 16px !important; /* 15px -> 16px */
             }
 
             #chat-draggable-btn,
@@ -296,7 +297,7 @@
     <a href="{{ route('dashboard') }}" class="back-link">← {{ __('wanna go back?') }}</a>
 
     @if(session('success'))
-        <div style="background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; font-family: 'Henny Penny', cursive; font-size: 14px;">
+        <div style="background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 15px; border-radius: 8px; margin-bottom: 20px; font-family: 'Henny Penny', cursive; font-size: 15px;">
             ✨ {{ session('success') }}
         </div>
     @endif
@@ -329,15 +330,16 @@
                        style="
                            display: inline-flex; 
                            align-items: center; 
-                           gap: 5px; 
+                           gap: 6px; 
                            background-color: #d2f48a; 
                            color: #101e08; 
                            border: 1.5px solid #1d491b; 
-                           padding: 5px 12px; 
+                           padding: 6px 14px; 
                            border-radius: 8px; 
                            text-decoration: none; 
                            font-family: 'Unkempt', cursive; 
-                           font-size: 13px; 
+                           font-size: 14px; 
+                           font-weight: bold;
                            white-space: nowrap; 
                            flex-shrink: 0; 
                            cursor: pointer; 
@@ -347,7 +349,7 @@
                 @endif
             </div>
 
-            <h4 class="book-author-text" style="color: #435b3e; margin: 2px 0 8px 0; font-size: 16px; font-weight: normal;">
+            <h4 class="book-author-text" style="color: #435b3e; margin: 2px 0 8px 0; font-size: 17px; font-weight: normal;">
                 {{ __('by') }} <strong>{{ $authors ?? __('Unknown author') }}</strong>
             </h4>
 
@@ -366,7 +368,7 @@
             @endphp
 
             <div style="display: flex; align-items: center; gap: 8px; margin: 4px 0 10px 0;">
-                <div style="color: {{ $starColor }}; font-size: 18px; display: flex; gap: 2px;">
+                <div style="color: {{ $starColor }}; font-size: 20px; display: flex; gap: 2px;">
                     @for ($i = 1; $i <= 5; $i++)
                         @if ($averageRating >= $i || $averageRating >= ($i - 0.5))
                             ★ 
@@ -376,18 +378,18 @@
                     @endfor
                 </div>
 
-                <span style="font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; color: #1a3c11;">
+                <span style="font-family: 'Unkempt', cursive; font-size: 15.5px; font-weight: bold; color: #1a3c11;">
                     {{ $averageRating > 0 ? number_format($averageRating, 1) : __('no ratings yet') }}
                 </span>
 
                 @if($totalReviews > 0)
-                    <span style="color: #666; font-size: 12px; font-family: 'Unkempt', cursive;">
+                    <span style="color: #666; font-size: 13.5px; font-family: 'Unkempt', cursive;">
                         ({{ $totalReviews }} {{ __('reviews') }})
                     </span>
                 @endif
             </div>
 
-            <p class="book-desc-text" style="color: #4a5d44; font-size: 14px; line-height: 1.45; max-height: 110px; overflow-y: auto; margin-bottom: 16px; padding-right: 5px; border-bottom: 1px solid #e0ebd9; padding-bottom: 10px;">
+            <p class="book-desc-text" style="color: #4a5d44; font-size: 15px; line-height: 1.45; max-height: 115px; overflow-y: auto; margin-bottom: 16px; padding-right: 5px; border-bottom: 1px solid #e0ebd9; padding-bottom: 10px;">
                 {{ Str::limit($description ?? '', 350) }}
             </p>
 
@@ -418,7 +420,7 @@
                 @endif
 
                 {{-- Okuma Durumu --}}
-                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 16px;">{{ __('reading progress') }}</label>
+                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 16.5px;">{{ __('reading progress') }}</label>
                 <div class="radio-group-wrap" style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
                     <label class="radio-label">
                         <input type="radio" name="status" value="reading" class="status-radio" {{ ($userBook && $userBook->status == 'reading') ? 'checked' : '' }} required>
@@ -426,7 +428,7 @@
                     </label>
                     <label class="radio-label">
                         <input type="radio" name="status" value="read" class="status-radio" {{ ($userBook && $userBook->status == 'read') ? 'checked' : '' }}>
-                        {{ __('read') }}
+                        {{ __('read') }} 
                     </label>
                     <label class="radio-label">
                         <input type="radio" name="status" value="want_to_read" class="status-radio" {{ (!$userBook || $userBook->status == 'want_to_read' || $userBook->status == 'toRead') ? 'checked' : '' }}>
@@ -436,15 +438,15 @@
 
                 {{-- Sayfa İlerleme Kutusu --}}
                 <div id="page-box" class="page-box" style="display: {{ ($userBook && $userBook->status == 'reading') ? 'flex' : 'none' }};">
-                    <span style="color: #1f5117; font-size: 13px; font-weight: bold;">{{ __('on page:') }}</span>
+                    <span style="color: #1f5117; font-size: 14.5px; font-weight: bold;">{{ __('on page:') }}</span>
                     <input type="number" name="current_page" id="current_page" class="page-input" min="0" max="{{ $pageCount ?? 9999 }}" value="{{ $currentPage }}" placeholder="0">
                     
                     @if(!empty($pageCount) && $pageCount > 0)
-                        <span style="color: #4a5d44; font-size: 13px;">/ {{ $pageCount }} {{ __('pages') }}</span>
+                        <span style="color: #4a5d44; font-size: 14.5px;">/ {{ $pageCount }} {{ __('pages') }}</span>
                     @endif
                 </div>
 
-                {{-- Puan Verme (Başlık kaldırıldı, ferah yıldızlar) --}}
+                {{-- Puan Verme --}}
                 <div style="margin-bottom: 14px; display: flex; align-items: center; gap: 8px;">
                     <input type="hidden" name="rating" id="selected-rating" value="{{ $userBook->rating ?? '' }}">
 
@@ -470,16 +472,16 @@
                         @endfor
                     </div>
                     
-                    <span id="rating-text" style="font-family: 'Henny Penny', cursive; color: #3a7d2c; font-size: 14px; margin-left: 4px;">
+                    <span id="rating-text" style="font-family: 'Henny Penny', cursive; color: #3a7d2c; font-size: 15px; margin-left: 4px;">
                         {{ isset($userBook->rating) ? "({$userBook->rating}/5)" : __('(no rating)') }}
                     </span>
                 </div>
 
                 {{-- Değerlendirme / Yorum --}}
-                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 16px;">{{ __('your thoughts:') }}</label>
-                <textarea name="review" rows="3" placeholder="{{ __('what did u think about this book?') }}" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #2d5a27; font-family: 'Unkempt', cursive; font-size: 14px; color: #1b3711; resize: vertical; box-sizing: border-box; margin-bottom: 14px; outline: none; background: #fff;">{{ $userBook->review ?? '' }}</textarea>
+                <label style="display: block; font-weight: bold; color: #1f5117; margin-bottom: 6px; font-size: 16.5px;">{{ __('your thoughts:') }}</label>
+                <textarea name="review" rows="3" placeholder="{{ __('what did u think about this book?') }}" style="width: 100%; padding: 10px 12px; border-radius: 8px; border: 1.5px solid #2d5a27; font-family: 'Unkempt', cursive; font-size: 15px; color: #1b3711; resize: vertical; box-sizing: border-box; margin-bottom: 14px; outline: none; background: #fff;">{{ $userBook->review ?? '' }}</textarea>
 
-                <button type="submit" class="review-submit-btn" style="background: #2d5a27; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 15px; cursor: pointer; transition: background 0.15s ease;">
+                <button type="submit" class="review-submit-btn" style="background: #2d5a27; color: white; border: none; padding: 10px 22px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 16.5px; font-weight: bold; cursor: pointer; transition: background 0.15s ease;">
                     {{ __('save it to my library!') }}
                 </button>
             </form>
@@ -487,7 +489,7 @@
             {{-- 2. ADMİN TAVSİYE FORMU --}}
             @if(auth()->check() && auth()->user()->email === "bookieapp.info@gmail.com")
                 <div style="margin-top: 18px; padding: 12px; background: #eaf3e4; border: 1.5px dashed #2d5a27; border-radius: 8px;">
-                    <h4 style="margin: 0 0 6px 0; font-size: 13px; color: #1a3c11; font-weight: bold; font-family: 'Henny Penny', cursive;">
+                    <h4 style="margin: 0 0 6px 0; font-size: 14px; color: #1a3c11; font-weight: bold; font-family: 'Henny Penny', cursive;">
                         ⭐ {{ __('Set as Admin Recommendation') }}
                     </h4>
                     <form action="{{ route('adminRecommendation.store') }}" method="POST" style="display: flex; flex-direction: column; gap: 8px;">
@@ -497,9 +499,9 @@
                         <input type="hidden" name="authors" value="{{ $authors ?? '' }}">
                         <input type="hidden" name="cover_url" value="{{ $coverUrl ?? '' }}">
                         
-                        <textarea name="admin_note" rows="2" placeholder="{{ __('Write your admin recommendation note here...') }}" style="width: 100%; box-sizing: border-box; padding: 8px; border-radius: 6px; border: 1px solid #737e3d; font-size: 13px; resize: none; font-family: 'Unkempt', cursive; background: #fff; outline: none;"></textarea>
+                        <textarea name="admin_note" rows="2" placeholder="{{ __('Write your admin recommendation note here...') }}" style="width: 100%; box-sizing: border-box; padding: 8px; border-radius: 6px; border: 1px solid #737e3d; font-size: 14px; resize: none; font-family: 'Unkempt', cursive; background: #fff; outline: none;"></textarea>
 
-                        <button type="submit" style="align-self: flex-start; background: #2d5a27; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; font-family: 'Unkempt', cursive;">
+                        <button type="submit" style="align-self: flex-start; background: #2d5a27; color: #fff; border: none; padding: 6px 14px; border-radius: 6px; font-size: 13.5px; cursor: pointer; font-weight: bold; font-family: 'Unkempt', cursive;">
                             {{ __('save recommendation 📌') }}
                         </button>
                     </form>
@@ -508,7 +510,7 @@
 
             {{-- 3. KULLANICI YORUMLARI --}}
             <div style="margin-top: 24px;">
-                <h3 style="font-family: 'Henny Penny', cursive; color: #1f5117; margin-bottom: 10px; font-size: 18px;">{{ __('reviews') }} ({{ $allReviews->count() }})</h3>
+                <h3 style="font-family: 'Henny Penny', cursive; color: #1f5117; margin-bottom: 10px; font-size: 20px;">{{ __('reviews') }} ({{ $allReviews->count() }})</h3>
 
                 @forelse($allReviews as $item)
                     @php
@@ -516,26 +518,26 @@
                     @endphp
                     <div id="review-{{ $item->id }}" style="background: #f1f8ed; border: 1.5px solid #4c7237; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; transition: transform 0.2s ease;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-                            <strong style="font-weight: bold; color: #1f5117; font-size: 14px;">{{ $item->user->username ?? ($item->user->name ?? __('Anonymous')) }}</strong>
-                            <span style="color: {{ $itemRatingColor }}; font-size: 14px;">
+                            <strong style="font-weight: bold; color: #1f5117; font-size: 15.5px; font-family: 'Unkempt', cursive;">{{ $item->user->username ?? ($item->user->name ?? __('Anonymous')) }}</strong>
+                            <span style="color: {{ $itemRatingColor }}; font-size: 15px;">
                                 {{ $item->rating > 0 ? str_repeat('★', $item->rating) : __('no rating') }}
                             </span> 
                         </div>
                         
                         @if(!empty($item->review))
-                            <p style="color: #4a5d44; font-size: 13px; line-height: 1.35; margin: 0 0 8px 0;">{{ $item->review }}</p>
+                            <p style="color: #4a5d44; font-size: 14.5px; line-height: 1.4; margin: 0 0 8px 0; font-family: 'Unkempt', cursive;">{{ $item->review }}</p>
                         @endif
 
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 6px; border-top: 1px dashed #d7e8cf;">
                             @include('partials.review-like-btn', ['review' => $item])
 
-                            <span style="font-size: 11px; color: #666;">
+                            <span style="font-size: 12.5px; color: #666; font-family: 'Unkempt', cursive;">
                                 {{ $item->created_at ? $item->created_at->diffForHumans() : '' }}
                             </span>
                         </div>
                     </div>
                 @empty
-                    <p style="color: #4a5d44; font-size: 13px;">{{ __('there are no ratings for this book yet, wanna be the first one :>?') }}</p>
+                    <p style="color: #4a5d44; font-size: 14.5px; font-family: 'Unkempt', cursive;">{{ __('there are no ratings for this book yet, wanna be the first one :>?') }}</p>
                 @endforelse
             </div>
 
@@ -659,7 +661,6 @@ pageSound.volume = 0.35;
 const playPromise = pageSound.play();
 if (playPromise !== undefined) {
     playPromise.catch(() => {
-        // Tarayıcı otomatik sesi kısıtlarsa ilk tıklamada çalar
         const playOnce = () => {
             pageSound.play().catch(() => {});
             document.removeEventListener('click', playOnce);

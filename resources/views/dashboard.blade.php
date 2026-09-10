@@ -293,7 +293,7 @@
             }
 
             #bookSearchInput {
-                font-size: 14px !important;
+                font-size: 15px !important;
                 display: block !important;
                 width: 100% !important;
             }
@@ -350,7 +350,6 @@
                 display: none !important;
             }
 
-            /* Mobil Açılır Menü Butonları: 52px & Bordersız */
             .mobile-icon-box {
                 width: 52px !important;
                 height: 52px !important;
@@ -499,7 +498,7 @@
                 padding: 7px 14px;
                 font-family: 'Unkempt', cursive;
                 font-weight: bold;
-                font-size: 14px;
+                font-size: 15px; /* 14px -> 15px */
                 box-shadow: -3px 4px 10px rgba(0,0,0,0.18);
                 cursor: pointer;
                 z-index: 9999;
@@ -555,7 +554,6 @@
             </div>
             
             <div class="header-desktop-actions">
-                {{-- DİL SEÇİCİ PARTIAL --}}
                 @include('partials.lang-switch')
 
                 <div style="display: flex; align-items: center; justify-content: center; line-height: 0;">
@@ -594,9 +592,8 @@
         </div>
     </header>
 
-
     @if(session('success'))
-        <div id="bildiri-message" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: 'Unkempt', cursive;">
+        <div id="bildiri-message" style="position: fixed; top: 20px; left: 50%; transform: translateX(-50%); z-index: 9999; background-color: #d4edda; color: #155724; border: 1.5px solid #c3e6cb; padding: 10px 24px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); font-family: 'Unkempt', cursive; font-size: 15px;">
             {{ session('success') }}
         </div>
         <script>
@@ -653,14 +650,14 @@
             
             <div style="position: relative; width: 100%;">
                 <div style="background: #f4fbf0; border: 1.5px solid #515f30; border-radius: 22px; padding: 8px 16px; display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 16px;">👤</span>
-                    <input type="text" id="userSearchInput" placeholder="{{ __('find other users') }}" autocomplete="off" style="border: none; background: transparent; outline: none; font-family: 'Unkempt', cursive; font-size: 16px; color: #1b3711; width: 100%;">
+                    <span style="font-size: 17px;">👤</span>
+                    <input type="text" id="userSearchInput" placeholder="{{ __('find other users') }}" autocomplete="off" style="border: none; background: transparent; outline: none; font-family: 'Unkempt', cursive; font-size: 16.5px; color: #1b3711; width: 100%;">
                 </div>
                 <div id="userSearchResults" style="display: none; position: absolute; top: 45px; left: 0; width: 100%; background: #ffffff; border: 1.5px solid #4c7237; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); max-height: 220px; overflow-y: auto; z-index: 999999;"></div>
             </div>
 
             <div style="display: flex; justify-content: space-between; align-items: center;">
-                <span style="font-family: 'Henny Penny', cursive; font-size: 18px; color: #1a3c11;">
+                <span style="font-family: 'Henny Penny', cursive; font-size: 20px; color: #1a3c11;">
                     {{ __('Friend reviews') }}
                 </span>
                 <button type="button" id="closeDrawerBtn" style="display: none; background: none; border: none; font-size: 20px; cursor: pointer; color: #1a3c11;">✕</button>
@@ -695,27 +692,27 @@
                     <div id="review-{{ $item->id }}" style="background: #f1f8ed; border: 1.5px solid #4c7237; border-radius: 10px; padding: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
                             @if($item->user)
-                            <a href="{{ route('profile', $item->user->id) }}" style="color: #1f5117; text-decoration: none; font-weight: bold; font-family: 'Unkempt', cursive;">
+                            <a href="{{ route('profile', $item->user->id) }}" style="color: #1f5117; text-decoration: none; font-weight: bold; font-family: 'Unkempt', cursive; font-size: 15.5px;">
                                 {{ $item->user->username ?? ($item->user->name ?? __('Anonymous')) }}
                             </a>
                             @else
-                            <strong style="font-weight: bold; color: #1f5117; font-family: 'Unkempt', cursive;">{{ __('Anonymous') }}</strong>
+                            <strong style="font-weight: bold; color: #1f5117; font-family: 'Unkempt', cursive; font-size: 15.5px;">{{ __('Anonymous') }}</strong>
                             @endif
 
-                            <span style="color: {{ $itemRatingColor }}; font-size: 14px;">
+                            <span style="color: {{ $itemRatingColor }}; font-size: 15px;">
                                 {{ $item->rating > 0 ? str_repeat('★', $item->rating) : __('no rating') }}
                             </span> 
                         </div>
 
                         <div style="margin-bottom: 6px;">
-                            <span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">{{ __('book:') }} </span>
-                            <a href="{{ route('show', $bookKey) }}#review-{{ $item->id }}" style="font-size: 14px; font-weight: bold; color: #1a3c11; text-decoration: underline; font-family: 'Unkempt', cursive;">
+                            <span style="font-size: 13px; color: #666; font-family: 'Unkempt', cursive;">{{ __('book:') }} </span>
+                            <a href="{{ route('show', $bookKey) }}#review-{{ $item->id }}" style="font-size: 14.5px; font-weight: bold; color: #1a3c11; text-decoration: underline; font-family: 'Unkempt', cursive;">
                                 {{ $bookTitle }}
                             </a>
                         </div>
 
                         @if(!empty($item->review))
-                            <p style="color: #4a5d44; font-size: 13px; line-height: 1.4; margin: 0 0 8px 0; font-family: 'Unkempt', cursive;">
+                            <p style="color: #4a5d44; font-size: 14px; line-height: 1.45; margin: 0 0 8px 0; font-family: 'Unkempt', cursive;">
                                 {{ $item->review }}
                             </p>
                         @endif
@@ -723,13 +720,13 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 6px; padding-top: 6px; border-top: 1px dashed #d7e8cf;">
                             @include('partials.review-like-btn', ['review' => $item])
 
-                            <span style="font-size: 11px; color: #777; font-family: 'Unkempt', cursive;">
+                            <span style="font-size: 12.5px; color: #777; font-family: 'Unkempt', cursive;">
                                {{ $item->created_at ? \Carbon\Carbon::parse($item->created_at)->timezone('Europe/Istanbul')->diffForHumans() : '' }}
                             </span>
                         </div>
                     </div>
                 @empty
-                    <p style="color: #4a5d44; font-size: 13px; margin: 0; font-family: 'Unkempt', cursive;">
+                    <p style="color: #4a5d44; font-size: 14.5px; margin: 0; font-family: 'Unkempt', cursive; padding: 8px 4px;">
                         {{ __('there are no reviews yet, sorry!') }}
                     </p>
                 @endforelse
@@ -834,11 +831,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const nextBatch = allSearchResults.slice(displayedCount, displayedCount + PAGE_SIZE);
             const html = nextBatch.map(book => `
-                <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
-                    <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 38px; height: 52px; object-fit: cover; border-radius: 4px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
+                <div onclick="window.location.href='/books/${book.id}'" style="display: flex; align-items: center; gap: 12px; padding: 9px 12px; cursor: pointer; border-bottom: 1px solid #e2ebd8; transition: background-color 0.15s;" onmouseenter="this.style.backgroundColor='#f4f8e8'" onmouseleave="this.style.backgroundColor='transparent'">
+                    <img src="${book.cover || '{{ asset('images/default-book.png') }}'}" loading="lazy" referrerpolicy="no-referrer" style="width: 40px; height: 56px; object-fit: cover; border-radius: 5px; flex-shrink: 0; background-color: #e8f0dc;" onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
                     <div style="overflow: hidden; text-align: left;">
-                        <div style="font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
-                        <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.authors || textUnknownAuthor}</div>
+                        <div style="font-family: 'Unkempt', cursive; font-size: 16px; font-weight: bold; color: #1f5117; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${book.title}</div>
+                        <div style="font-family: 'Unkempt', cursive; font-size: 13.5px; color: #666; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;">${book.authors || textUnknownAuthor}</div>
                     </div>
                 </div>
             `).join('');
@@ -850,7 +847,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const remaining = allSearchResults.length - displayedCount;
                 const loadMoreHtml = `
                     <div id="searchLoadMoreContainer" style="padding: 8px 12px; text-align: center; background: #fafdf7;">
-                        <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 5px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">${textLoadMore} (+${Math.min(PAGE_SIZE, remaining)})</button>
+                        <button type="button" id="searchLoadMoreBtn" style="background: #eef6ea; border: 1.5px solid #4c7237; color: #1f5117; padding: 6px 18px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer;">${textLoadMore} (+${Math.min(PAGE_SIZE, remaining)})</button>
                     </div>
                 `;
                 dropdown.insertAdjacentHTML('beforeend', loadMoreHtml);
@@ -869,7 +866,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textSearching}</div>`;
+            dropdown.innerHTML = `<div style="padding: 14px; font-family: 'Unkempt', cursive; font-size: 14.5px; color: #666; text-align: center;">${textSearching}</div>`;
             dropdown.style.display = 'block';
 
             try {
@@ -878,7 +875,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const books = Array.isArray(data) ? data : (data.items || []);
 
                 if (!books || books.length === 0) {
-                    dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: #666; text-align: center;">${textNotFound}</div>`;
+                    dropdown.innerHTML = `<div style="padding: 14px; font-family: 'Unkempt', cursive; font-size: 14.5px; color: #666; text-align: center;">${textNotFound}</div>`;
                     return;
                 }
                 dropdown.innerHTML = '';
@@ -886,7 +883,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 displayedCount = 0;
                 renderNextBooks();
             } catch (err) {
-                dropdown.innerHTML = `<div style="padding: 12px; font-family: 'Unkempt', cursive; color: red; text-align: center;">${textSearchError}</div>`;
+                dropdown.innerHTML = `<div style="padding: 14px; font-family: 'Unkempt', cursive; font-size: 14px; color: red; text-align: center;">${textSearchError}</div>`;
             }
         }
 
@@ -941,7 +938,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const users = await res.json();
 
                     if (users.length === 0) {
-                        userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: #777; text-align: center; font-family: 'Unkempt', cursive;">${textUserNotFound}</div>`;
+                        userSearchResults.innerHTML = `<div style="padding: 12px; font-size: 14px; color: #777; text-align: center; font-family: 'Unkempt', cursive;">${textUserNotFound}</div>`;
                         userSearchResults.style.display = 'block';
                         return;
                     }
@@ -950,16 +947,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     userSearchResults.innerHTML = users.map(user => {
                         let actionHtml = '';
                         if (user.status === 'accepted') {
-                            actionHtml = `<span style="font-size: 12px; color: #1a3c11; font-weight: bold; font-family: 'Unkempt', cursive;">${textFriendsStatus}</span>`;
+                            actionHtml = `<span style="font-size: 13px; color: #1a3c11; font-weight: bold; font-family: 'Unkempt', cursive;">${textFriendsStatus}</span>`;
                         } else if (user.status === 'pending') {
                             actionHtml = user.is_sender 
-                                ? `<span style="font-size: 12px; color: #666; font-family: 'Unkempt', cursive;">${textPendingStatus}</span>`
-                                : `<span style="font-size: 12px; color: #c62828; font-family: 'Unkempt', cursive;">${textRequestedStatus}</span>`;
+                                ? `<span style="font-size: 13px; color: #666; font-family: 'Unkempt', cursive;">${textPendingStatus}</span>`
+                                : `<span style="font-size: 13px; color: #c62828; font-family: 'Unkempt', cursive;">${textRequestedStatus}</span>`;
                         } else {
                             actionHtml = `
                                 <form action="/friends/${user.id}/request" method="POST" style="margin: 0;" onclick="event.stopPropagation();">
                                     <input type="hidden" name="_token" value="${csrfToken}">
-                                    <button type="submit" style="background: #2d5a27; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; font-family: 'Unkempt', cursive;" title="{{ __('Add Friend') }}">+</button>
+                                    <button type="submit" style="background: #2d5a27; color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-family: 'Unkempt', cursive;" title="{{ __('Add Friend') }}">+</button>
                                 </form>
                             `;
                         }
@@ -970,12 +967,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
 
                         return `
-                            <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
+                            <div onclick="window.location.href='/profile/${user.id}'" style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; cursor: pointer; border-bottom: 1px solid #eef4e8; transition: background 0.15s ease;" onmouseenter="this.style.background='#f1f8ed'" onmouseleave="this.style.background='transparent'">
                                 <div style="display: flex; align-items: center; gap: 10px;">
-                                    <div style="width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
+                                    <div style="width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center;">
                                         <img src="${userAvatarSrc}" alt="${user.username}" referrerpolicy="no-referrer" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" onerror="this.onerror=null; this.src='${defaultAvatar}';">
                                     </div>
-                                    <div style="font-size: 14px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
+                                    <div style="font-size: 15px; font-weight: bold; color: #1a3c11; font-family: 'Unkempt', cursive;">
                                         @${user.username}
                                     </div>
                                 </div>
@@ -986,7 +983,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     userSearchResults.style.display = 'block';
                 } catch (err) {
-                    userSearchResults.innerHTML = `<div style="padding: 10px; font-size: 13px; color: red; text-align: center; font-family: 'Unkempt', cursive;">${textUserSearchError}</div>`;
+                    userSearchResults.innerHTML = `<div style="padding: 12px; font-size: 14px; color: red; text-align: center; font-family: 'Unkempt', cursive;">${textUserSearchError}</div>`;
                 }
             }, 300);
         });

@@ -312,7 +312,7 @@
 
         .library-card-title {
             font-family: 'Henny Penny', cursive;
-            font-size: 13px;
+            font-size: 14px; /* 13px -> 14px */
             color: #d64b6f;
             letter-spacing: 0.5px;
         }
@@ -461,7 +461,7 @@
             }
 
             .profile-main-content h3 {
-                font-size: 21px !important;
+                font-size: 22px !important;
             }
 
             #profile-list-view,
@@ -532,7 +532,7 @@
                 {{-- Üst Damga Alanı --}}
                 <div class="library-card-header">
                     <span class="library-card-title">★ LIBRARY CARD</span>
-                    <span style="font-size: 11px; color: #5a7d3b; font-weight: bold;">BOOKIE MEMBER</span>
+                    <span style="font-size: 12.5px; color: #5a7d3b; font-weight: bold;">BOOKIE MEMBER</span>
                 </div>
 
                 {{-- Orta Gövde (Fotoğraf, İsim, Rozet & Sağ Altta Tarih) --}}
@@ -552,7 +552,7 @@
 
                     {{-- Unkempt İsim ve Unvan --}}
                     <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start;">
-                        <div style="font-family: 'Unkempt', cursive; font-size: 20px; font-weight: bold; color: #1a3c11; line-height: 1.15; word-break: break-word;">
+                        <div style="font-family: 'Unkempt', cursive !important; font-size: 20px; font-weight: bold; color: #1a3c11; line-height: 1.15; word-break: break-word;">
                             {{ $user->username ?? $user->name }}
                         </div>
 
@@ -568,31 +568,31 @@
                                         border: 1px solid {{ $title['border'] }};
                                         color: {{ $title['color'] }};
                                     @endif
-                                    padding: 2px 8px;
+                                    padding: 2.5px 8px;
                                     border-radius: 12px;
                                     font-family: 'Unkempt', cursive;
-                                    font-size: 12px;
+                                    font-size: 13px; /* 12px -> 13px */
                                     font-weight: bold;
                                     line-height: 1.2;
                                 ">
                                     <span>{{ $title['icon'] }}</span>
                                     <span>{{ __($title['name'] ?? 'gariban üye') }}</span>
-                                    <span style="font-size: 9px; opacity: 0.6;">▼</span>
+                                    <span style="font-size: 10px; opacity: 0.6;">▼</span>
                                 </div>
                             </button>
                         </div>
                     </div>
 
                     {{-- Sağ Alttaki Üyelik Tarihi Damgası --}}
-                    <div style="position: absolute; right: 0; bottom: 0; font-size: 10.5px; color: #738b5e; font-family: 'Unkempt', cursive; line-height: 1; letter-spacing: 0.3px;">
+                    <div style="position: absolute; right: 0; bottom: 0; font-size: 12px; color: #738b5e; font-family: 'Unkempt', cursive; line-height: 1; letter-spacing: 0.3px;">
                         üye: <span style="font-weight: bold;">{{ $joinDate }}</span>
                     </div>
                 </div>
 
                 {{-- Bio Not Alanı --}}
                 <div style="margin-top: 10px; background: #fdfaf0; border: 1px dashed #d5c8a8; border-radius: 6px; padding: 6px 8px; min-height: 40px; background-image: repeating-linear-gradient(transparent, transparent 17px, #faedd3 18px); line-height: 18px;">
-                    <div style="font-size: 10px; color: #9c845b; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">bio :</div>
-                    <div style="font-family: 'Unkempt', cursive; font-size: 13.5px; color: #355e28; word-break: break-word; font-style: italic;">
+                    <div style="font-size: 11.5px; color: #9c845b; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">bio :</div>
+                    <div style="font-family: 'Unkempt', cursive; font-size: 14.5px; color: #355e28; word-break: break-word; font-style: italic;">
                         {{ !empty($user->bio) ? $user->bio : __('No note yet...') }}
                     </div>
                 </div>
@@ -604,7 +604,7 @@
                     @if(!$friendship)
                         <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                             @csrf
-                            <button type="submit" style="width: 100%; background-color: #2d5a27; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 15px;">
+                            <button type="submit" style="width: 100%; background-color: #2d5a27; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold;">
                                 {{ __('Add friend') }}
                             </button>
                         </form>
@@ -612,7 +612,7 @@
                         @if($friendship->user_id === auth()->id())
                             <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                                 @csrf
-                                <button type="submit" style="width: 100%; background-color: #6c757d; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">
+                                <button type="submit" style="width: 100%; background-color: #6c757d; color: white; border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14.5px;">
                                     {{ __('Request Sent (Cancel)') }}
                                 </button>
                             </form>
@@ -620,11 +620,11 @@
                             <div style="display: flex; gap: 5px; width: 100%;">
                                 <form action="{{ route('friends.accept', $user->id) }}" method="POST" style="flex: 1; margin: 0;">
                                     @csrf
-                                    <button type="submit" style="width: 100%; background-color: #25621d; color: rgb(140, 155, 25); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">{{ __('Accept') }}</button>
+                                    <button type="submit" style="width: 100%; background-color: #25621d; color: rgb(140, 155, 25); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold;">{{ __('Accept') }}</button>
                                 </form>
                                 <form action="{{ route('friends.reject', $user->id) }}" method="POST" style="flex: 1; margin: 0;">
                                     @csrf
-                                    <button type="submit" style="width: 100%; background-color: #516a28; color: rgb(119, 131, 26); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px;">{{ __('Decline') }}</button>
+                                    <button type="submit" style="width: 100%; background-color: #516a28; color: rgb(119, 131, 26); border: none; padding: 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold;">{{ __('Decline') }}</button>
                                 </form>
                             </div>
                         @endif
@@ -632,7 +632,7 @@
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%;">
                             <form action="{{ route('friends.remove', $user->id) }}" method="POST" style="margin: 0; display: flex; justify-content: center; width: 100%;">
                                 @csrf
-                                <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1px solid #1d491b; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 13.5px; text-align: center; display: block;">
+                                <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1.5px solid #1d491b; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; text-align: center; display: block;">
                                     {{ __('Remove Friend') }}
                                 </button>
                             </form>
@@ -673,7 +673,7 @@
                     <span style="
                         background: #2d5a27; 
                         color: #ffffff; 
-                        font-size: 13px; 
+                        font-size: 13.5px; 
                         font-weight: bold; 
                         padding: 3px 9px; 
                         border-radius: 12px; 
@@ -701,14 +701,14 @@
                 gap: 6px;
             ">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 15px; font-weight: bold; color: #1a3c11; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
+                    <span style="font-size: 15.5px; font-weight: bold; color: #1a3c11; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
                         🎯 {{ $currentYear ?? date('Y') }} {{ __('Goal') }}
                     </span>
                     @if(!empty($readingGoal))
                         <span style="
                             background: #2d5a27; 
                             color: #ffffff; 
-                            font-size: 12px; 
+                            font-size: 13px; 
                             font-weight: bold; 
                             padding: 2px 8px; 
                             border-radius: 12px; 
@@ -724,7 +724,7 @@
                     <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.12); border-radius: 6px; overflow: hidden; margin-top: 2px;">
                         <div style="height: 100%; width: {{ $goalProgress ?? 0 }}%; background: #255719; border-radius: 6px; transition: width 0.4s ease;"></div>
                     </div>
-                    <div style="text-align: right; font-size: 11px; color: #1a3c11; font-weight: bold;">
+                    <div style="text-align: right; font-size: 12px; color: #1a3c11; font-weight: bold;">
                         %{{ $goalProgress ?? 0 }} {{ __('completed') }}
                     </div>
                 @elseif($isOwner ?? ($isOwnProfile ?? false))
@@ -740,7 +740,7 @@
                             required
                             style="
                                 width: 100%; 
-                                font-size: 13px; 
+                                font-size: 14px; 
                                 padding: 5px 8px; 
                                 border-radius: 6px; 
                                 border: 1.5px solid #2d5a27; 
@@ -757,7 +757,7 @@
                                 border: none; 
                                 padding: 5px 12px; 
                                 border-radius: 6px; 
-                                font-size: 13px; 
+                                font-size: 14px; 
                                 font-weight: bold; 
                                 cursor: pointer; 
                                 font-family: 'Unkempt', cursive;
@@ -766,11 +766,11 @@
                             {{ __('Save') }}
                         </button>
                     </form>
-                    <span style="font-size: 10px; color: #355e28; font-style: italic;">
+                    <span style="font-size: 11.5px; color: #355e28; font-style: italic;">
                         *{{ __('Can only be set once a year') }}
                     </span>
                 @else
-                    <span style="font-size: 12px; color: #355e28; font-style: italic; text-align: center; margin-top: 2px;">
+                    <span style="font-size: 13px; color: #355e28; font-style: italic; text-align: center; margin-top: 2px;">
                         {{ __('No goal set for this year.') }}
                     </span>
                 @endif
@@ -995,7 +995,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div 
                                 style="
                                     font-family: 'Unkempt', cursive; 
-                                    font-size: 12.5px; 
+                                    font-size: 13.5px; 
                                     color: #666;
                                 "
                             >
@@ -1007,7 +1007,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span 
                         style="
                             font-family: 'Unkempt', cursive; 
-                            font-size: 13px; 
+                            font-size: 14px; 
                             color: #4c7237; 
                             font-weight: bold;
                         "
