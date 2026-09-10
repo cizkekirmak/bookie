@@ -50,9 +50,9 @@
         background: #255719;
         color: #fff;
         text-decoration: none;
-        padding: 4px 12px;
+        padding: 5px 12px;
         border-radius: 12px;
-        font-size: 13px;
+        font-size: 14px; /* 13px -> 14px */
         font-family: 'Unkempt', cursive;
         font-weight: bold;
         transition: transform 0.15s ease;
@@ -65,39 +65,45 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 175px !important;
-            padding: 10px 8px !important;
+            height: 180px !important;
+            padding: 10px 10px !important;
             border-radius: 14px !important;
         }
 
         .admin-book-cover-link {
-            width: 52px !important;
-            height: 80px !important;
+            width: 55px !important;
+            height: 85px !important;
         }
 
         .admin-book-info {
-            height: 80px !important;
+            height: 85px !important;
             justify-content: space-between !important;
         }
 
+        .admin-card-title {
+            font-size: 14px !important;
+            margin-bottom: 4px !important;
+        }
+
         .adminRecommendation-card h4 {
-            font-size: 12px !important;
+            font-size: 14px !important; /* 12px -> 14px */
             margin-bottom: 2px !important;
         }
 
         .adminRecommendation-card p {
-            font-size: 10px !important;
+            font-size: 12px !important; /* 10px -> 12px */
             margin-bottom: 3px !important;
         }
 
         .admin-note-text {
             -webkit-line-clamp: 1 !important;
-            font-size: 9px !important;
+            font-size: 11.5px !important; /* 9px -> 11.5px */
+            line-height: 1.3 !important;
         }
 
         .admin-btn {
-            padding: 3px 8px !important;
-            font-size: 11px !important;
+            padding: 4px 9px !important;
+            font-size: 12.5px !important; /* 11px -> 12.5px */
             border-radius: 8px !important;
         }
     }
@@ -105,9 +111,9 @@
 
 <div class="adminRecommendation-card">
 
-    <span style="
+    <span class="admin-card-title" style="
         font-family: 'Henny Penny', cursive;
-        font-size: 15px;
+        font-size: 16.5px;
         color: #1a3c11;
         margin-bottom: 6px;
         display: block;
@@ -132,16 +138,16 @@
         {{-- Kitap Bilgileri --}}
         <div class="admin-book-info">
             <div>
-                <h4 style="color: #1a3c11; font-size: 15px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
+                <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->title }}
                 </h4>
-                <p style="color: #3b612d; font-size: 12px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+                <p style="color: #3b612d; font-size: 13.5px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
                 </p>
             </div>
 
             @if(!empty($adminRecommendation->admin_note))
-                <p class="admin-note-text" style="font-size: 11px; color: #1a3c11; font-style: italic; margin: 0; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
+                <p class="admin-note-text" style="font-size: 12.5px; color: #1a3c11; font-style: italic; margin: 0; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
                     "{{ $adminRecommendation->admin_note }}"
                 </p>
             @endif

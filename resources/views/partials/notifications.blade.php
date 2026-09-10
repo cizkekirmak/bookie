@@ -17,7 +17,7 @@
 
     <div class="notification-dropdown-panel" style="display: none;">
         <div class="notification-header">
-            <div>
+            <div style="display: flex; align-items: center; gap: 6px;">
                 <span>{{ __('Notifications') }}</span>
                 @if($totalCount > 0)
                     <span class="notification-subtext">{{ $totalCount }} {{ __('new') }}</span>
@@ -25,7 +25,7 @@
             </div>
 
             @if(auth()->check() && auth()->user()->notifications && auth()->user()->notifications->count() > 0)
-                <button type="button" onclick="clearAllNotifications(this)" style="background: none; border: none; font-size: 13px; color: #888; cursor: pointer; text-decoration: underline; padding: 0; font-family: 'Unkempt', cursive;">
+                <button type="button" onclick="clearAllNotifications(this)" style="background: none; border: none; font-size: 14px; color: #888; cursor: pointer; text-decoration: underline; padding: 0; font-family: 'Unkempt', cursive;">
                     {{ __('Clear all') }}
                 </button>
             @endif
@@ -69,39 +69,41 @@
 
 .notification-badge {
     position: absolute;
-    top: 4px;            /* -6px yerine aşağı indirip zarfın hizasına aldık */
-    right: 4px;          /* -10px yerine içeri aldık */
+    top: 3px;
+    right: 3px;
     background: #c04e0c;
     color: #fff;
-    font-size: 10px;
+    font-size: 11.5px; /* 10px -> 11.5px */
     font-weight: bold;
     border-radius: 50%;
-    min-width: 16px;
-    height: 16px;
+    min-width: 17px;
+    height: 17px;
     padding: 0 4px;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
-    border: 1.5px solid #fff3f3; /* Yeşil arkaplanda ve zarfın üstünde net ayrışması için */
+    border: 1.5px solid #fff3f3;
     box-sizing: border-box;
     pointer-events: none;
+    font-family: 'Unkempt', cursive;
 }
 
 .notification-dropdown-panel {
     position: absolute;
     right: 0;
     top: 100%;
-    width: 320px;
+    width: 325px;
     max-height: 420px;
     background: #ffffff;
     border: 1px solid #e0e0e0;
-    border-radius: 10px;
+    border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.12);
     z-index: 1001;
     overflow: hidden;
     text-align: left;
     line-height: normal;
+    font-family: 'Unkempt', cursive;
 }
 
 .notification-header {
@@ -112,16 +114,17 @@
     font-weight: bold;
     border-bottom: 1px solid #f0f0f0;
     background: #fafafa;
-    font-size: 14px;
+    font-size: 15.5px; /* 14px -> 15.5px */
     color: #333;
 }
 
 .notification-subtext {
-    font-size: 11px;
+    font-size: 12px; /* 11px -> 12px */
     color: #666;
     background: #eee;
-    padding: 2px 6px;
+    padding: 2px 7px;
     border-radius: 8px;
+    font-weight: normal;
 }
 
 .notification-list {
@@ -173,7 +176,7 @@
 }
 
 .sender-name {
-    font-size: 13px;
+    font-size: 14.5px; /* 13px -> 14.5px */
     font-weight: 600;
     color: #1a3c11;
     text-decoration: none;
@@ -184,7 +187,7 @@
 }
 
 .notification-desc {
-    font-size: 12px;
+    font-size: 13.5px; /* 12px -> 13.5px */
     color: #555;
 }
 
@@ -199,9 +202,10 @@
     color: #fff;
     border: none;
     border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: 4px 10px;
+    font-size: 12.5px; /* 11px -> 12.5px */
     cursor: pointer;
+    font-family: 'Unkempt', cursive;
 }
 
 .btn-action-accept:hover {
@@ -213,9 +217,10 @@
     color: #444;
     border: none;
     border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 11px;
+    padding: 4px 10px;
+    font-size: 12.5px; /* 11px -> 12.5px */
     cursor: pointer;
+    font-family: 'Unkempt', cursive;
 }
 
 .btn-action-reject:hover {
@@ -227,7 +232,7 @@
     padding: 24px;
     text-align: center;
     color: #888;
-    font-size: 13px;
+    font-size: 14.5px; /* 13px -> 14.5px */
 }
 
 @media (max-width: 1024px) {

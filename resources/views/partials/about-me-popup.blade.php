@@ -1,4 +1,3 @@
-
 <div id="about-postit-container" class="postit-wrapper">
     <button type="button" id="about-postit-tab" class="postit-tab" title="{{ __('About Me') }}">
         <span class="postit-pin">📌</span>
@@ -40,7 +39,7 @@
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    transform: translateY(205px);
+    transform: translateY(230px);
     transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.15);
     user-select: none;
     -webkit-tap-highlight-color: transparent !important;
@@ -55,7 +54,7 @@
     border: 2px solid #5a7d3b;
     border-bottom: none; 
     border-radius: 12px 12px 0 0;
-    padding: 5px 14px;
+    padding: 6px 16px;
     display: flex;
     align-items: center;
     gap: 6px;
@@ -64,7 +63,7 @@
     font-family: 'Unkempt', cursive;
     color: #1f5117;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 14.5px; /* 13px -> 14.5px */
     outline: none;
     transition: background 0.15s ease;
 }
@@ -74,13 +73,13 @@
 }
 
 .postit-pin {
-    font-size: 13px;
+    font-size: 14px;
     display: inline-block;
     transform: rotate(-15deg);
 }
 
 .postit-arrow {
-    font-size: 10px;
+    font-size: 11px;
     margin-left: 2px;
     transition: transform 0.3s ease;
 }
@@ -90,12 +89,12 @@
 }
 
 .postit-body {
-    width: 270px;
-    height: 205px;
+    width: 295px; /* 270px -> 295px */
+    height: 230px; /* 205px -> 230px */
     background: #fdf3a9;
     border: 2px solid #5a7d3b;
     border-radius: 0 14px 0 0;
-    padding: 12px 14px 14px 14px;
+    padding: 14px 16px;
     box-shadow: 0 -5px 16px rgba(0, 0, 0, 0.14);
     box-sizing: border-box;
     display: flex;
@@ -111,7 +110,7 @@
 
 .postit-tape {
     position: absolute;
-    top: -18px;
+    top: -20px;
     right: 15px;
     width: 48px;
     height: 14px;
@@ -123,22 +122,22 @@
 .postit-title {
     font-family: 'Henny Penny', cursive;
     color: #1a3c11;
-    font-size: 17px;
-    margin: 2px 0 4px 0;
+    font-size: 19px; /* 17px -> 19px */
+    margin: 2px 0 6px 0;
 }
 
 .postit-desc {
     font-family: 'Unkempt', cursive;
-    font-size: 12px;
-    line-height: 1.35;
+    font-size: 13.5px; /* 12px -> 13.5px */
+    line-height: 1.4;
     color: #38552b;
     margin: 0 0 auto 0;
 }
 
 .postit-links {
     display: flex;
-    gap: 6px;
-    margin-top: 8px;
+    gap: 7px;
+    margin-top: 10px;
 }
 
 .postit-pill {
@@ -147,8 +146,8 @@
     background: #ffffff;
     border: 1.5px solid #5a7d3b;
     border-radius: 8px;
-    padding: 5px 2px;
-    font-size: 11.5px;
+    padding: 6px 3px;
+    font-size: 13px; /* 11.5px -> 13px */
     color: #1a3c11;
     text-decoration: none;
     font-family: 'Unkempt', cursive;

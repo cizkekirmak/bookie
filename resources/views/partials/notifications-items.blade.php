@@ -22,19 +22,19 @@
             </a>
 
             <div class="notification-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
-                <a href="{{ route('profile', $sender?->id ?? '#') }}" class="sender-name" style="font-size: 13px; font-weight: bold; color: #1a3c11; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                <a href="{{ route('profile', $sender?->id ?? '#') }}" class="sender-name" style="font-size: 14.5px; font-weight: bold; color: #1a3c11; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
                     {{ $sender?->name ?? ($sender?->username ?? __('User')) }}
                 </a>
-                <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __('sent you a friend request.') }}</span>
+                <span class="notification-desc" style="font-size: 13.5px; color: #555; font-family: 'Unkempt', cursive;">{{ __('sent you a friend request.') }}</span>
 
                 <div class="notification-actions" style="display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap;">
                     <form action="{{ route('friends.accept', $sender?->id) }}" method="POST" onsubmit="handleFriendAction(event, this)" style="margin:0;">
                         @csrf
-                        <button type="submit" class="btn-action-accept" style="background: #1a3c11; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Unkempt', cursive;">{{ __('Accept ^^') }}</button>
+                        <button type="submit" class="btn-action-accept" style="background: #1a3c11; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12.5px; cursor: pointer; font-family: 'Unkempt', cursive; font-weight: bold;">{{ __('Accept ^^') }}</button>
                     </form>
                     <form action="{{ route('friends.reject', $sender?->id) }}" method="POST" onsubmit="handleFriendAction(event, this)" style="margin:0;">
                         @csrf
-                        <button type="submit" class="btn-action-reject" style="background: #eee; color: #444; border: none; border-radius: 6px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-family: 'Unkempt', cursive;">{{ __('Reject :<') }}</button>
+                        <button type="submit" class="btn-action-reject" style="background: #eee; color: #444; border: none; border-radius: 6px; padding: 4px 10px; font-size: 12.5px; cursor: pointer; font-family: 'Unkempt', cursive;">{{ __('Reject :<') }}</button>
                     </form>
                 </div>
             </div>
@@ -86,13 +86,13 @@
                         <a href="{{ route('profile', $senderId ?? '#') }}" 
                            onclick="event.stopPropagation();"
                            class="sender-name" 
-                           style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 13px;">
+                           style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 14.5px; font-family: 'Unkempt', cursive;">
                             {{ $notifData['sender_name'] ?? ($notifUser?->username ?? __('User')) }}
                         </a>
-                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __($notifData['message'] ?? 'liked your review.') }}</span>
+                        <span class="notification-desc" style="font-size: 13.5px; color: #555; font-family: 'Unkempt', cursive;">{{ __($notifData['message'] ?? 'liked your review.') }}</span>
                     </div>
                     
-                    <small style="display:block; font-size:11px; color:#888; margin-top:2px;">
+                    <small style="display:block; font-size: 12px; color:#888; margin-top:2px; font-family: 'Unkempt', cursive;">
                         {{ $notification->created_at ? $notification->created_at->diffForHumans() : '' }}
                     </small>
                 </div>
@@ -112,15 +112,15 @@
                 </a>
 
                 <div class="notification-info" style="flex: 1; min-width: 0;">
-                    <a href="{{ route('profile', $senderId ?? '#') }}" class="sender-name" style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 13px;">
+                    <a href="{{ route('profile', $senderId ?? '#') }}" class="sender-name" style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 14.5px; font-family: 'Unkempt', cursive;">
                         {{ $notifData['sender_name'] ?? ($notifUser?->username ?? __('User')) }}
                     </a>
                     @if(($notifData['type'] ?? '') === 'accepted_self')
-                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __("'s friend request was accepted !") }}</span>
+                        <span class="notification-desc" style="font-size: 13.5px; color: #555; font-family: 'Unkempt', cursive;">{{ __("'s friend request was accepted !") }}</span>
                     @else
-                        <span class="notification-desc" style="font-size: 12px; color: #555;">{{ __($notifData['message'] ?? 'accepted your friend request.') }}</span>
+                        <span class="notification-desc" style="font-size: 13.5px; color: #555; font-family: 'Unkempt', cursive;">{{ __($notifData['message'] ?? 'accepted your friend request.') }}</span>
                     @endif
-                    <small style="display:block; font-size:11px; color:#888; margin-top:2px;">
+                    <small style="display:block; font-size: 12px; color:#888; margin-top:2px; font-family: 'Unkempt', cursive;">
                         {{ $notification->created_at ? $notification->created_at->diffForHumans() : '' }}
                     </small>
                 </div>
@@ -129,7 +129,7 @@
     @endforeach
 
     @if(count($pendingList ?? []) === 0 && auth()->user()->notifications->count() === 0)
-        <div class="notification-empty" style="text-align: center; padding: 18px 10px; color: #888; font-size: 13px; font-family: 'Unkempt', cursive;">
+        <div class="notification-empty" style="text-align: center; padding: 18px 10px; color: #888; font-size: 14.5px; font-family: 'Unkempt', cursive;">
             {{ __('No notifications yet ^^') }}
         </div>
     @endif

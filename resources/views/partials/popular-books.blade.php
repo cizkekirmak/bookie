@@ -51,7 +51,7 @@
 
         .popular-books-card h3 {
             margin: 0 0 10px 0 !important;
-            font-size: 14px !important;
+            font-size: 15px !important; /* 14px -> 15px */
             text-align: left !important;
         }
 
@@ -85,7 +85,7 @@
 </style>
 
 <div class="popular-books-card">
-    <h3 style="font-family: 'Henny Penny', cursive; color: #1a3c11; font-size: 15px; margin: 0 0 14px 0; font-weight: normal;">
+    <h3 style="font-family: 'Henny Penny', cursive; color: #1a3c11; font-size: 16.5px; margin: 0 0 12px 0; font-weight: normal;">
         {{ __('Popular books this week:') }}
     </h3>
 
@@ -103,16 +103,16 @@
                      onerror="this.onerror=null; this.src='https://via.placeholder.com/120x180?text=No+Cover';"
                      class="popular-book-img">
 
-                <div style="font-family: 'Unkempt', cursive; font-size: 11px; font-weight: bold; color: #1f5117; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px;" title="{{ $pBook['title'] }}">
+                <div style="font-family: 'Unkempt', cursive; font-size: 13px; font-weight: bold; color: #1f5117; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 5px;" title="{{ $pBook['title'] }}">
                     {{ $pBook['title'] }}
                 </div>
 
-                <div style="font-family: 'Unkempt', cursive; font-size: 10px; color: #666; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="{{ $pBook['author'] }}">
+                <div style="font-family: 'Unkempt', cursive; font-size: 11.5px; color: #527943; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 1px;" title="{{ $pBook['author'] }}">
                     {{ $pBook['author'] }}
                 </div>
             </div>
         @empty
-            <div style="font-family: 'Unkempt', cursive; font-size: 12px; color: #777; width: 100%; text-align: center;">
+            <div style="font-family: 'Unkempt', cursive; font-size: 13.5px; color: #777; width: 100%; text-align: center; padding: 20px 0;">
                 {{ __("Couldn't load the popular books.") }}
             </div>
         @endforelse

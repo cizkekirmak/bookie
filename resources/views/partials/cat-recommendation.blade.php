@@ -19,7 +19,7 @@
     border: 2px solid #4c7237;
     border-radius: 14px;
     padding: 10px 18px;
-    font-size: 16px;
+    font-size: 17px; /* 16px -> 17px */
     color: #1a3c11;
     line-height: 1.35;
     box-shadow: 0 3px 6px rgba(0,0,0,0.06);
@@ -48,9 +48,10 @@
     background: #f1f8ed;
     border: 1px solid #4c7237;
     border-radius: 14px;
-    padding: 4px 10px;
+    padding: 4px 11px;
     font-family: 'Unkempt', cursive;
-    font-size: 12px;
+    font-size: 13.5px; /* 12px -> 13.5px */
+    font-weight: bold;
     color: #1a3c11;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -97,11 +98,11 @@
 
     .cat-mobile-chips .genre-chip-btn {
         padding: 3px 8px !important;
-        font-size: 11px !important;
+        font-size: 12.5px !important; /* 11px -> 12.5px */
     }
 
     .css-bubble-right {
-        font-size: 13px !important;
+        font-size: 14.5px !important; /* 13px -> 14.5px */
         padding: 6px 12px !important;
     }
 
@@ -121,6 +122,22 @@
     #cat-step-3 #cat-rec-cover {
         width: 46px !important;
         height: 64px !important;
+    }
+
+    #cat-step-3 #cat-rec-title {
+        font-size: 13.5px !important;
+    }
+
+    #cat-step-3 #cat-rec-author {
+        font-size: 11.5px !important;
+    }
+
+    #cat-step-3 #cat-rec-pages {
+        font-size: 11px !important;
+    }
+
+    #cat-step-3 .step-3-bubble {
+        font-size: 13.5px !important;
     }
 }
 </style>
@@ -154,7 +171,7 @@
 
     {{-- ADIM 2: Düşünen Kedi --}}
     <div id="cat-step-2" style="display: none; align-items: center; justify-content: center; gap: 20px; width: 100%;">
-        <div class="css-bubble-right" style="font-size: 20px; font-weight: bold; padding: 12px 22px;">
+        <div class="css-bubble-right" style="font-size: 21px; font-weight: bold; padding: 12px 22px;">
             <span id="cat-thinking-text">{{ __('Mmmmm...') }}</span> 💭
         </div>
         <img src="{{ asset('images/thinkcat.png') }}" alt="{{ __('Thinking Cat') }}" class="cat-img-responsive" style="width: 170px; height: 170px; object-fit: contain; flex-shrink: 0; animation: pulseCat 0.9s infinite alternate;">
@@ -164,22 +181,22 @@
     <div id="cat-step-3" style="display: none; align-items: center; justify-content: space-between; gap: 12px; width: 100%;">
         
         {{-- Sol Kısım: Önerilen Kitap Kutusu --}}
-        <a id="cat-rec-book-link" href="#" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; background: #ffffff; border: 1.5px solid #4c7237; padding: 8px 12px; border-radius: 12px; width: 140px; box-sizing: border-box; transition: transform 0.15s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.06); flex-shrink: 0;" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform='scale(1)'">
+        <a id="cat-rec-book-link" href="#" style="text-decoration: none; display: flex; flex-direction: column; align-items: center; background: #ffffff; border: 1.5px solid #4c7237; padding: 8px 12px; border-radius: 12px; width: 145px; box-sizing: border-box; transition: transform 0.15s ease; box-shadow: 0 2px 5px rgba(0,0,0,0.06); flex-shrink: 0;" onmouseenter="this.style.transform='scale(1.03)'" onmouseleave="this.style.transform='scale(1)'">
             <img id="cat-rec-cover" src="" alt="{{ __('Cover') }}" style="width: 55px; height: 75px; object-fit: cover; border-radius: 4px; border: 1px solid #c2d8b7; margin-bottom: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             <div style="text-align: center; width: 100%;">
-                <div id="cat-rec-title" style="font-size: 13px; font-weight: bold; color: #1a3c11; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;"></div>
-                <div id="cat-rec-author" style="font-size: 11px; color: #527943; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;"></div>
-                <div id="cat-rec-pages" style="font-size: 10px; color: #737e3d; font-weight: bold; margin-top: 3px;"></div>
+                <div id="cat-rec-title" style="font-size: 14.5px; font-weight: bold; color: #1a3c11; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2;"></div>
+                <div id="cat-rec-author" style="font-size: 12.5px; color: #527943; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px;"></div>
+                <div id="cat-rec-pages" style="font-size: 11.5px; color: #737e3d; font-weight: bold; margin-top: 3px;"></div>
             </div>
         </a>
 
         {{-- Orta Kısım: Baloncuk ve Altında Yenile Butonu --}}
         <div style="display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 1;">
-            <div class="css-bubble-right" style="font-size: 13px; max-width: 140px; line-height: 1.3; text-align: center;">
+            <div class="css-bubble-right step-3-bubble" style="font-size: 14px; max-width: 155px; line-height: 1.35; text-align: center;">
                 {{ __('i found a book for u! hope u like it :3') }}
             </div>
             
-            <button type="button" onclick="resetCatRecommendation()" title="{{ __('Choose another genre') }}" style="background: #eef6ea; border: 1.5px solid #4c7237; border-radius: 50%; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 15px; color: #2d5a27; transition: transform 0.15s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.08);" onmouseenter="this.style.transform='rotate(90deg)'" onmouseleave="this.style.transform='rotate(0deg)'">
+            <button type="button" onclick="resetCatRecommendation()" title="{{ __('Choose another genre') }}" style="background: #eef6ea; border: 1.5px solid #4c7237; border-radius: 50%; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 16px; color: #2d5a27; transition: transform 0.15s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.08);" onmouseenter="this.style.transform='rotate(90deg)'" onmouseleave="this.style.transform='rotate(0deg)'">
                 🔄
             </button>
         </div>
