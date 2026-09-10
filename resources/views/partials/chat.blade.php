@@ -801,16 +801,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadMessages(forceScroll = false) {
-        const messages = await res.json();
-        console.log("GELEN MESAJLAR:", messages);
         if (!activeFriendId) return;
         try {
             const res = await fetch(`/messages/${activeFriendId}`, {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-            const messages = await res.json();
 
-            // Yeni mesaj gelmemişse ve zorunlu kaydırma yoksa DOM'a dokunma
+            if (!res.ok) return;
+
+            const messages = await res.json();
+            console.log("GELEN MESAJLAR:", messages);
+
             if (messages.length === lastLoadedMessagesCount && !forceScroll) {
                 return;
             }
@@ -822,12 +823,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             lastLoadedMessagesCount = messages.length;
 
-            // Mesajları ve Gün Ayraçlarını Temizce Baştan İnşa Et
             renderMessagesWithDates(messages);
 
             messagesBody.scrollTop = messagesBody.scrollHeight;
 
-        } catch (e) {}
+        } catch (e) {
+            console.error("Mesaj yükleme hatası:", e);
+        }
     }
 
     async function sendMessage(text) {
