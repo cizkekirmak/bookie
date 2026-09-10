@@ -1036,58 +1036,66 @@
         }
     }
 
-    // ŞEFFAFLIK VE ALFA KANALINI BOZMAYAN SIKIŞTIRMA FONKSİYONU
     function compressImageClientSide(file, maxWidth = 300, maxHeight = 300, quality = 0.75) {
-        return new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = function (e) {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = function () {
-                    let width = img.width;
-                    let height = img.height;
+    return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const dataUrl = e.target.result;
 
-                    if (width > height) {
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                    } else {
-                        if (height > maxHeight) {
-                            width = Math.round((width * maxHeight) / height);
-                            height = maxHeight;
-                        }
+            // Gerçek formatı dosya adı / File.type yerine tarayıcının ürettiği
+            // data URL'in mime önekinden alıyoruz. Böylece aslında PNG olan
+            // (şeffaf) bir görsel yanlışlıkla JPEG sanılıp alfa kanalı
+            // kaybolmuyor ve arkasında beyaz bir kutu belirmiyor.
+            const mimeMatch = /^data:(image\/[a-zA-Z0-9+.-]+);base64,/.exec(dataUrl);
+            const realMime = mimeMatch ? mimeMatch[1].toLowerCase() : (file.type || '').toLowerCase();
+
+            const img = new Image();
+            img.src = dataUrl;
+            img.onload = function () {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > height) {
+                    if (width > maxWidth) {
+                        height = Math.round((height * maxWidth) / width);
+                        width = maxWidth;
                     }
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = width;
-                    canvas.height = height;
-
-                    const ctx = canvas.getContext('2d', { alpha: true });
-                    ctx.clearRect(0, 0, width, height);
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    // Uzantı ve MIME kontrolü (Dosya adı ve type kontrol edilir)
-                    const fileName = (file.name || '').toLowerCase();
-                    const isPng = file.type === 'image/png' || fileName.endsWith('.png');
-                    const isWebp = file.type === 'image/webp' || fileName.endsWith('.webp');
-
-                    let compressedBase64;
-                    if (isPng) {
-                        // PNG için asla kalite parametresi verilmez, doğrudan toDataURL() çağrılır!
-                        compressedBase64 = canvas.toDataURL('image/png');
-                    } else if (isWebp) {
-                        compressedBase64 = canvas.toDataURL('image/webp', quality);
-                    } else {
-                        compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                } else {
+                    if (height > maxHeight) {
+                        width = Math.round((width * maxHeight) / height);
+                        height = maxHeight;
                     }
+                }
 
-                    resolve({ base64: compressedBase64, width, height });
-                };
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+
+                const ctx = canvas.getContext('2d', { alpha: true });
+                ctx.clearRect(0, 0, width, height);
+                ctx.drawImage(img, 0, 0, width, height);
+
+                const isPng = realMime === 'image/png';
+                const isWebp = realMime === 'image/webp';
+
+                let compressedBase64;
+                if (isPng) {
+                    // PNG: kalite parametresi verilmez, şeffaflık olduğu gibi korunur.
+                    compressedBase64 = canvas.toDataURL('image/png');
+                } else if (isWebp) {
+                    compressedBase64 = canvas.toDataURL('image/webp', quality);
+                } else {
+                    // JPEG (alfa desteklemeyen formatlar): kendi orijinal
+                    // (opak) haliyle bırakılır, ekstra bir müdahale yapılmaz.
+                    compressedBase64 = canvas.toDataURL('image/jpeg', quality);
+                }
+
+                resolve({ base64: compressedBase64, width, height });
             };
-        });
-    }
+        };
+        reader.readAsDataURL(file);
+    });
+}
 
     function rescaleBoardForMobile() {
         const frame = document.getElementById('corkboardArea');
