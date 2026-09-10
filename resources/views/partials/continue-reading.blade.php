@@ -28,6 +28,24 @@
         box-sizing: border-box;
     }
 
+    .continue-card-title {
+        font-family: 'Henny Penny', cursive;
+        font-size: 16.5px;
+        color: #1a3c11;
+        margin: 0 0 6px 0;
+        display: block;
+        font-weight: normal;
+        flex-shrink: 0;
+    }
+
+    .continue-reading-body {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex: 1;
+        min-height: 0;
+    }
+
     .continue-book-cover {
         width: 90px;
         height: 140px;
@@ -41,6 +59,7 @@
     .continue-book-info {
         overflow: hidden;
         flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -54,10 +73,11 @@
         text-decoration: none;
         padding: 5px 12px;
         border-radius: 12px;
-        font-size: 14px; /* 13px -> 14px */
+        font-size: 14px;
         font-family: 'Unkempt', cursive;
         font-weight: bold;
         transition: transform 0.15s ease;
+        white-space: nowrap;
     }
 
     .continue-btn:hover {
@@ -67,70 +87,78 @@
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
-            height: 180px !important;
-            padding: 10px 10px !important;
+            height: 185px !important;
+            padding: 12px 10px !important;
             border-radius: 14px !important;
-            justify-content: space-between !important;
-        }
-
-        .continue-reading-body {
-            align-items: center !important;
-            justify-content: center !important;
-            flex: 1 !important;
-            margin-top: -4px !important;
-        }
-
-        .continue-book-cover {
-            width: 55px !important;
-            height: 85px !important;
-        }
-
-        .continue-book-info {
-            height: auto !important;
-            min-height: 85px !important;
-            justify-content: center !important;
-            gap: 4px !important;
+            justify-content: flex-start !important;
         }
 
         .continue-card-title {
             font-size: 14px !important;
+            margin-bottom: 8px !important;
+            height: 18px !important;
+            line-height: 18px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        .continue-reading-body {
+            display: flex !important;
+            gap: 8px !important;
+            align-items: flex-start !important;
+            flex: 1 !important;
+            height: 110px !important;
+            min-height: 110px !important;
+        }
+
+        .continue-book-cover {
+            width: 58px !important;
+            height: 86px !important;
+            border-radius: 6px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .continue-book-info {
+            height: 86px !important;
+            min-height: 86px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            flex: 1 !important;
         }
 
         .continue-reading-card h4 {
-            font-size: 14px !important; /* 13px -> 14px */
-            margin-bottom: 0px !important;
-            line-height: 1.2 !important;
+            font-size: 14px !important;
+            margin: 0 0 2px 0 !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
 
         .continue-reading-card p {
-            font-size: 12px !important; /* 11px -> 12px */
-            margin-bottom: 2px !important;
-            line-height: 1.2 !important;
+            font-size: 12px !important;
+            margin: 0 !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
 
         .continue-btn {
             padding: 4px 10px !important;
-            font-size: 12.5px !important; /* 11px -> 12.5px */
+            font-size: 12.5px !important;
             border-radius: 8px !important;
-            margin-top: 2px !important;
+            align-self: flex-start !important;
         }
     }
 </style>
 
 <div class="continue-reading-card">
-    
-    <span class="continue-card-title" style="
-        font-family: 'Henny Penny', cursive;
-        font-size: 16.5px;
-        color: #1a3c11;
-        margin-bottom: 4px;
-        display: block;
-        font-weight: normal;
-        flex-shrink: 0;">
-        {{ __('continue?') }}
-    </span>
+    <span class="continue-card-title">{{ __('continue?') }}</span>
 
-    <div class="continue-reading-body" style="display: flex; gap: 10px; align-items: center; flex: 1;">
+    <div class="continue-reading-body">
         @if($currentBook)
             <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" style="flex-shrink: 0; line-height: 0;">
                 @if(!empty($currentBook->cover_image))
@@ -138,7 +166,6 @@
                          alt="{{ $currentBook->title }}" 
                          loading="eager"
                          decoding="sync"
-                         fetchpriority="high"
                          referrerpolicy="no-referrer" 
                          class="continue-book-cover">
                 @else
@@ -148,24 +175,23 @@
                 @endif
             </a>
 
-            {{-- Kitap Bilgileri --}}
             <div class="continue-book-info">
                 <div>
                     <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->title }}
                     </h4>
-                    <p style="color: #3b612d; font-size: 13.5px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+                    <p style="color: #3b612d; font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->author }}
                     </p>
 
                     @if($hasPercentage)
-                        <div style="margin-bottom: 2px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
+                        <div style="margin-top: 3px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
                                 <span>%{{ $pct }}</span>
                                 <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} {{ __('p.') }}</span>
                             </div>
-                            <div style="width: 100%; height: 6px; background-color: #eaf3e4; border: 1px solid #737e3d; border-radius: 6px; overflow: hidden;">
-                                <div style="width: {{ $pct }}%; height: 100%; background: #2d5a27; border-radius: 6px; transition: width 0.4s ease;"></div>
+                            <div style="width: 100%; height: 5px; background-color: #eaf3e4; border: 1px solid #737e3d; border-radius: 6px; overflow: hidden;">
+                                <div style="width: {{ $pct }}%; height: 100%; background: #2d5a27; border-radius: 6px;"></div>
                             </div>
                         </div>
                     @endif
@@ -176,7 +202,7 @@
                 </a>
             </div>
         @else
-            <div style="text-align: center; width: 100%; color: #3b612d; font-size: 13.5px; font-family: 'Unkempt', cursive;">
+            <div style="text-align: center; width: 100%; color: #3b612d; font-size: 13.5px; font-family: 'Unkempt', cursive; margin: auto 0;">
                 <p style="margin: 0 0 4px 0;">{{ __('No books currently being read.') }}</p>
                 <span style="font-size: 20px;">📚</span>
             </div>

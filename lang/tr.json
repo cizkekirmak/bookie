@@ -278,5 +278,8 @@
     "Back": "Geri",
     "Avatar": "Profil Fotoğrafı",
     "new message": "yeni mesaj",
-    "Click to chat": "Sohbet etmek için tıkla"
+    "Click to chat": "Sohbet etmek için tıkla",
+    "started:": "başlangıç:",
+    "finished:": "bitiş:"
+    
 }

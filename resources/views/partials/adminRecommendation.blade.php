@@ -25,6 +25,24 @@
         box-sizing: border-box;
     }
 
+    .admin-card-title {
+        font-family: 'Henny Penny', cursive;
+        font-size: 16.5px;
+        color: #1a3c11;
+        margin: 0 0 6px 0;
+        display: block;
+        font-weight: normal;
+        flex-shrink: 0;
+    }
+
+    .admin-recommendation-body {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex: 1;
+        min-height: 0;
+    }
+
     .admin-book-cover-link {
         flex-shrink: 0;
         width: 90px;
@@ -39,6 +57,7 @@
     .admin-book-info {
         overflow: hidden;
         flex: 1;
+        min-width: 0;
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -52,10 +71,11 @@
         text-decoration: none;
         padding: 5px 12px;
         border-radius: 12px;
-        font-size: 14px; /* 13px -> 14px */
+        font-size: 14px;
         font-family: 'Unkempt', cursive;
         font-weight: bold;
         transition: transform 0.15s ease;
+        white-space: nowrap;
     }
 
     .admin-btn:hover {
@@ -65,63 +85,82 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 180px !important;
-            padding: 10px 10px !important;
+            height: 185px !important;
+            padding: 12px 10px !important;
             border-radius: 14px !important;
-        }
-
-        .admin-book-cover-link {
-            width: 55px !important;
-            height: 85px !important;
-        }
-
-        .admin-book-info {
-            height: 85px !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
         }
 
         .admin-card-title {
             font-size: 14px !important;
-            margin-bottom: 4px !important;
+            margin-bottom: 8px !important;
+            height: 18px !important;
+            line-height: 18px !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
+        }
+
+        .admin-recommendation-body {
+            display: flex !important;
+            gap: 8px !important;
+            align-items: flex-start !important;
+            flex: 1 !important;
+            height: 110px !important;
+            min-height: 110px !important;
+        }
+
+        .admin-book-cover-link {
+            width: 58px !important;
+            height: 86px !important;
+            border-radius: 6px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .admin-book-info {
+            height: 86px !important;
+            min-height: 86px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            flex: 1 !important;
         }
 
         .adminRecommendation-card h4 {
-            font-size: 14px !important; /* 12px -> 14px */
-            margin-bottom: 2px !important;
+            font-size: 14px !important;
+            margin: 0 0 2px 0 !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
 
         .adminRecommendation-card p {
-            font-size: 12px !important; /* 10px -> 12px */
-            margin-bottom: 3px !important;
+            font-size: 12px !important;
+            margin: 0 !important;
+            line-height: 1.15 !important;
+            white-space: nowrap !important;
+            overflow: hidden !important;
+            text-overflow: ellipsis !important;
         }
 
         .admin-note-text {
-            -webkit-line-clamp: 1 !important;
-            font-size: 11.5px !important; /* 9px -> 11.5px */
-            line-height: 1.3 !important;
+            display: none !important; /* Mobilde dar alanda yüksekliği bozmaması için gizlendi */
         }
 
         .admin-btn {
-            padding: 4px 9px !important;
-            font-size: 12.5px !important; /* 11px -> 12.5px */
+            padding: 4px 10px !important;
+            font-size: 12.5px !important;
             border-radius: 8px !important;
+            align-self: flex-start !important;
         }
     }
 </style>
 
 <div class="adminRecommendation-card">
+    <span class="admin-card-title">{{ __('admin recommends!') }}</span>
 
-    <span class="admin-card-title" style="
-        font-family: 'Henny Penny', cursive;
-        font-size: 16.5px;
-        color: #1a3c11;
-        margin-bottom: 6px;
-        display: block;
-        font-weight: normal;">
-        {{ __('admin recommends!') }}
-    </span>
-
-    <div style="display: flex; gap: 10px; align-items: center; flex: 1;">
+    <div class="admin-recommendation-body">
         <a href="{{ route('show', $adminBookKey) }}" class="admin-book-cover-link">
             @if(!empty($coverSrc))
                 <img src="{{ $coverSrc }}" 
@@ -135,19 +174,18 @@
             @endif
         </a>
 
-        {{-- Kitap Bilgileri --}}
         <div class="admin-book-info">
             <div>
                 <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->title }}
                 </h4>
-                <p style="color: #3b612d; font-size: 13.5px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+                <p style="color: #3b612d; font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
                 </p>
             </div>
 
             @if(!empty($adminRecommendation->admin_note))
-                <p class="admin-note-text" style="font-size: 12.5px; color: #1a3c11; font-style: italic; margin: 0; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
+                <p class="admin-note-text" style="font-size: 12px; color: #1a3c11; font-style: italic; margin: 0; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
                     "{{ $adminRecommendation->admin_note }}"
                 </p>
             @endif

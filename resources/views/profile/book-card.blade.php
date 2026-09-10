@@ -21,11 +21,11 @@
 
     // Tarih Biçimlendirmeleri (created_at ve updated_at üzerinden)
     $startDate = !empty($item->created_at) 
-        ? \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') 
+        ? \Carbon\Carbon::parse($item->created_at)->locale(app()->getLocale())->translatedFormat('d M Y') 
         : '-';
 
     $finishDate = ($item->status === 'read' && !empty($item->updated_at)) 
-        ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d M Y') 
+        ? \Carbon\Carbon::parse($item->updated_at)->locale(app()->getLocale())->translatedFormat('d M Y') 
         : '-';
         
     $uniqueId = 'note_' . ($item->id ?? rand(1000, 9999));
@@ -112,16 +112,16 @@
                 <button type="button" 
                         class="mobile-paperclip-btn" 
                         onclick="toggleMobileDateNote('{{ $uniqueId }}')"
-                        title="Tarihleri Göster"
+                        title="{{ __('Show Dates') }}"
                         style="background: {{ $theme['badge_bg'] }}; border: 1.5px solid {{ $theme['badge_border'] }}; border-radius: 8px; padding: 3px 7px; cursor: pointer; display: none; font-size: 14px; line-height: 1.1;">
                     📎
                 </button>
 
                 {{-- Renkli Durum Rozeti --}}
                 <span style="font-size: 13px; font-family: 'Unkempt', cursive; padding: 3px 9px; border-radius: 12px; font-weight: bold; background: {{ $theme['badge_bg'] }}; color: {{ $theme['badge_color'] }}; border: 1.5px solid {{ $theme['badge_border'] }}; white-space: nowrap;">
-                    @if($item->status === 'reading') {{ __('okunuyor') }}
-                    @elseif($item->status === 'read') {{ __('okundu') }}
-                    @elseif($item->status === 'toRead' || $item->status === 'want_to_read') {{ __('okunacak') }}
+                    @if($item->status === 'reading') {{ __('currently reading') }}
+                    @elseif($item->status === 'read') {{ __('read') }}
+                    @elseif($item->status === 'toRead' || $item->status === 'want_to_read') {{ __('to read') }}
                     @else {{ __($item->status) }}
                     @endif
                 </span>
@@ -183,11 +183,11 @@
                 </span>
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                     <div>
-                        <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">başlangıç:</span> 
+                        <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">{{ __('started:') }}</span> 
                         <span style="font-weight: 500; margin-left: 4px;">{{ $startDate }}</span>
                     </div>
                     <div>
-                        <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">bitiş:</span> 
+                        <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">{{ __('finished:') }}</span> 
                         <span style="font-weight: 500; margin-left: 4px;">{{ $finishDate }}</span>
                     </div>
                 </div>
@@ -203,10 +203,10 @@
             </span>
             <div style="display: flex; flex-direction: column; gap: 2px;">
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">başlangıç:</span> {{ $startDate }}
+                    <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">{{ __('started:') }}</span> {{ $startDate }}
                 </div>
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">bitiş:</span> {{ $finishDate }}
+                    <span style="color: {{ $theme['label_color'] }}; font-weight: bold;">{{ __('finished:') }}</span> {{ $finishDate }}
                 </div>
             </div>
         </div>
