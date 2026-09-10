@@ -351,7 +351,7 @@ class ProfileController extends Controller
             ],
             'yengec'   => [
                 'name'     => __('Harsh Judge'),
-                'file'     => 'yengeç.png',
+                'file'     => 'domo.png',
                 'unlocked' => in_array('yengec', $currentUnlocked),
                 'desc'     => __('Give 1 star to 5 different books')
             ],

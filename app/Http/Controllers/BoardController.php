@@ -177,7 +177,7 @@ class BoardController extends Controller
             'maymun'   => ['title' => 'Maymun',   'file' => 'maymun.png',   'unlocked' => $unlockedMaymun],
             'tama'     => ['title' => 'Tama',     'file' => 'tama.png',     'unlocked' => $unlockedTama],
             'usagi'    => ['title' => 'Usagi',    'file' => 'usagi.png',    'unlocked' => $unlockedUsagi],
-            'yengec'   => ['title' => 'Yengeç',   'file' => 'yengeç.png',   'unlocked' => $unlockedYengec],
+            'yengec'   => ['title' => 'Yengeç',   'file' => 'domo.png',   'unlocked' => $unlockedYengec],
             'yonca'    => ['title' => 'Yonca',    'file' => 'yonca.png',    'unlocked' => $unlockedYonca],
         ];
     }
