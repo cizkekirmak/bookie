@@ -19,12 +19,11 @@
     $hasProgress = $item->status === 'reading' && $currentPage > 0;
     $pct = ($totalPages > 0 && $currentPage > 0) ? min(100, round(($currentPage / $totalPages) * 100)) : null;
 
-   // Tarih Biçimlendirmeleri (Tablodaki created_at ve updated_at üzerinden)
+    // Tarih Biçimlendirmeleri (created_at ve updated_at üzerinden)
     $startDate = !empty($item->created_at) 
         ? \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') 
         : '-';
 
-    // Sadece kitap 'read' (okundu) durumundaysa bitiş tarihi olarak updated_at gösterilsin
     $finishDate = ($item->status === 'read' && !empty($item->updated_at)) 
         ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d M Y') 
         : '-';
@@ -55,10 +54,10 @@
              onerror="this.onerror=null; this.src='{{ asset('images/default-book.png') }}';">
     </a>
 
-    {{-- Sol/Orta Ana Bilgiler Alanı --}}
+    {{-- Bilgiler & Orta Alan --}}
     <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px;">
         
-        {{-- Başlık + Durum Rozeti + Mobil Ataş Butonu --}}
+        {{-- Başlık + Durum Rozeti + Mobil Buton --}}
         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; width: 100%;">
             <div style="min-width: 0; flex: 1;">
                 <h4 style="margin: 0 0 2px 0; font-size: 15px; color: #1a3c11; line-height: 1.2; word-break: break-word;">
@@ -71,13 +70,13 @@
                 </span>
             </div>
 
-            <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
-                {{-- Mobilde Tarih Notunu Açıp Kapatan Ataş Butonu --}}
+            <div style="display: flex; align-items: center; gap: 5px; flex-shrink: 0;">
+                {{-- Mobilde Açılır-Kapanır Ataş Butonu --}}
                 <button type="button" 
                         class="mobile-paperclip-btn" 
                         onclick="toggleMobileDateNote('{{ $uniqueId }}')"
                         title="Tarihleri Göster"
-                        style="background: #fff6f8; border: 1px solid #f3c2cf; border-radius: 6px; padding: 2px 5px; cursor: pointer; display: none; font-size: 11px; line-height: 1;">
+                        style="background: #eef7ec; border: 1px solid #c2d8b7; border-radius: 6px; padding: 2px 6px; cursor: pointer; display: none; font-size: 12px; line-height: 1.2;">
                     📎
                 </button>
 
@@ -92,7 +91,7 @@
             </div>
         </div>
 
-        {{-- İlerleme Çubuğu (Artık Sonsuza Uzamıyor, Maks 220px) --}}
+        {{-- İlerleme Çubuğu (Soldan Başlar, Maksimum 220px Genişlik) --}}
         @if($hasProgress)
             <div style="width: 100%; max-width: 220px; margin-top: 2px; margin-bottom: 2px;">
                 <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: #3b612d; font-weight: bold; margin-bottom: 2px;">
@@ -111,7 +110,7 @@
             </div>
         @endif
 
-        {{-- Renkli Yıldızlar --}}
+        {{-- Yıldızlar --}}
         @if($item->rating)
             @php
                 $starColor = match((int)$item->rating) {
@@ -132,38 +131,45 @@
             </div>
         @endif
 
-        {{-- Yorum (Taşarsa İçinde Tatlıca Kayan Alan) --}}
+        {{-- Yorum (Çok Uzarsa İnce Kaydırma Çubuklu) --}}
         @if(!empty($item->review))
             <div class="custom-review-scroll" style="margin: 4px 0 0 0; font-size: 12px; color: #333; line-height: 1.35; background: #fbfdf9; padding: 6px 8px; border-radius: 6px; border-left: 3px solid #8ec46f; max-height: 60px; overflow-y: auto; word-break: break-word;">
                 "{{ $item->review }}"
             </div>
         @endif
 
-        {{-- Mobilde Açılan Ataşlı Kağıt Bölümü --}}
-        <div id="{{ $uniqueId }}_mobile" class="mobile-date-slip" style="display: none; margin-top: 8px;">
-            <div class="paperclip-note" style="position: relative; background: #fffcf2; border: 1px solid #ebd9b4; border-radius: 6px; padding: 6px 10px; font-size: 11px; color: #6b583e; background-image: repeating-linear-gradient(transparent, transparent 15px, #f1e4c8 16px);">
-                <span style="position: absolute; top: -7px; left: 8px; font-size: 13px;">📎</span>
-                <div style="display: flex; justify-content: space-between;">
-                    <span><strong>başlangıç:</strong> {{ $startDate }}</span>
-                    <span><strong>bitiş:</strong> {{ $finishDate }}</span>
+        {{-- Mobilde Açılan Pastel Yeşil Ataşlı Kağıt --}}
+        <div id="{{ $uniqueId }}_mobile" class="mobile-date-slip" style="display: none; margin-top: 8px; width: 100%;">
+            <div style="position: relative; background: #f4faf2; border: 1.5px dashed #b9d8b0; border-radius: 8px; padding: 8px 12px; font-size: 11px; color: #2d5a27; box-shadow: 0 1px 4px rgba(0,0,0,0.02);">
+                <span style="position: absolute; top: -9px; right: 10px; font-size: 15px; line-height: 1; transform: rotate(15deg);">
+                    📎
+                </span>
+                <div style="display: flex; flex-direction: column; gap: 3px;">
+                    <div>
+                        <span style="color: #638c5b; font-weight: 600;">başlangıç:</span> 
+                        <span style="font-weight: 500; margin-left: 4px;">{{ $startDate }}</span>
+                    </div>
+                    <div>
+                        <span style="color: #638c5b; font-weight: 600;">bitiş:</span> 
+                        <span style="font-weight: 500; margin-left: 4px;">{{ $finishDate }}</span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    {{-- Masaüstü İçin Sağ Taraftaki Sabit Ataşlı Not Kağıdı --}}
+    {{-- Masaüstü İçin Sağ Taraftaki Sabit Ataşlı Kağıt (Pastel Nane Yeşili) --}}
     <div class="desktop-date-slip" style="flex-shrink: 0; width: 155px; align-self: center; margin-right: 4px;">
-        <div style="position: relative; background: #fffcf2; border: 1px solid #ebd9b4; border-radius: 6px; padding: 8px 10px 8px 12px; font-size: 11px; color: #5c4a30; box-shadow: 1px 2px 5px rgba(0,0,0,0.04); transform: rotate(1deg); background-image: repeating-linear-gradient(transparent, transparent 17px, #f3e5ca 18px); line-height: 1.6;">
-            {{-- Sevimli Pembe Ataş --}}
-            <span style="position: absolute; top: -8px; right: 12px; font-size: 15px; transform: rotate(-15deg); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));">
+        <div style="position: relative; background: #f4faf2; border: 1px solid #cce2c6; border-radius: 8px; padding: 10px 12px; font-size: 11px; color: #2d5a27; box-shadow: 0 2px 5px rgba(0,0,0,0.03); transform: rotate(1deg); line-height: 1.6;">
+            <span style="position: absolute; top: -9px; right: 10px; font-size: 16px; line-height: 1; transform: rotate(-12deg); filter: drop-shadow(0 1px 1px rgba(0,0,0,0.1));">
                 📎
             </span>
-            <div style="font-family: inherit;">
+            <div style="display: flex; flex-direction: column; gap: 2px;">
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    <span style="color: #9c7b52; font-weight: bold;">başlangıç:</span> {{ $startDate }}
+                    <span style="color: #638c5b; font-weight: 600;">başlangıç:</span> {{ $startDate }}
                 </div>
                 <div style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                    <span style="color: #9c7b52; font-weight: bold;">bitiş:</span> {{ $finishDate }}
+                    <span style="color: #638c5b; font-weight: 600;">bitiş:</span> {{ $finishDate }}
                 </div>
             </div>
         </div>
@@ -171,7 +177,6 @@
 </div>
 
 <style>
-    /* Masaüstü ve Mobil Geçişleri */
     @media (max-width: 768px) {
         .desktop-date-slip {
             display: none !important;
@@ -181,7 +186,6 @@
         }
     }
 
-    /* İnce, tatlı yeşil kaydırma çubuğu */
     .custom-review-scroll::-webkit-scrollbar {
         width: 3px;
     }
