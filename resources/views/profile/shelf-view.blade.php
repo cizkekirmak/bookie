@@ -774,7 +774,6 @@
 
     $isAdmin = auth()->check() && (
         strtolower(auth()->user()->username ?? '') === 'admin' ||
-        auth()->id() === 1 ||
         auth()->id() === 2
     );
 
