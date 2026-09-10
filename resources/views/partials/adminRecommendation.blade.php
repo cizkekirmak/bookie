@@ -85,17 +85,16 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 185px !important;
-            padding: 12px 10px !important;
+            height: 145px !important; /* Boy kısaltıldı */
+            padding: 9px 8px !important;
             border-radius: 14px !important;
             justify-content: flex-start !important;
         }
 
         .admin-card-title {
             font-size: 14px !important;
-            margin-bottom: 8px !important;
-            height: 18px !important;
-            line-height: 18px !important;
+            margin-bottom: 6px !important;
+            line-height: 1.1 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
@@ -104,22 +103,22 @@
         .admin-recommendation-body {
             display: flex !important;
             gap: 8px !important;
-            align-items: flex-start !important;
+            align-items: center !important;
             flex: 1 !important;
-            height: 110px !important;
-            min-height: 110px !important;
+            height: 94px !important;
+            min-height: 94px !important;
         }
 
         .admin-book-cover-link {
-            width: 58px !important;
-            height: 86px !important;
+            width: 60px !important;
+            height: 90px !important;
             border-radius: 6px !important;
             flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: 86px !important;
-            min-height: 86px !important;
+            height: 90px !important;
+            min-height: 90px !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
@@ -128,7 +127,7 @@
 
         .adminRecommendation-card h4 {
             font-size: 14px !important;
-            margin: 0 0 2px 0 !important;
+            margin: 0 0 1px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -145,12 +144,12 @@
         }
 
         .admin-note-text {
-            display: none !important; /* Mobilde dar alanda yüksekliği bozmaması için gizlendi */
+            display: none !important;
         }
 
         .admin-btn {
             padding: 4px 10px !important;
-            font-size: 12.5px !important;
+            font-size: 12px !important;
             border-radius: 8px !important;
             align-self: flex-start !important;
         }
