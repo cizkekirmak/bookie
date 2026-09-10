@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 227px;
+        height: 220px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -88,9 +88,11 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 148px !important;
-            padding: 9px 8px !important;
+            height: auto !important;
+            min-height: 152px !important;
+            padding: 9px 8px 10px 8px !important;
             border-radius: 14px !important;
+            box-sizing: border-box !important;
         }
 
         .admin-card-title {
@@ -103,61 +105,59 @@
         .admin-recommendation-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: 88px !important;
+            height: auto !important;
+            min-height: 90px !important;
         }
 
         .admin-book-cover-link {
-            width: 58px !important;
-            height: 88px !important;
+            width: 56px !important;
+            height: 84px !important;
             border-radius: 6px !important;
+            flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: 88px !important;
-            min-height: 88px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-        }
-
-        .admin-text-meta {
-            height: 56px !important;
-            overflow: hidden !important;
+            height: auto !important;
+            min-height: 84px !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: flex-start !important;
+            flex: 1 !important;
+            overflow: visible !important;
         }
 
         .adminRecommendation-card h4 {
             font-size: 13px !important;
-            margin: 0 0 2px 0 !important;
+            margin: 0 0 1px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
 
-        .adminRecommendation-card p {
-            font-size: 11.5px !important;
-            margin: 0 !important;
+        .adminRecommendation-card p.admin-author-text {
+            font-size: 11px !important;
+            margin: 0 0 3px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
 
-        /* Not burada sığmadığında alt satıra geçer */
+        /* Not burada kısıtlamasız alt satıra geçer */
         .admin-note-text {
-            font-size: 10.5px !important;
-            line-height: 1.15 !important;
-            margin: 2px 0 0 0 !important;
+            font-size: 10px !important;
+            line-height: 1.2 !important;
+            margin: 0 0 6px 0 !important;
             color: #27491d !important;
+            font-style: italic !important;
+            font-family: 'Unkempt', cursive !important;
             white-space: normal !important;
-            word-break: break-word !important;
-            display: -webkit-box !important;
-            -webkit-line-clamp: 2 !important;
-            -webkit-box-orient: vertical !important;
-            overflow: hidden !important;
+            word-break: normal !important;
+            overflow-wrap: break-word !important;
+            display: block !important;
+            overflow: visible !important;
+            max-height: none !important;
         }
 
         .admin-btn-text-mobile { display: inline !important; }
@@ -167,7 +167,7 @@
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
-            margin: 0 !important;
+            margin-top: 2px !important;
             align-self: flex-start !important;
         }
     }
@@ -191,20 +191,18 @@
         </a>
 
         <div class="admin-book-info">
-            <div class="admin-text-meta">
-                <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
-                    {{ $adminRecommendation->title }}
-                </h4>
-                <p style="color: #3b612d; font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
-                    {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
-                </p>
+            <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
+                {{ $adminRecommendation->title }}
+            </h4>
+            <p class="admin-author-text" style="color: #3b612d; font-size: 13.5px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+                {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
+            </p>
 
-                @if(!empty($adminRecommendation->admin_note))
-                    <p class="admin-note-text" style="font-size: 13px; color: #1a3c11; font-style: italic; margin: 4px 0 0 0; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
-                        "{{ $adminRecommendation->admin_note }}"
-                    </p>
-                @endif
-            </div>
+            @if(!empty($adminRecommendation->admin_note))
+                <div class="admin-note-text">
+                    "{{ $adminRecommendation->admin_note }}"
+                </div>
+            @endif
 
             <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
                 <span class="admin-btn-text-desktop">{{ __('view book →') }}</span>
