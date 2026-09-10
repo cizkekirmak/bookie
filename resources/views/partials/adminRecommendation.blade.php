@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 220px;
+        height: 227px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -146,16 +146,18 @@
             text-overflow: ellipsis !important;
         }
 
+        /* Not burada sığmadığında alt satıra geçer */
         .admin-note-text {
             font-size: 10.5px !important;
             line-height: 1.15 !important;
             margin: 2px 0 0 0 !important;
             color: #27491d !important;
+            white-space: normal !important;
+            word-break: break-word !important;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
             overflow: hidden !important;
-            word-break: break-word !important;
         }
 
         .admin-btn-text-mobile { display: inline !important; }
