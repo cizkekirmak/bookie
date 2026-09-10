@@ -48,47 +48,6 @@
                 if (mainContainer) mainContainer.classList.add('board-active');
             }
         };
-
-        let currentProfileStatus = 'all';
-
-        window.filterStatus = function(status, clickedBtn) {
-            currentProfileStatus = status;
-
-            document.querySelectorAll('.status-tab').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            clickedBtn.classList.add('active');
-
-            window.applyProfileSearchFilter();
-        };
-
-        window.applyProfileSearchFilter = function() {
-            const query = (document.getElementById('profileBookSearchInput')?.value || '').toLowerCase().trim();
-            const cards = document.querySelectorAll('.book-card-item');
-
-            cards.forEach(card => {
-                const cardStatus = card.getAttribute('data-status');
-                const title = (card.querySelector('h4')?.innerText || '').toLowerCase();
-                const author = (card.querySelector('span')?.innerText || '').toLowerCase();
-
-                let statusMatch = (currentProfileStatus === 'all');
-                if (!statusMatch) {
-                    if (currentProfileStatus === 'toRead') {
-                        statusMatch = (cardStatus === 'toRead' || cardStatus === 'want_to_read');
-                    } else {
-                        statusMatch = (cardStatus === currentProfileStatus);
-                    }
-                }
-
-                const searchMatch = !query || title.includes(query) || author.includes(query);
-
-                if (statusMatch && searchMatch) {
-                    card.style.display = 'flex';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        };
     </script>
 
     <style>
@@ -337,66 +296,7 @@
             letter-spacing: 0.5px;
         }
 
-        /* ========================================================
-           YENİ KİTAPLIK KONTROL BARI (BİLGİSAYAR & MOBİL)
-           ======================================================== */
-        .profile-toolbar-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            width: 100%;
-            margin-bottom: 14px;
-            flex-shrink: 0;
-        }
-
-        .status-buttons-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-        }
-
-        .status-tab {
-            font-family: 'Unkempt', cursive;
-            font-size: 14px;
-            font-weight: bold;
-            padding: 6px 14px;
-            border-radius: 16px;
-            cursor: pointer;
-            border: 1.5px solid #737e3d;
-            background: #eaf3e4;
-            color: #1a3c11;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .status-tab.active {
-            background: #255719 !important;
-            color: #ffffff !important;
-            border-color: #255719 !important;
-        }
-
-        .profile-search-middle {
-            flex: 1;
-            min-width: 140px;
-            display: flex;
-            align-items: center;
-        }
-
-        .profile-search-middle input {
-            width: 100%;
-            padding: 7px 14px;
-            border-radius: 12px;
-            border: 1.5px solid #737e3d;
-            background: #ffffff;
-            font-family: 'Unkempt', cursive;
-            font-size: 14px;
-            color: #1a3c11;
-            outline: none;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
-            box-sizing: border-box;
-        }
-
+        /* Sağ Üst Görünüm Değiştirici Butonları */
         .view-switch-right {
             display: flex;
             background: #cae28c;
@@ -573,64 +473,6 @@
                 overflow-x: hidden !important;
                 -webkit-overflow-scrolling: touch;
                 padding-bottom: 25px !important;
-            }
-
-            /* MOBİLDE BUTONLAR VE ARAMA DÜZENİ */
-            .profile-toolbar-container {
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 8px !important;
-                margin-bottom: 10px !important;
-            }
-
-            /* Sol taraftaki 4 buton: 2x2 grid */
-            .status-buttons-group {
-                display: grid !important;
-                grid-template-columns: 1fr 1fr !important;
-                gap: 5px !important;
-                flex: 1 !important;
-                min-width: 0 !important;
-            }
-
-            .status-tab {
-                padding: 5px 6px !important;
-                font-size: 11.5px !important;
-                border-radius: 10px !important;
-                text-align: center !important;
-                white-space: nowrap !important;
-                overflow: hidden !important;
-                text-overflow: ellipsis !important;
-            }
-
-            /* Sağdaki buton grubu (2 sırayı dikeyde tam dolduracak) */
-            .view-switch-right {
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: center !important;
-                align-items: stretch !important;
-                padding: 3px !important;
-                gap: 3px !important;
-                width: 95px !important;
-                flex-shrink: 0 !important;
-            }
-
-            .view-toggle-btn {
-                padding: 4px 6px !important;
-                font-size: 11.5px !important;
-                text-align: center !important;
-                line-height: 1.1 !important;
-            }
-
-            /* Mobilde Arama Çubuğu: Butonların altında tam genişlik */
-            .profile-search-middle {
-                order: 3 !important;
-                width: 100% !important;
-                flex: 1 1 100% !important;
-            }
-
-            .profile-search-middle input {
-                font-size: 13px !important;
-                padding: 6px 12px !important;
             }
         }
     </style>
@@ -932,35 +774,8 @@
         {{-- SAĞ İÇERİK ALANI --}}
         <main class="profile-main-content">
 
-            {{-- YENİ TEK SIRA TOOLBAR (Masaüstünde: Butonlar | Arama Çubuğu | Pano Switch) --}}
-            <div class="profile-toolbar-container">
-                
-                {{-- Sol Filtre Butonları (Mobilde 2x2 grid olur) --}}
-                <div class="status-buttons-group">
-                    <button type="button" class="status-tab active" onclick="filterStatus('all', this)">
-                        {{ __('All') }} ({{ count($userBooks ?? []) }})
-                    </button>
-                    <button type="button" class="status-tab" onclick="filterStatus('read', this)">
-                        {{ __('Read') }} ({{ isset($userBooks) ? $userBooks->where('status', 'read')->count() : 0 }})
-                    </button>
-                    <button type="button" class="status-tab" onclick="filterStatus('reading', this)">
-                        {{ __('Reading') }} ({{ isset($userBooks) ? $userBooks->where('status', 'reading')->count() : 0 }})
-                    </button>
-                    <button type="button" class="status-tab" onclick="filterStatus('toRead', this)">
-                        {{ __('To Read') }} ({{ isset($userBooks) ? $userBooks->whereIn('status', ['toRead', 'want_to_read'])->count() : 0 }})
-                    </button>
-                </div>
-
-                {{-- Ortadaki Arama Çubuğu --}}
-                <div class="profile-search-middle">
-                    <input type="text" 
-                           id="profileBookSearchInput" 
-                           oninput="applyProfileSearchFilter()" 
-                           placeholder="🔍 {{ __('Search books or authors...') }}"
-                           autocomplete="off">
-                </div>
-
-                {{-- Sağdaki Görünüm Değiştirici --}}
+            {{-- YALNIZCA GÖRÜNÜM DEĞİŞTİRİCİ: Masaüstü ve Mobilde Sağa Yaslı --}}
+            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; width: 100%; flex-shrink: 0;">
                 <div class="view-switch-right">
                     <button type="button" id="btn-list-view" onclick="switchProfileView('list')" class="view-toggle-btn active">
                         {{ __('Book List') }}
@@ -969,7 +784,6 @@
                         {{ __('Board') }}
                     </button>
                 </div>
-
             </div>
 
             {{-- 1. KİTAP LİSTESİ GÖRÜNÜMÜ --}}
