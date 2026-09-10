@@ -334,8 +334,8 @@
     font-family: 'Unkempt', cursive;
     font-size: 12px;
     color: #8c767e;
-    background: rgba(255, 255, 255, 0.85);
-    padding: 2px 12px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2px 14px;
     border-radius: 10px;
     border: 1px dashed #e8c6d1;
     box-shadow: 0 1px 3px rgba(0,0,0,0.04);
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
-    // GÜVENLİ VE HAFİF SES YÖNETİMİ
+    // SES YÖNETİMİ
     const SOUND_URLS = {
         closed: "{{ asset('sounds/yeni-mesaj.mp3') }}",
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
@@ -555,39 +555,86 @@ document.addEventListener('DOMContentLoaded', () => {
     let pollInterval = null;
     let isCheckingUnread = false;
     let cachedFriends = [];
-    let lastRenderedDate = null;
 
     function getAvatarSrc(avatar) {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
     }
 
-    function formatMessageDate(dateStr) {
-        if (!dateStr) return '';
-        const d = new Date(dateStr);
-        if (isNaN(d.getTime())) return '';
+    function formatMessageDate(dateObj) {
+        if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
+            return I18N.today;
+        }
 
         const today = new Date();
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
 
-        if (d.toDateString() === today.toDateString()) {
+        if (dateObj.toDateString() === today.toDateString()) {
             return I18N.today;
-        } else if (d.toDateString() === yesterday.toDateString()) {
+        } else if (dateObj.toDateString() === yesterday.toDateString()) {
             return I18N.yesterday;
         }
 
         const locale = document.documentElement.lang || 'tr';
-        return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+        return dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    function checkAndAppendDateSeparator(dateObj) {
-        const msgDay = dateObj.toDateString();
-        if (msgDay !== lastRenderedDate) {
-            lastRenderedDate = msgDay;
+    // GÜN AYIRICILARINI GARANTİLEYEN YENİ VE SAĞLAM MOTOR
+    function renderMessagesWithDates(messages) {
+        messagesBody.innerHTML = '';
+
+        if (!messages || messages.length === 0) {
+            messagesBody.innerHTML = `<div class="chat-empty-state">${I18N.emptyChat}</div>`;
+            return;
+        }
+
+        let lastDateKey = null;
+
+        messages.forEach(msg => {
+            let msgDate = new Date();
+            const raw = msg.created_at || msg.date || null;
+            if (raw) {
+                const parsed = new Date(raw);
+                if (!isNaN(parsed.getTime())) msgDate = parsed;
+            }
+
+            const dateKey = msgDate.toDateString();
+
+            // Gün değiştiğinde ayracı ekle
+            if (dateKey !== lastDateKey) {
+                lastDateKey = dateKey;
+                const separator = document.createElement('div');
+                separator.className = 'chat-date-separator';
+                separator.innerHTML = `<span>---- ${formatMessageDate(msgDate)} ----</span>`;
+                messagesBody.appendChild(separator);
+            }
+
+            // Balonu ekle
+            const bubble = document.createElement('div');
+            bubble.className = `chat-bubble ${msg.is_mine ? 'mine' : 'theirs'}`;
+            bubble.addEventListener('click', () => bubble.classList.toggle('show-time'));
+
+            if (msg.message && msg.message.startsWith('[sticker:') && msg.message.endsWith(']')) {
+                const stickerName = msg.message.replace('[sticker:', '').replace(']', '');
+                bubble.innerHTML = `
+                    <img src="/images/${escapeHtml(stickerName)}" class="chat-bubble-sticker" alt="${I18N.stickerAlt}">
+                    <div class="chat-bubble-time">${escapeHtml(msg.time || '')}</div>
+                `;
+            } else {
+                bubble.innerHTML = `
+                    <div>${escapeHtml(msg.message)}</div>
+                    <div class="chat-bubble-time">${escapeHtml(msg.time || '')}</div>
+                `;
+            }
+            messagesBody.appendChild(bubble);
+        });
+
+        // En az bir mesaj varsa ve ayraç oluşmadıysa (tarih parse edilemediyse) Today ayracını başa koy
+        if (messages.length > 0 && messagesBody.querySelectorAll('.chat-date-separator').length === 0) {
             const separator = document.createElement('div');
             separator.className = 'chat-date-separator';
-            separator.innerHTML = `<span>---- ${formatMessageDate(dateObj)} ----</span>`;
-            messagesBody.appendChild(separator);
+            separator.innerHTML = `<span>---- ${I18N.today} ----</span>`;
+            messagesBody.insertBefore(separator, messagesBody.firstChild);
         }
     }
 
@@ -596,7 +643,6 @@ document.addEventListener('DOMContentLoaded', () => {
         viewConversation.style.display = 'none';
         activeFriendId = null;
         lastLoadedMessagesCount = 0;
-        lastRenderedDate = null;
         messagesBody.innerHTML = '';
         messageInput.disabled = true;
         sendBtn.disabled = true;
@@ -668,7 +714,6 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = 'none';
         activeFriendId = null;
         lastLoadedMessagesCount = 0;
-        lastRenderedDate = null;
         startPolling();
     }
     closeBtn.addEventListener('click', closePopup);
@@ -728,7 +773,6 @@ document.addEventListener('DOMContentLoaded', () => {
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
-        lastRenderedDate = null;
         blockInChatSound = true;
 
         messagesBody.innerHTML = '';
@@ -752,7 +796,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startPolling();
     }
 
-    // AKICI & SADECE YENİLERİ EKLEYEN LOAD MESSAGES
     async function loadMessages(forceScroll = false) {
         if (!activeFriendId) return;
         try {
@@ -761,69 +804,26 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const messages = await res.json();
 
+            // Yeni mesaj gelmemişse ve zorunlu kaydırma yoksa DOM'a dokunma
             if (messages.length === lastLoadedMessagesCount && !forceScroll) {
                 return;
             }
 
-            const isFirstLoad = (lastLoadedMessagesCount === 0 || forceScroll);
-
-            if (isFirstLoad) {
-                messagesBody.innerHTML = '';
-                lastRenderedDate = null;
-
-                if (messages.length === 0) {
-                    messagesBody.innerHTML = `<div class="chat-empty-state">${I18N.emptyChat}</div>`;
-                    lastLoadedMessagesCount = 0;
-                    return;
-                }
-            } else {
-                const emptyState = messagesBody.querySelector('.chat-empty-state');
-                if (emptyState) emptyState.remove();
-            }
-
-            const newMessages = isFirstLoad ? messages : messages.slice(lastLoadedMessagesCount);
-
-            if (!blockInChatSound && !isFirstLoad && newMessages.length > 0) {
-                const hasIncoming = newMessages.some(m => !m.is_mine);
-                if (hasIncoming) playSound('inChat');
+            if (!blockInChatSound && lastLoadedMessagesCount > 0 && messages.length > lastLoadedMessagesCount) {
+                const newest = messages[messages.length - 1];
+                if (!newest.is_mine) playSound('inChat');
             }
 
             lastLoadedMessagesCount = messages.length;
 
-            newMessages.forEach(msg => {
-                const rawDate = msg.created_at || msg.date || null;
-                if (rawDate) {
-                    checkAndAppendDateSeparator(new Date(rawDate));
-                }
+            // Mesajları ve Gün Ayraçlarını Temizce Baştan İnşa Et
+            renderMessagesWithDates(messages);
 
-                const bubble = document.createElement('div');
-                bubble.className = `chat-bubble ${msg.is_mine ? 'mine' : 'theirs'}`;
-                bubble.addEventListener('click', () => bubble.classList.toggle('show-time'));
-
-                if (msg.message.startsWith('[sticker:') && msg.message.endsWith(']')) {
-                    const stickerName = msg.message.replace('[sticker:', '').replace(']', '');
-                    bubble.innerHTML = `
-                        <img src="/images/${escapeHtml(stickerName)}" class="chat-bubble-sticker" alt="${I18N.stickerAlt}">
-                        <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
-                    `;
-                } else {
-                    bubble.innerHTML = `
-                        <div>${escapeHtml(msg.message)}</div>
-                        <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
-                    `;
-                }
-                messagesBody.appendChild(bubble);
-            });
-
-            messagesBody.scrollTo({
-                top: messagesBody.scrollHeight,
-                behavior: isFirstLoad ? 'auto' : 'smooth'
-            });
+            messagesBody.scrollTop = messagesBody.scrollHeight;
 
         } catch (e) {}
     }
 
-    // ANINDA EKRANA BASAN OPTIMISTIC UI SEND MESSAGE
     async function sendMessage(text) {
         if (!activeFriendId || !text.trim()) return;
 
@@ -831,14 +831,20 @@ document.addEventListener('DOMContentLoaded', () => {
         messageInput.value = '';
         stickerPicker.style.display = 'none';
 
-        // 1. Ekrana anında bas
+        // Boş mesaj uyarısını kaldır
         const emptyState = messagesBody.querySelector('.chat-empty-state');
         if (emptyState) emptyState.remove();
 
+        // Eğer hiç ayraç yoksa hemen Today ayracı koy
+        if (messagesBody.querySelectorAll('.chat-date-separator').length === 0) {
+            const separator = document.createElement('div');
+            separator.className = 'chat-date-separator';
+            separator.innerHTML = `<span>---- ${I18N.today} ----</span>`;
+            messagesBody.appendChild(separator);
+        }
+
         const now = new Date();
         const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-        checkAndAppendDateSeparator(now);
 
         const bubble = document.createElement('div');
         bubble.className = 'chat-bubble mine';
@@ -858,12 +864,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         messagesBody.appendChild(bubble);
-        messagesBody.scrollTo({ top: messagesBody.scrollHeight, behavior: 'smooth' });
+        messagesBody.scrollTop = messagesBody.scrollHeight;
 
         playSound('inChat');
-        lastLoadedMessagesCount++;
 
-        // 2. Arka planda sunucuya ilet
         try {
             const res = await fetch('/messages/send', {
                 method: 'POST',
@@ -881,7 +885,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!res.ok) {
                 bubble.style.opacity = '0.5';
-                bubble.title = 'Gönderilemedi';
+            } else {
+                // Sunucudaki son mesajı senkronize etmek için arkadan sessizce yükle
+                setTimeout(() => loadMessages(false), 300);
             }
         } catch (e) {
             bubble.style.opacity = '0.5';
