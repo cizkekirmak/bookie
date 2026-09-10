@@ -385,18 +385,22 @@ document.addEventListener('DOMContentLoaded', () => {
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
     };
 
+    // Ses nesnelerini önceden oluştur
+    const audioClosed = new Audio(SOUND_URLS.closed);
+    const audioInChat = new Audio(SOUND_URLS.inChat);
+
     let audioUnlocked = false;
     function unlockAudio() {
         if (!audioUnlocked) {
-            const silent1 = new Audio(SOUND_URLS.closed);
-            const silent2 = new Audio(SOUND_URLS.inChat);
-            silent1.play().then(() => { silent1.pause(); }).catch(() => {});
-            silent2.play().then(() => { silent2.pause(); }).catch(() => {});
+            audioClosed.play().then(() => { audioClosed.pause(); audioClosed.currentTime = 0; }).catch(() => {});
+            audioInChat.play().then(() => { audioInChat.pause(); audioInChat.currentTime = 0; }).catch(() => {});
             audioUnlocked = true;
             document.removeEventListener('click', unlockAudio);
+            document.removeEventListener('keydown', unlockAudio);
         }
     }
     document.addEventListener('click', unlockAudio);
+    document.addEventListener('keydown', unlockAudio);
 
     function playSound(type) {
         const soundEnabled = localStorage.getItem('chat_sound_enabled') !== 'false';
@@ -404,9 +408,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!soundEnabled || volume <= 0) return;
 
         try {
-            const url = (type === 'closed') ? SOUND_URLS.closed : SOUND_URLS.inChat;
-            const audio = new Audio(url);
+            const audio = (type === 'closed') ? audioClosed : audioInChat;
             audio.volume = volume;
+            audio.currentTime = 0;
             audio.play().catch(e => {});
         } catch (e) {}
     }
@@ -416,9 +420,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let shiftX, shiftY;
     let lastLoadedMessagesCount = 0;
     let blockInChatSound = false;
-    let lastUnreadTotal = null; // İlk kontrolü anlamak için null başlatıldı
-    let isInitialCheck = true;   // Sayfa ilk yüklendiğinde ses çalmasını önleyen kilit
+    let lastUnreadTotal = null; // İlk durumu güvenle yakalamak için null başlar
     let pollInterval = null;
+    let isCheckingUnread = false;
 
     function getAvatarSrc(avatar) {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
@@ -492,7 +496,6 @@ document.addEventListener('DOMContentLoaded', () => {
         lastLoadedMessagesCount = 0;
         document.querySelectorAll('.chat-friend-item').forEach(el => el.classList.remove('active'));
         startPolling();
-        checkUnread();
     });
 
     async function loadFriends() {
@@ -666,6 +669,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     async function checkUnread() {
+        if (isCheckingUnread) return;
+        isCheckingUnread = true;
+
         try {
             const res = await fetch('/messages/unread-count', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -680,19 +686,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 unreadDot.style.display = (currentCount > 0) ? 'block' : 'none';
             }
 
-            // Sadece sayfa ilk açılışı bittiyse ve GERÇEKTEN yeni bir mesaj sayısı arttıysa ses çal
-            if (!isInitialCheck && !isPopupOpen && currentCount > 0 && currentCount > (lastUnreadTotal ?? 0)) {
-                playSound('closed');
+            // İlk sayfa yüklenişi: Mevcut sayıyı kaydet, sesi çalma
+            if (lastUnreadTotal === null) {
+                lastUnreadTotal = currentCount;
+            } else {
+                // Balon kapalıyken YENİ bir mesaj gelip sayı arttıysa sesi çal
+                if (!isPopupOpen && currentCount > 0 && currentCount > lastUnreadTotal) {
+                    playSound('closed');
+                }
+                lastUnreadTotal = currentCount;
             }
-
-            lastUnreadTotal = currentCount;
-            isInitialCheck = false; // İlk kontrol tamamlandı, kilit açıldı
 
             if (isPopupOpen && activeFriendId) {
                 loadMessages(false);
             }
         } catch (e) {
-            isInitialCheck = false;
+        } finally {
+            isCheckingUnread = false;
         }
     }
 
@@ -708,7 +718,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return div.innerHTML;
     }
 
-    checkUnread();
-    startPolling();
+    // İlk döngüyü tek noktadan güvenle başlat
+    checkUnread().then(() => {
+        startPolling();
+    });
 });
 </script>
