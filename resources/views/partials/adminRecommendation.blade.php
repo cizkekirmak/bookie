@@ -20,10 +20,9 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 227px;
+        height: 220px;
         width: 320px;
         box-sizing: border-box;
-        position: relative;
     }
 
     .admin-card-title {
@@ -105,22 +104,21 @@
         .admin-recommendation-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: 110px !important;
+            height: 96px !important;
         }
 
         .admin-book-cover-link {
             width: 58px !important;
-            height: 88px !important;
+            height: 96px !important;
             border-radius: 6px !important;
-            flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: 88px !important;
+            height: 96px !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: flex-start !important;
-            position: relative !important;
+            justify-content: space-between !important;
+            overflow: visible !important;
         }
 
         .adminRecommendation-card h4 {
@@ -134,7 +132,7 @@
 
         .adminRecommendation-card p.admin-author-text {
             font-size: 11px !important;
-            margin: 0 0 2px 0 !important;
+            margin: 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -144,30 +142,29 @@
         .admin-note-text {
             font-size: 10px !important;
             line-height: 1.15 !important;
-            margin: 0 !important;
+            margin: 2px 0 0 0 !important;
             color: #27491d !important;
             font-style: italic !important;
             font-family: 'Unkempt', cursive !important;
             white-space: normal !important;
             word-break: normal !important;
             overflow-wrap: break-word !important;
-            display: block !important;
-            max-height: 28px !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
             overflow: hidden !important;
         }
 
         .admin-btn-text-mobile { display: inline !important; }
         .admin-btn-text-desktop { display: none !important; }
 
-        /* Buton tam continue-reading ile aynı seviyeye (bottom: 9px) kilitlendi */
         .admin-btn {
-            position: absolute !important;
-            bottom: 9px !important;
-            left: 74px !important;
+            position: static !important;
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
             margin: 0 !important;
+            align-self: flex-start !important;
         }
     }
 </style>
@@ -190,18 +187,20 @@
         </a>
 
         <div class="admin-book-info">
-            <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
-                {{ $adminRecommendation->title }}
-            </h4>
-            <p class="admin-author-text" style="color: #3b612d; font-size: 13.5px; margin: 0 0 4px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
-                {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
-            </p>
+            <div>
+                <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
+                    {{ $adminRecommendation->title }}
+                </h4>
+                <p class="admin-author-text" style="color: #3b612d; font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+                    {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
+                </p>
 
-            @if(!empty($adminRecommendation->admin_note))
-                <div class="admin-note-text">
-                    "{{ $adminRecommendation->admin_note }}"
-                </div>
-            @endif
+                @if(!empty($adminRecommendation->admin_note))
+                    <div class="admin-note-text">
+                        "{{ $adminRecommendation->admin_note }}"
+                    </div>
+                @endif
+            </div>
 
             <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
                 <span class="admin-btn-text-desktop">{{ __('view book →') }}</span>

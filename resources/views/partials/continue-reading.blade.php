@@ -23,10 +23,9 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 227px;
+        height: 220px;
         width: 320px;
         box-sizing: border-box;
-        position: relative;
     }
 
     .continue-card-title {
@@ -108,21 +107,21 @@
         .continue-reading-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: 110px !important;
+            height: 96px !important;
         }
 
         .continue-book-cover {
             width: 58px !important;
-            height: 88px !important;
+            height: 96px !important;
             border-radius: 6px !important;
         }
 
         .continue-book-info {
-            height: 88px !important;
+            height: 96px !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: flex-start !important;
-            position: relative !important;
+            justify-content: space-between !important;
+            overflow: visible !important;
         }
 
         .continue-reading-card h4 {
@@ -146,15 +145,13 @@
         .btn-text-mobile { display: inline !important; }
         .btn-text-desktop { display: none !important; }
 
-        /* Buton kapağın alt tabanına kilitlendi */
         .continue-btn {
-            position: absolute !important;
-            bottom: 9px !important;
-            left: 74px !important;
+            position: static !important;
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
             margin: 0 !important;
+            align-self: flex-start !important;
         }
     }
 </style>
