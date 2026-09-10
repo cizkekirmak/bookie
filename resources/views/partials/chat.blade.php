@@ -140,7 +140,7 @@
 }
 .chat-view-title {
     font-weight: bold;
-    font-size: 17px; /* 16px -> 17px */
+    font-size: 17px;
     color: #333;
     font-family: 'Unkempt', cursive;
 }
@@ -155,7 +155,7 @@
     border: 1.5px solid #d9d0d5;
     border-radius: 17px;
     padding: 0 14px;
-    font-size: 15px; /* 14px -> 15px */
+    font-size: 15px;
     outline: none;
     font-family: 'Unkempt', cursive !important;
     background-color: #ffffff;
@@ -231,7 +231,7 @@
 }
 .chat-friend-name {
     font-weight: 600;
-    font-size: 15px; /* 14px -> 15px */
+    font-size: 15px;
     color: #333;
     font-family: 'Unkempt', cursive;
     white-space: nowrap;
@@ -239,7 +239,7 @@
     text-overflow: ellipsis;
 }
 .chat-friend-sub {
-    font-size: 12.5px; /* 11px -> 12.5px */
+    font-size: 12.5px;
     color: #888;
     font-family: 'Unkempt', cursive;
     margin-top: 1px;
@@ -283,7 +283,7 @@
 }
 .chat-header-name {
     font-weight: 600;
-    font-size: 15px; /* 14px -> 15px */
+    font-size: 15px;
     color: #333;
     font-family: 'Unkempt', cursive;
     white-space: nowrap;
@@ -315,18 +315,38 @@
 .chat-empty-state {
     margin: auto;
     color: #777;
-    font-size: 14px; /* 13px -> 14px */
+    font-size: 14px;
     background: rgba(255,255,255,0.92);
     padding: 7px 16px;
     border-radius: 12px;
     font-family: 'Unkempt', cursive;
 }
 
+/* YENİ: GÜN AYIRICI ÇİZGİSİ */
+.chat-date-separator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 10px 0 6px 0;
+    width: 100%;
+    user-select: none;
+}
+.chat-date-separator span {
+    font-family: 'Unkempt', cursive;
+    font-size: 12px;
+    color: #8c767e;
+    background: rgba(255, 255, 255, 0.85);
+    padding: 2px 12px;
+    border-radius: 10px;
+    border: 1px dashed #e8c6d1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
 .chat-bubble {
     max-width: 80%;
     padding: 7px 11px;
     border-radius: 12px;
-    font-size: 15.5px; /* 15px -> 15.5px */
+    font-size: 15.5px;
     line-height: 1.35;
     word-break: break-word;
     cursor: pointer;
@@ -352,7 +372,7 @@
 }
 .chat-bubble-time {
     display: none;
-    font-size: 11px; /* 9px -> 11px */
+    font-size: 11px;
     color: #666;
     margin-top: 3px;
     text-align: right;
@@ -406,7 +426,7 @@
     border: 1.5px solid #6b9c56;
     border-radius: 19px;
     padding: 0 14px;
-    font-size: 15.5px; /* 15px -> 15.5px */
+    font-size: 15.5px;
     outline: none;
     font-family: 'Unkempt', cursive !important;
     background-color: #ffffff;
@@ -474,38 +494,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const stickerPicker = document.getElementById('chat-sticker-picker');
     const unreadDot = document.getElementById('chat-unread-dot');
 
-    // Çeviri Sözlüğü
     const I18N = {
         emptyChat: @json(__('No messages yet. Send the first one!')),
         noFriendsFound: @json(__('No friends found.')),
         newMessage: @json(__('new message')),
         clickToChat: @json(__('Click to chat')),
-        stickerAlt: @json(__('Sticker'))
+        stickerAlt: @json(__('Sticker')),
+        today: @json(__('Today')),
+        yesterday: @json(__('Yesterday'))
     };
 
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
+    // GÜVENLİ SES YÖNETİMİ (ÜST ÜSTE BİNMEZ, MOBİLDE KUYRUĞA ALIP PATLATMAZ)
     const SOUND_URLS = {
         closed: "{{ asset('sounds/yeni-mesaj.mp3') }}",
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
     };
 
-    const audioClosed = new Audio(SOUND_URLS.closed);
-    const audioInChat = new Audio(SOUND_URLS.inChat);
-
-    let audioUnlocked = false;
-    function unlockAudio() {
-        if (!audioUnlocked) {
-            audioClosed.play().then(() => { audioClosed.pause(); audioClosed.currentTime = 0; }).catch(() => {});
-            audioInChat.play().then(() => { audioInChat.pause(); audioInChat.currentTime = 0; }).catch(() => {});
-            audioUnlocked = true;
-            document.removeEventListener('click', unlockAudio);
-            document.removeEventListener('keydown', unlockAudio);
-        }
-    }
-    document.addEventListener('click', unlockAudio);
-    document.addEventListener('keydown', unlockAudio);
+    let currentAudio = null;
 
     function playSound(type) {
         const soundEnabled = localStorage.getItem('chat_sound_enabled') !== 'false';
@@ -513,12 +521,32 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!soundEnabled || volume <= 0) return;
 
         try {
-            const audio = (type === 'closed') ? audioClosed : audioInChat;
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+
+            const audio = new Audio(SOUND_URLS[type]);
             audio.volume = volume;
-            audio.currentTime = 0;
-            audio.play().catch(e => {});
+            currentAudio = audio;
+
+            const playPromise = audio.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Mobilde izin verilmemişse sessizce geç, asla kuyrukta biriktirme!
+                    currentAudio = null;
+                });
+            }
         } catch (e) {}
     }
+
+    // Sayfa değişirken veya çıkarken sesleri anında durdur
+    window.addEventListener('pagehide', () => {
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio = null;
+        }
+    });
 
     let activeFriendId = null;
     let isDragging = false;
@@ -532,6 +560,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function getAvatarSrc(avatar) {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
+    }
+
+    // TARİHİ "10 Eylül 2026" FORMATINA ÇEVİREN YARDIMCI
+    function formatMessageDate(dateStr) {
+        if (!dateStr) return '';
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return '';
+
+        const today = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(today.getDate() - 1);
+
+        if (d.toDateString() === today.toDateString()) {
+            return I18N.today;
+        } else if (d.toDateString() === yesterday.toDateString()) {
+            return I18N.yesterday;
+        }
+
+        const locale = document.documentElement.lang || 'tr';
+        return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
     function showFriendsView() {
@@ -722,7 +770,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // GÜN BAZLI AYIRICI DÖNGÜSÜ
+            let lastMessageDay = null;
+
             messages.forEach(msg => {
+                // Backend'den created_at veya date bilgisi varsa onu, yoksa bugünü baz al
+                const rawDate = msg.created_at || msg.date || null;
+                if (rawDate) {
+                    const msgDay = new Date(rawDate).toDateString();
+                    if (msgDay !== lastMessageDay) {
+                        lastMessageDay = msgDay;
+                        const dateSeparator = document.createElement('div');
+                        dateSeparator.className = 'chat-date-separator';
+                        dateSeparator.innerHTML = `<span>---- ${formatMessageDate(rawDate)} ----</span>`;
+                        messagesBody.appendChild(dateSeparator);
+                    }
+                }
+
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.is_mine ? 'mine' : 'theirs'}`;
 

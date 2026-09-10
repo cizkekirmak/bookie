@@ -28,7 +28,7 @@
             font-display: swap;
         }
         @view-transition {
-        navigation: auto;
+            navigation: auto;
         }
         ::view-transition-old(root),
         ::view-transition-new(root) {
@@ -144,7 +144,7 @@
             border-radius: 8px;
             padding: 7px 14px;
             cursor: pointer;
-            font-size: 15.5px; /* 15px -> 15.5px */
+            font-size: 15.5px;
             color: #1f5117;
             font-weight: 500;
             transition: background 0.15s ease;
@@ -206,7 +206,7 @@
 
             .back-link {
                 margin-bottom: 12px;
-                font-size: 15px; /* 14px -> 15px */
+                font-size: 15px;
             }
 
             .book-main-flex {
@@ -229,17 +229,17 @@
             }
 
             .book-title-heading {
-                font-size: 20px !important; /* 18px -> 20px */
+                font-size: 20px !important;
                 line-height: 1.2;
             }
 
             .book-author-text {
-                font-size: 14px !important; /* 13px -> 14px */
+                font-size: 14px !important;
                 margin-bottom: 4px !important;
             }
 
             .book-desc-text {
-                font-size: 14px !important; /* 13px -> 14px */
+                font-size: 14px !important;
                 max-height: 85px !important;
                 margin-bottom: 12px !important;
                 padding-bottom: 8px !important;
@@ -252,7 +252,7 @@
 
             .radio-label {
                 padding: 5px 9px !important;
-                font-size: 13.5px !important; /* 12px -> 13.5px */
+                font-size: 13.5px !important;
                 border-radius: 6px !important;
             }
 
@@ -275,7 +275,7 @@
             .review-submit-btn {
                 width: 100% !important;
                 padding: 10px 14px !important;
-                font-size: 16px !important; /* 15px -> 16px */
+                font-size: 16px !important;
             }
 
             #chat-draggable-btn,
@@ -654,22 +654,29 @@ function toggleReviewLike(reviewId, buttonElement) {
     .catch(err => console.error('Beğeni hatası:', err));
 }
 
-// Kitap sayfası açılış sesi
-const pageSound = new Audio('{{ asset("sounds/page-flip.mp3") }}');
-pageSound.volume = 0.35;
+// Kitap sayfası açılış sesi (Güvenli & Çıkışta patlamayan sürüm)
+(function() {
+    let bookPageSound = new Audio('{{ asset("sounds/page-flip.mp3") }}');
+    bookPageSound.volume = 0.35;
 
-const playPromise = pageSound.play();
-if (playPromise !== undefined) {
-    playPromise.catch(() => {
-        const playOnce = () => {
-            pageSound.play().catch(() => {});
-            document.removeEventListener('click', playOnce);
-            document.removeEventListener('keydown', playOnce);
-        };
-        document.addEventListener('click', playOnce);
-        document.addEventListener('keydown', playOnce);
+    const playPromise = bookPageSound.play();
+    if (playPromise !== undefined) {
+        playPromise.catch(() => {
+            // Tarayıcı otomatik sesi engellerse sessizce geç
+            // Asla ekrana click listener ekleyip çıkış anında çalması için kuyruğa alma!
+            bookPageSound = null;
+        });
+    }
+
+    // Sayfadan çıkarken veya geri tuşuna basıldığında sesi anında kes
+    window.addEventListener('pagehide', function() {
+        if (bookPageSound) {
+            bookPageSound.pause();
+            bookPageSound.currentTime = 0;
+            bookPageSound = null;
+        }
     });
-}
+})();
 </script>
 @include('partials.chat')
 </body>
