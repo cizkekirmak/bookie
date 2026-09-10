@@ -96,7 +96,9 @@ class BookController extends Controller
                         $rawKey = $doc['key'] ?? '';
                         $cleanId = str_replace(['/works/', '/books/'], '', $rawKey);
                         $olKey = 'OL_' . $cleanId;
-                        $coverUrl = "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-M.jpg";
+                        
+                        // Garantili yüksek çözünürlük için -L.jpg
+                        $coverUrl = "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-L.jpg";
                         $author = $doc['author_name'][0] ?? 'Bilinmeyen Yazar';
 
                         $book = Book::updateOrCreate(
@@ -173,6 +175,8 @@ class BookController extends Controller
 
             $rawCover = $book->cover_image;
             if (!empty($rawCover) && !str_contains($rawCover, 'res.cloudinary.com')) {
+                // Eski Open Library -M kalıntılarını güvenle -L yap
+                $rawCover = str_replace('-M.jpg', '-L.jpg', $rawCover);
                 $cachedPath = $this->getCachedCoverUrl($rawCover, $cleanKey);
                 if ($cachedPath !== $rawCover) {
                     $book->update(['cover_image' => $cachedPath]);
@@ -297,11 +301,14 @@ class BookController extends Controller
                     $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
                     if (empty($rawCover) || empty($info['title'])) continue;
 
+                    // Orijinal zoom seviyesini bozmadan sadece bulanıklık yaratan edge=curl kaldırıldı
+                    $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover);
+
                     $googleResults[] = [
                         'id'      => $item['id'],
                         'title'   => $info['title'],
                         'authors' => isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : 'Bilinmeyen Yazar',
-                        'cover'   => str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover),
+                        'cover'   => $cover,
                     ];
                 }
             }
@@ -316,11 +323,13 @@ class BookController extends Controller
                     if (empty($coverId) || empty($doc['title'])) continue;
 
                     $cleanId = str_replace(['/works/', '/books/'], '', $doc['key'] ?? '');
+                    
+                    // Open Library için garantili net -L boyutu
                     $openLibResults[] = [
                         'id'      => 'OL_' . $cleanId,
                         'title'   => $doc['title'],
                         'authors' => isset($doc['author_name']) ? implode(', ', array_slice($doc['author_name'], 0, 2)) : 'Bilinmeyen Yazar',
-                        'cover'   => "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg",
+                        'cover'   => "https://covers.openlibrary.org/b/id/{$coverId}-L.jpg",
                     ];
                 }
             }
@@ -490,7 +499,7 @@ class BookController extends Controller
                 $bookId = 'OL_' . $cleanId;
 
                 $authors = isset($doc['author_name']) ? implode(', ', array_slice($doc['author_name'], 0, 2)) : 'Bilinmeyen Yazar';
-                $cover = "https://covers.openlibrary.org/b/id/{$coverId}-M.jpg";
+                $cover = "https://covers.openlibrary.org/b/id/{$coverId}-L.jpg";
 
                 $results[] = [
                     'id'      => $bookId,
@@ -506,7 +515,7 @@ class BookController extends Controller
         }
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'title'  => 'required|string',
@@ -520,6 +529,8 @@ class BookController extends Controller
 
         $coverValue = $request->input('cover_image') ?? $request->input('cover_url');
         if (!empty($coverValue)) {
+            // Kaydedilirken Open Library linki geldiyse güvenle -L yap
+            $coverValue = str_replace('-M.jpg', '-L.jpg', $coverValue);
             $coverValue = $this->getCachedCoverUrl($coverValue, $cleanKey);
         }
 
