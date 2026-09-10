@@ -3,36 +3,59 @@
     @csrf
 @endif
 
-    {{-- DURUM SEKMELERİ & SİLME BUTONU --}}
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
+    {{-- EKOSE TEMALI RENKLİ DURUM SEKMELERİ & SİLME BUTONU --}}
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            <button type="button" onclick="filterStatus('all', this)" class="status-tab" style="border: none; background: #255719; color: #fff; padding: 6px 14px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">
+            {{-- Tümü (Mercan / Şeftali) --}}
+            <button type="button" 
+                    onclick="filterStatus('all', this)" 
+                    class="status-tab" 
+                    data-type="all"
+                    style="border: 2px solid #e06350; background: #ff7d6b; color: #ffffff; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(224,99,80,0.25); transition: all 0.15s ease;">
                 {{ __('All') }} ({{ $userBooks->count() }})
             </button>
-            <button type="button" onclick="filterStatus('read', this)" class="status-tab" style="border: 1px solid #737e3d; background: #eaf3e4; color: #1a3c11; padding: 6px 14px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">
+
+            {{-- Okundu (Çilek Pembesi) --}}
+            <button type="button" 
+                    onclick="filterStatus('read', this)" 
+                    class="status-tab" 
+                    data-type="read"
+                    style="border: 1.5px solid #f8b4c2; background: #ffe5eb; color: #b32d4e; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
                 {{ __('read') }} ({{ $userBooks->where('status', 'read')->count() }})
             </button>
-            <button type="button" onclick="filterStatus('reading', this)" class="status-tab" style="border: 1px solid #737e3d; background: #eaf3e4; color: #1a3c11; padding: 6px 14px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">
+
+            {{-- Şu An Okuyor (Gök Mavisi) --}}
+            <button type="button" 
+                    onclick="filterStatus('reading', this)" 
+                    class="status-tab" 
+                    data-type="reading"
+                    style="border: 1.5px solid #b9dcf7; background: #e2f2fc; color: #21638a; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
                 {{ __('currently reading') }} ({{ $userBooks->where('status', 'reading')->count() }})
             </button>
-            <button type="button" onclick="filterStatus('toRead', this)" class="status-tab" style="border: 1px solid #737e3d; background: #eaf3e4; color: #1a3c11; padding: 6px 14px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 13px; cursor: pointer;">
+
+            {{-- Okunacak (Tereyağı Sarısı) --}}
+            <button type="button" 
+                    onclick="filterStatus('toRead', this)" 
+                    class="status-tab" 
+                    data-type="toRead"
+                    style="border: 1.5px solid #fae18c; background: #fff4cc; color: #8f680a; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
                 {{ __('to read') }} ({{ $userBooks->where('status', 'toRead')->count() }})
             </button>
         </div>
 
         @if($isOwnProfile ?? false)
-            <button type="submit" id="btnBulkDelete" style="display: none; background: #c62828; color: #ffffff; border: none; padding: 6px 14px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 13px; font-weight: bold; cursor: pointer; transition: transform 0.15s ease;" onmouseenter="this.style.transform='scale(1.05)'" onmouseleave="this.style.transform='scale(1)'">
+            <button type="submit" id="btnBulkDelete" style="display: none; background: #d93838; color: #ffffff; border: none; padding: 6px 16px; border-radius: 16px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(217,56,56,0.25); transition: transform 0.15s ease;" onmouseenter="this.style.transform='scale(1.05)'" onmouseleave="this.style.transform='scale(1)'">
                 🗑️ {{ __('Delete Selected') }} (<span id="selectedCount">0</span>)
             </button>
         @endif
     </div>
 
-    {{-- KİTAP LİSTESİ: BEYAZ ALANIN EN DİBİNE KADAR AKAN ASIL KAYDIRMA ALANI --}}
+    {{-- KİTAP LİSTESİ: AKAN KAYDIRMA ALANI --}}
     <div class="custom-scroll book-items-scroll-area" style="flex: 1 1 0%; min-height: 0; height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 12px; padding-right: 4px; padding-bottom: 36px;">
         @forelse($userBooks as $item)
             @include('profile.book-card', ['item' => $item])
         @empty
-            <div style="text-align: center; color: #6c8c5a; padding: 40px 0; font-size: 15px;">
+            <div style="text-align: center; color: #6c8c5a; font-family: 'Unkempt', cursive; padding: 40px 0; font-size: 16px;">
                 @if($isOwnProfile ?? false)
                     {{ __("You didn't save any books yet, you should start somewhere") }}
                 @else
@@ -47,6 +70,46 @@
 @endif
 
 <script>
+// Sekmeler arası geçişte her butonun kendi pastel rengini korumasını sağlar
+window.filterStatus = function(status, clickedBtn) {
+    const tabStyles = {
+        'all': { bg: '#ff7d6b', activeBg: '#e06350', color: '#fff', border: '#e06350', shadow: 'rgba(224,99,80,0.3)' },
+        'read': { bg: '#ffe5eb', activeBg: '#d64b6f', color: '#b32d4e', border: '#f8b4c2', shadow: 'rgba(214,75,111,0.3)' },
+        'reading': { bg: '#e2f2fc', activeBg: '#21638a', color: '#21638a', border: '#b9dcf7', shadow: 'rgba(33,99,138,0.3)' },
+        'toRead': { bg: '#fff4cc', activeBg: '#c29013', color: '#8f680a', border: '#fae18c', shadow: 'rgba(194,144,19,0.3)' }
+    };
+
+    document.querySelectorAll('.status-tab').forEach(btn => {
+        const type = btn.getAttribute('data-type');
+        const style = tabStyles[type];
+        if (style) {
+            btn.style.background = style.bg;
+            btn.style.color = (type === 'all') ? '#fff' : style.color;
+            btn.style.border = (type === 'all') ? '2px solid ' + style.border : '1.5px solid ' + style.border;
+            btn.style.boxShadow = 'none';
+        }
+    });
+
+    const activeType = clickedBtn.getAttribute('data-type');
+    const activeStyle = tabStyles[activeType];
+    if (activeStyle) {
+        clickedBtn.style.background = activeStyle.activeBg;
+        clickedBtn.style.color = '#ffffff';
+        clickedBtn.style.border = '2px solid ' + activeStyle.activeBg;
+        clickedBtn.style.boxShadow = '0 3px 8px ' + activeStyle.shadow;
+    }
+
+    const cards = document.querySelectorAll('.book-card-item');
+    cards.forEach(card => {
+        const cardStatus = card.getAttribute('data-status');
+        if (status === 'all' || cardStatus === status) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+};
+
 function updateDeleteButtonState() {
     const checkboxes = document.querySelectorAll('.book-select-checkbox:checked');
     const deleteBtn = document.getElementById('btnBulkDelete');
