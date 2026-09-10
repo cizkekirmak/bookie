@@ -84,10 +84,13 @@
         transform: scale(1.05);
     }
 
+    .btn-text-mobile { display: none; }
+    .btn-text-desktop { display: inline; }
+
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
-            height: 168px !important;
+            height: 175px !important;
             padding: 10px 10px !important;
             border-radius: 14px !important;
             box-sizing: border-box !important;
@@ -95,7 +98,7 @@
 
         .continue-card-title {
             font-size: 15px !important;
-            margin-bottom: 8px !important;
+            margin-bottom: 6px !important;
             line-height: 1 !important;
             height: 16px !important;
             white-space: nowrap !important;
@@ -107,29 +110,29 @@
             display: flex !important;
             gap: 8px !important;
             align-items: stretch !important;
-            height: 116px !important;
-            min-height: 116px !important;
+            height: 124px !important;
+            min-height: 124px !important;
         }
 
         .continue-book-cover {
-            width: 62px !important;
-            height: 96px !important;
+            width: 54px !important;
+            height: 82px !important;
             border-radius: 6px !important;
             flex-shrink: 0 !important;
         }
 
         .continue-book-info {
-            height: 116px !important;
-            min-height: 116px !important;
+            height: 124px !important;
+            min-height: 124px !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: flex-start !important;
+            justify-content: space-between !important;
             flex: 1 !important;
         }
 
         .continue-reading-card h4 {
             font-size: 13.5px !important;
-            margin: 0 0 2px 0 !important;
+            margin: 0 0 1px 0 !important;
             line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -145,12 +148,15 @@
             text-overflow: ellipsis !important;
         }
 
+        .btn-text-mobile { display: inline !important; }
+        .btn-text-desktop { display: none !important; }
+
         .continue-btn {
-            padding: 4px 10px !important;
+            padding: 3px 8px !important;
             font-size: 12px !important;
-            border-radius: 8px !important;
-            margin-top: auto !important; /* Butonu en alt tabana hizalar */
+            border-radius: 6px !important;
             align-self: flex-start !important;
+            margin-top: auto !important;
         }
     }
 </style>
@@ -198,7 +204,8 @@
                 </div>
 
                 <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" class="continue-btn">
-                    {{ __('view book →') }}
+                    <span class="btn-text-desktop">{{ __('view book →') }}</span>
+                    <span class="btn-text-mobile">{{ __('view →') }}</span>
                 </a>
             </div>
         @else
