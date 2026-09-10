@@ -91,14 +91,14 @@
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
-            height: 152px !important;
-            padding: 8px 8px !important;
+            height: 148px !important;
+            padding: 9px 8px !important;
             border-radius: 14px !important;
         }
 
         .continue-card-title {
             font-size: 14px !important;
-            margin: 0 0 4px 0 !important;
+            margin: 0 0 6px 0 !important;
             height: 16px !important;
             line-height: 16px !important;
         }
@@ -106,7 +106,7 @@
         .continue-reading-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: 114px !important;
+            height: 88px !important;
         }
 
         .continue-book-cover {
@@ -116,14 +116,23 @@
         }
 
         .continue-book-info {
-            height: 114px !important;
+            height: 88px !important;
+            min-height: 88px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+        }
+
+        .continue-text-meta {
+            height: 56px !important;
+            overflow: hidden !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: flex-start !important;
         }
 
         .continue-reading-card h4 {
-            font-size: 13.5px !important;
+            font-size: 13px !important;
             margin: 0 0 2px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
@@ -133,7 +142,7 @@
 
         .continue-reading-card p {
             font-size: 11.5px !important;
-            margin: 0 0 4px 0 !important;
+            margin: 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -147,7 +156,8 @@
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
-            margin-top: 4px !important;
+            margin: 0 !important;
+            align-self: flex-start !important;
         }
     }
 </style>
@@ -173,7 +183,7 @@
             </a>
 
             <div class="continue-book-info">
-                <div>
+                <div class="continue-text-meta">
                     <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->title }}
                     </h4>
@@ -182,8 +192,8 @@
                     </p>
 
                     @if($hasPercentage)
-                        <div style="margin-top: 4px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
+                        <div style="margin-top: 3px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
                                 <span>%{{ $pct }}</span>
                                 <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} {{ __('p.') }}</span>
                             </div>

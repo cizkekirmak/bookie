@@ -88,14 +88,14 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 152px !important;
-            padding: 8px 8px !important;
+            height: 148px !important;
+            padding: 9px 8px !important;
             border-radius: 14px !important;
         }
 
         .admin-card-title {
             font-size: 14px !important;
-            margin: 0 0 4px 0 !important;
+            margin: 0 0 6px 0 !important;
             height: 16px !important;
             line-height: 16px !important;
         }
@@ -103,7 +103,7 @@
         .admin-recommendation-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: 114px !important;
+            height: 88px !important;
         }
 
         .admin-book-cover-link {
@@ -113,14 +113,23 @@
         }
 
         .admin-book-info {
-            height: 114px !important;
+            height: 88px !important;
+            min-height: 88px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+        }
+
+        .admin-text-meta {
+            height: 56px !important;
+            overflow: hidden !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: flex-start !important;
         }
 
         .adminRecommendation-card h4 {
-            font-size: 13.5px !important;
+            font-size: 13px !important;
             margin: 0 0 2px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
@@ -130,7 +139,7 @@
 
         .adminRecommendation-card p {
             font-size: 11.5px !important;
-            margin: 0 0 2px 0 !important;
+            margin: 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -138,9 +147,9 @@
         }
 
         .admin-note-text {
-            font-size: 11px !important;
+            font-size: 10.5px !important;
             line-height: 1.15 !important;
-            margin: 0 0 4px 0 !important;
+            margin: 2px 0 0 0 !important;
             color: #27491d !important;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
@@ -156,7 +165,8 @@
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
-            margin-top: 2px !important;
+            margin: 0 !important;
+            align-self: flex-start !important;
         }
     }
 </style>
@@ -179,7 +189,7 @@
         </a>
 
         <div class="admin-book-info">
-            <div>
+            <div class="admin-text-meta">
                 <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->title }}
                 </h4>
