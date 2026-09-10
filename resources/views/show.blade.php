@@ -651,6 +651,24 @@ function toggleReviewLike(reviewId, buttonElement) {
     })
     .catch(err => console.error('Beğeni hatası:', err));
 }
+
+// Kitap sayfası açılış sesi
+const pageSound = new Audio('{{ asset("sounds/page-flip.mp3") }}');
+pageSound.volume = 0.35;
+
+const playPromise = pageSound.play();
+if (playPromise !== undefined) {
+    playPromise.catch(() => {
+        // Tarayıcı otomatik sesi kısıtlarsa ilk tıklamada çalar
+        const playOnce = () => {
+            pageSound.play().catch(() => {});
+            document.removeEventListener('click', playOnce);
+            document.removeEventListener('keydown', playOnce);
+        };
+        document.addEventListener('click', playOnce);
+        document.addEventListener('keydown', playOnce);
+    });
+}
 </script>
 @include('partials.chat')
 </body>
