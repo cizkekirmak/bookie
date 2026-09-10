@@ -4,17 +4,28 @@
 </div>
 
 <div id="chat-popup-container" class="chat-popup" style="display: none;">
-    <div class="chat-friends-sidebar" id="chat-friends-list"></div>
+    <!-- 1. EKRAN: ARKADAŞ LİSTESİ VE ARAMA -->
+    <div class="chat-view" id="chat-view-friends">
+        <div class="chat-view-header">
+            <span class="chat-view-title">{{ __('Messages') }}</span>
+            <button type="button" class="chat-close-btn" id="chat-friends-close-btn">&times;</button>
+        </div>
+        <div class="chat-search-wrap">
+            <input type="text" id="chat-friend-search" placeholder="{{ __('Search friends...') }}" autocomplete="off">
+        </div>
+        <div class="chat-friends-scroll" id="chat-friends-list">
+            <!-- Arkadaş kartları JS ile buraya dolacak -->
+        </div>
+    </div>
 
-    <div class="chat-main-area">
+    <!-- 2. EKRAN: SOHBET EKRANI -->
+    <div class="chat-view" id="chat-view-conversation" style="display: none;">
         <div class="chat-header">
-            <a href="#" id="chat-header-user" class="chat-header-user" style="display: none; text-decoration: none; cursor: pointer;">
+            <button type="button" class="chat-back-btn" id="chat-back-btn" title="{{ __('Back') }}">&#8249;</button>
+            <a href="#" id="chat-header-user" class="chat-header-user" style="text-decoration: none; cursor: pointer;">
                 <img id="chat-active-avatar" src="{{ asset('images/default-avatar.jpg') }}" alt="Avatar" class="chat-header-avatar">
                 <span id="chat-active-name" class="chat-header-name"></span>
             </a>
-            <div id="chat-header-placeholder" class="chat-header-placeholder">
-                {{ __('Choose a friend to start chatting.') }}
-            </div>
             <button type="button" class="chat-close-btn" id="chat-close-btn">&times;</button>
         </div>
 
@@ -78,44 +89,17 @@
     border: 1px solid #27211f;
 }
 
-.chat-friend-item {
-    position: relative;
-    cursor: pointer;
-}
-.chat-friend-dot {
-    position: absolute;
-    top: 0;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    background-color: #eba4b4;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    pointer-events: none;
-}
-.chat-friend-avatar {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid transparent;
-    transition: transform 0.2s ease, border-color 0.2s ease;
-}
-.chat-friend-item.active .chat-friend-avatar {
-    border-color: #9fa3c2;
-    transform: scale(1.08);
-}
-
 .chat-popup {
     position: fixed;
     bottom: 135px;
     left: 30px;
     width: 360px;
-    height: 430px;
+    height: 450px;
     background: #ffffff;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.16);
     display: flex;
+    flex-direction: column;
     overflow: hidden;
     z-index: 99998;
     border: 1px solid rgba(0,0,0,0.08);
@@ -125,7 +109,7 @@
     .chat-popup {
         width: 92vw !important;
         max-width: 350px !important;
-        height: 430px !important;
+        height: 450px !important;
         left: 50% !important;
         right: auto !important;
         top: auto !important;
@@ -135,43 +119,165 @@
     }
 }
 
-.chat-friends-sidebar {
-    width: 62px;
-    background-color: #f2feff;
-    border-right: 1px solid #eaeaea;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 12px 0;
-    gap: 10px;
-    overflow-y: auto;
-}
-
-.chat-main-area {
+/* GÖRÜNÜM TAŞIYICILARI */
+.chat-view {
     flex: 1;
     display: flex;
     flex-direction: column;
-    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
     background: #fff;
-    min-width: 0;
 }
-.chat-header {
+
+/* 1. EKRAN: ARKADAŞ LİSTESİ BAŞLIK VE ARAMA */
+.chat-view-header {
     height: 46px;
     border-bottom: 1px solid #ffedf8;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 12px;
+    padding: 0 14px;
     background: #fff6f9;
 }
-.chat-header-user {
+.chat-view-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    font-family: 'Unkempt', cursive;
+}
+.chat-search-wrap {
+    padding: 8px 12px;
+    background: #fdfafb;
+    border-bottom: 1px solid #ffedf8;
+}
+.chat-search-wrap input {
+    width: 100%;
+    height: 34px;
+    border: 1.5px solid #d9d0d5;
+    border-radius: 17px;
+    padding: 0 14px;
+    font-size: 14px;
+    outline: none;
+    font-family: 'Unkempt', cursive !important;
+    background-color: #ffffff;
+    color: #333;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease;
+}
+.chat-search-wrap input:focus {
+    border-color: #eba4b4;
+}
+
+/* ARKADAŞ LİSTESİ SCROLL ALANI VE ÖZEL PASTEL SCROLLBAR */
+.chat-friends-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 6px 0;
+    display: flex;
+    flex-direction: column;
+}
+.chat-friends-scroll::-webkit-scrollbar,
+.chat-messages-body::-webkit-scrollbar {
+    width: 4px;
+}
+.chat-friends-scroll::-webkit-scrollbar-thumb,
+.chat-messages-body::-webkit-scrollbar-thumb {
+    background: #eba4b4;
+    border-radius: 10px;
+}
+.chat-friends-scroll::-webkit-scrollbar-track,
+.chat-messages-body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+/* ARKADAŞ LİSTE ELEMANI (KART) */
+.chat-friend-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    position: relative;
+}
+.chat-friend-row:hover {
+    background: #fff3f7;
+}
+.chat-friend-avatar-wrap {
+    position: relative;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+}
+.chat-friend-avatar-wrap img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1.5px solid #eaeaea;
+}
+.chat-friend-row-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 12px;
+    height: 12px;
+    background-color: #eba4b4;
+    border-radius: 50%;
+    border: 2px solid #fff;
+}
+.chat-friend-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+.chat-friend-name {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+    font-family: 'Unkempt', cursive;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.chat-friend-sub {
+    font-size: 11px;
+    color: #888;
+    font-family: 'Unkempt', cursive;
+}
+
+/* 2. EKRAN: SOHBET BAŞLIĞI VE GERİ BUTONU */
+.chat-header {
+    height: 46px;
+    border-bottom: 1px solid #ffedf8;
     display: flex;
     align-items: center;
     gap: 8px;
-    transition: opacity 0.2s ease;
+    padding: 0 10px;
+    background: #fff6f9;
 }
-.chat-header-user:hover {
-    opacity: 0.8;
+.chat-back-btn {
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    color: #444;
+    padding: 0 6px 4px 2px;
+    transition: transform 0.15s ease;
+}
+.chat-back-btn:hover {
+    transform: translateX(-2px);
+    color: #eba4b4;
+}
+.chat-header-user {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
 }
 .chat-header-avatar {
     width: 30px;
@@ -184,11 +290,9 @@
     font-size: 14px;
     color: #333;
     font-family: 'Unkempt', cursive;
-}
-.chat-header-placeholder {
-    font-size: 13px;
-    color: #888;
-    font-family: 'Unkempt', cursive;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 .chat-close-btn {
     background: none;
@@ -196,6 +300,7 @@
     font-size: 20px;
     cursor: pointer;
     color: #333;
+    padding: 0 4px;
 }
 
 .chat-messages-body {
@@ -249,7 +354,6 @@
     height: auto;
     display: block;
 }
-
 .chat-bubble-time {
     display: none;
     font-size: 9px;
@@ -323,14 +427,6 @@
     opacity: 0.8;
 }
 
-.chat-messages-body::-webkit-scrollbar {
-    width: 6px;
-}
-.chat-messages-body::-webkit-scrollbar-thumb {
-    background: rgb(255, 198, 106);
-    border-radius: 10px;
-}
-
 .chat-action-btn {
     background: none;
     border: none;
@@ -363,10 +459,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btn = document.getElementById('chat-draggable-btn');
     const popup = document.getElementById('chat-popup-container');
     const closeBtn = document.getElementById('chat-close-btn');
+    const friendsCloseBtn = document.getElementById('chat-friends-close-btn');
+    const backBtn = document.getElementById('chat-back-btn');
+    
+    const viewFriends = document.getElementById('chat-view-friends');
+    const viewConversation = document.getElementById('chat-view-conversation');
     const friendsList = document.getElementById('chat-friends-list');
+    const friendSearchInput = document.getElementById('chat-friend-search');
+
     const messagesBody = document.getElementById('chat-messages-body');
     const headerUser = document.getElementById('chat-header-user');
-    const headerPlaceholder = document.getElementById('chat-header-placeholder');
     const activeAvatar = document.getElementById('chat-active-avatar');
     const activeName = document.getElementById('chat-active-name');
     const inputForm = document.getElementById('chat-input-form');
@@ -385,7 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
     };
 
-    // Ses nesnelerini önceden oluştur
     const audioClosed = new Audio(SOUND_URLS.closed);
     const audioInChat = new Audio(SOUND_URLS.inChat);
 
@@ -420,14 +521,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let shiftX, shiftY;
     let lastLoadedMessagesCount = 0;
     let blockInChatSound = false;
-    let lastUnreadTotal = null; // İlk durumu güvenle yakalamak için null başlar
+    let lastUnreadTotal = null;
     let pollInterval = null;
     let isCheckingUnread = false;
+    let cachedFriends = [];
 
     function getAvatarSrc(avatar) {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
     }
 
+    function showFriendsView() {
+        viewFriends.style.display = 'flex';
+        viewConversation.style.display = 'none';
+        activeFriendId = null;
+        lastLoadedMessagesCount = 0;
+        messageInput.disabled = true;
+        sendBtn.disabled = true;
+        loadFriends();
+        startPolling();
+    }
+
+    function showConversationView() {
+        viewFriends.style.display = 'none';
+        viewConversation.style.display = 'flex';
+        startPolling();
+    }
+
+    // SÜRÜKLEME MANTIĞI
     btn.addEventListener('mousedown', (e) => {
         isDragging = false;
         shiftX = e.clientX - btn.getBoundingClientRect().left;
@@ -454,14 +574,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', onMouseUp);
     });
 
+    // BALON TIKLAMA
     btn.addEventListener('click', async () => {
         if (isDragging) return;
         const isOpen = popup.style.display === 'flex';
         popup.style.display = isOpen ? 'none' : 'flex';
-        
+
         if (!isOpen) {
             unreadDot.style.display = 'none';
-            blockInChatSound = true;
 
             if (window.innerWidth > 768) {
                 const rect = btn.getBoundingClientRect();
@@ -472,87 +592,95 @@ document.addEventListener('DOMContentLoaded', () => {
                     popup.style.right = `${Math.max(20, window.innerWidth - rect.right)}px`;
                     popup.style.left = 'auto';
                 }
-                popup.style.top = `${Math.max(20, rect.top - 440)}px`;
+                popup.style.top = `${Math.max(20, rect.top - 460)}px`;
                 popup.style.bottom = 'auto';
             }
 
-            await loadFriends();
-            if (activeFriendId) {
-                await loadMessages(true);
-            }
-
-            setTimeout(() => {
-                blockInChatSound = false;
-            }, 1000);
+            // Açıldığında doğrudan Arkadaş Listesi görünümüne geçer
+            showFriendsView();
         } else {
             activeFriendId = null;
         }
         startPolling();
     });
 
-    closeBtn.addEventListener('click', () => {
+    // KAPAT BUTONLARI
+    function closePopup() {
         popup.style.display = 'none';
         activeFriendId = null;
         lastLoadedMessagesCount = 0;
-        document.querySelectorAll('.chat-friend-item').forEach(el => el.classList.remove('active'));
         startPolling();
+    }
+    closeBtn.addEventListener('click', closePopup);
+    friendsCloseBtn.addEventListener('click', closePopup);
+
+    // GERİ BUTONU (<)
+    backBtn.addEventListener('click', () => {
+        showFriendsView();
     });
 
+    // ARKADAŞ LİSTESİ ÇEKME & ARAMA FİLTRESİ
     async function loadFriends() {
         try {
             const res = await fetch('/messages/friends', {
                 headers: { 'X-Requested-With': 'XMLHttpRequest' }
             });
-            const friends = await res.json();
-            friendsList.innerHTML = '';
-
-            let targetFriend = null;
-
-            friends.forEach(friend => {
-                const item = document.createElement('div');
-                const isSelected = (activeFriendId === friend.id);
-                item.className = `chat-friend-item ${isSelected ? 'active' : ''}`;
-                
-                const showBadge = (!isSelected && friend.unread_count > 0);
-                const badgeHtml = showBadge ? '<span class="chat-friend-dot"></span>' : '';
-
-                item.innerHTML = `
-                    <img src="${getAvatarSrc(friend.avatar)}" class="chat-friend-avatar" alt="${escapeHtml(friend.username)}">
-                    ${badgeHtml}
-                `;
-                item.addEventListener('click', () => selectFriend(friend));
-                friendsList.appendChild(item);
-
-                if (!targetFriend && friend.unread_count > 0) {
-                    targetFriend = friend;
-                }
-            });
-
-            if (!activeFriendId && targetFriend) {
-                await selectFriend(targetFriend);
-            } else if (!activeFriendId && friends.length > 0) {
-                await selectFriend(friends[0]);
-            }
+            cachedFriends = await res.json();
+            renderFriends(cachedFriends);
         } catch (e) {}
     }
 
+    function renderFriends(friends) {
+        friendsList.innerHTML = '';
+        const filter = friendSearchInput.value.toLowerCase().trim();
+        const filtered = friends.filter(f => f.username.toLowerCase().includes(filter));
+
+        if (filtered.length === 0) {
+            friendsList.innerHTML = `<div class="chat-empty-state" style="margin: 20px auto;">${@json(__('No friends found.'))}</div>`;
+            return;
+        }
+
+        filtered.forEach(friend => {
+            const row = document.createElement('div');
+            row.className = 'chat-friend-row';
+
+            const badgeHtml = (friend.unread_count > 0) ? '<span class="chat-friend-row-badge"></span>' : '';
+
+            row.innerHTML = `
+                <div class="chat-friend-avatar-wrap">
+                    <img src="${getAvatarSrc(friend.avatar)}" alt="${escapeHtml(friend.username)}">
+                    ${badgeHtml}
+                </div>
+                <div class="chat-friend-info">
+                    <span class="chat-friend-name">${escapeHtml(friend.username)}</span>
+                    <span class="chat-friend-sub">${friend.unread_count > 0 ? friend.unread_count + ' ' + @json(__('new message')) : @json(__('Click to chat'))}</span>
+                </div>
+            `;
+
+            row.addEventListener('click', () => selectFriend(friend));
+            friendsList.appendChild(row);
+        });
+    }
+
+    friendSearchInput.addEventListener('input', () => {
+        renderFriends(cachedFriends);
+    });
+
+    // ARKADAŞ SEÇME VE SOHBETİ AÇMA
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
         blockInChatSound = true;
-        
-        headerPlaceholder.style.display = 'none';
-        headerUser.style.display = 'flex';
+
         headerUser.href = `/profile/${friend.id}`;
-        
         activeAvatar.src = getAvatarSrc(friend.avatar);
         activeName.textContent = friend.username;
 
         messageInput.disabled = false;
         sendBtn.disabled = false;
-        messageInput.focus();
 
-        document.querySelectorAll('.chat-friend-item').forEach(el => el.classList.remove('active'));
+        showConversationView();
+        messageInput.focus();
 
         await loadMessages(true);
 
@@ -563,6 +691,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startPolling();
     }
 
+    // MESAJLARI YÜKLEME
     async function loadMessages(forceScroll = false) {
         if (!activeFriendId) return;
         try {
@@ -624,6 +753,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {}
     }
 
+    // MESAJ GÖNDERME
     async function sendMessage(text) {
         if (!activeFriendId || !text.trim()) return;
         try {
@@ -668,6 +798,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // CANLI KONTROL (POLLING)
     async function checkUnread() {
         if (isCheckingUnread) return;
         isCheckingUnread = true;
@@ -686,19 +817,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 unreadDot.style.display = (currentCount > 0) ? 'block' : 'none';
             }
 
-            // İlk sayfa yüklenişi: Mevcut sayıyı kaydet, sesi çalma
             if (lastUnreadTotal === null) {
                 lastUnreadTotal = currentCount;
             } else {
-                // Balon kapalıyken YENİ bir mesaj gelip sayı arttıysa sesi çal
                 if (!isPopupOpen && currentCount > 0 && currentCount > lastUnreadTotal) {
                     playSound('closed');
                 }
                 lastUnreadTotal = currentCount;
             }
 
-            if (isPopupOpen && activeFriendId) {
-                loadMessages(false);
+            // Sohbet açıkken mesajları; liste açıkken de liste badge'lerini tazele
+            if (isPopupOpen) {
+                if (activeFriendId) {
+                    loadMessages(false);
+                } else {
+                    loadFriends();
+                }
             }
         } catch (e) {
         } finally {
@@ -718,7 +852,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return div.innerHTML;
     }
 
-    // İlk döngüyü tek noktadan güvenle başlat
     checkUnread().then(() => {
         startPolling();
     });
