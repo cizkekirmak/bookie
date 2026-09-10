@@ -32,21 +32,87 @@
             const boardView = document.getElementById('profile-board-view');
             const btnList = document.getElementById('btn-list-view');
             const btnBoard = document.getElementById('btn-board-view');
+            const bookFilters = document.querySelectorAll('.hide-on-board');
             const mainContainer = document.querySelector('.profile-main-content');
 
             if (mode === 'list') {
                 if (listView) listView.style.display = 'flex';
                 if (boardView) boardView.style.display = 'none';
+                bookFilters.forEach(el => el.style.display = '');
                 if (btnList) { btnList.classList.add('active'); }
                 if (btnBoard) { btnBoard.classList.remove('active'); }
                 if (mainContainer) mainContainer.classList.remove('board-active');
             } else {
                 if (listView) listView.style.display = 'none';
                 if (boardView) boardView.style.display = 'flex';
+                bookFilters.forEach(el => el.style.display = 'none');
                 if (btnBoard) { btnBoard.classList.add('active'); }
                 if (btnList) { btnList.classList.remove('active'); }
                 if (mainContainer) mainContainer.classList.add('board-active');
             }
+        };
+
+        let currentProfileStatus = 'all';
+
+        window.filterStatus = function(status, clickedBtn) {
+            currentProfileStatus = status;
+
+            const tabStyles = {
+                'all':     { bg: '#dcedd2', activeBg: '#b8dfa4', color: '#27521e', border: '#9ccb86', shadow: 'rgba(39, 82, 30, 0.15)' },
+                'read':    { bg: '#fee2e8', activeBg: '#fcc2ce', color: '#8e2b42', border: '#f7b1c0', shadow: 'rgba(142, 43, 66, 0.15)' },
+                'reading': { bg: '#e2f0fc', activeBg: '#c2e1f9', color: '#1e5579', border: '#a8d3f5', shadow: 'rgba(30, 85, 121, 0.15)' },
+                'toRead':  { bg: '#fef5d1', activeBg: '#fce9a5', color: '#7a5a0c', border: '#fae087', shadow: 'rgba(122, 90, 12, 0.15)' }
+            };
+
+            document.querySelectorAll('.status-tab').forEach(btn => {
+                const type = btn.getAttribute('data-type');
+                const style = tabStyles[type];
+                if (style) {
+                    btn.style.background = style.bg;
+                    btn.style.color = style.color;
+                    btn.style.border = '1.5px solid ' + style.border;
+                    btn.style.boxShadow = 'none';
+                }
+            });
+
+            const activeType = clickedBtn.getAttribute('data-type');
+            const activeStyle = tabStyles[activeType];
+            if (activeStyle) {
+                clickedBtn.style.background = activeStyle.activeBg;
+                clickedBtn.style.color = activeStyle.color;
+                clickedBtn.style.border = '1.5px solid ' + activeStyle.border;
+                clickedBtn.style.boxShadow = '0 2px 6px ' + activeStyle.shadow;
+            }
+
+            window.applyProfileSearchFilter();
+        };
+
+        window.applyProfileSearchFilter = function() {
+            const query = (document.getElementById('profileBookSearchInput')?.value || '').toLowerCase().trim();
+            const cards = document.querySelectorAll('.book-card-item');
+
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                const title = (card.querySelector('h4')?.innerText || '').toLowerCase();
+                const author = (card.querySelector('span')?.innerText || '').toLowerCase();
+
+                let statusMatch = (currentProfileStatus === 'all');
+                if (!statusMatch) {
+                    if (currentProfileStatus === 'toRead') {
+                        statusMatch = (cardStatus === 'toRead' || cardStatus === 'want_to_read');
+                    } else {
+                        statusMatch = (cardStatus === currentProfileStatus);
+                    }
+                }
+
+                const searchMatch = !query || title.includes(query) || author.includes(query);
+
+                if (statusMatch && searchMatch) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
         };
     </script>
 
@@ -76,6 +142,7 @@
         }
         * {
             box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent !important;
         }
 
         body {
@@ -90,10 +157,6 @@
             padding: 0;
             overflow-x: hidden;
             font-family: 'Unkempt', cursive;
-        }
-
-        * {
-            -webkit-tap-highlight-color: transparent !important;
         }
 
         button,
@@ -296,8 +359,58 @@
             letter-spacing: 0.5px;
         }
 
-        /* Sağ Üst Görünüm Değiştirici Butonları */
-        .view-switch-right {
+        /* ========================================================
+           ANA TOOLBAR DÜZENİ (Masaüstünde TEK SATIR!)
+           ======================================================== */
+        .master-toolbar-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .toolbar-pastel-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .status-tab {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: 'Unkempt', cursive;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+        }
+
+        .toolbar-search-box {
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+        }
+
+        .toolbar-search-box input {
+            width: 100%;
+            padding: 7px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #737e3d;
+            background: #ffffff;
+            font-family: 'Unkempt', cursive;
+            font-size: 14px;
+            color: #1a3c11;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+            box-sizing: border-box;
+        }
+
+        .toolbar-switch-box {
             display: flex;
             background: #cae28c;
             border: 2px solid #737e3d;
@@ -305,6 +418,7 @@
             padding: 3px;
             gap: 4px;
             flex-shrink: 0;
+            margin-left: auto;
         }
 
         .view-toggle-btn {
@@ -317,8 +431,8 @@
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.2s ease;
             white-space: nowrap;
+            transition: all 0.2s ease;
         }
 
         .view-toggle-btn.active {
@@ -473,6 +587,63 @@
                 overflow-x: hidden !important;
                 -webkit-overflow-scrolling: touch;
                 padding-bottom: 25px !important;
+            }
+        }
+
+        /* ========================================================
+           MOBİLDE MASTER TOOLBAR: 2 Sıra Buton + Pano Butonu + Altında Arama
+           ======================================================== */
+        @media (max-width: 768px) {
+            .master-toolbar-row {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                margin-bottom: 10px !important;
+                align-items: stretch !important;
+            }
+
+            .toolbar-pastel-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 5px !important;
+                flex: 1 !important;
+                min-width: 0 !important;
+            }
+
+            .status-tab {
+                padding: 5px 4px !important;
+                font-size: 11.5px !important;
+                border-radius: 10px !important;
+                text-align: center !important;
+            }
+
+            .toolbar-switch-box {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: stretch !important;
+                padding: 3px !important;
+                gap: 3px !important;
+                width: 90px !important;
+                margin-left: 0 !important;
+            }
+
+            .view-toggle-btn {
+                padding: 4px 6px !important;
+                font-size: 11px !important;
+                text-align: center !important;
+                line-height: 1.1 !important;
+            }
+
+            .toolbar-search-box {
+                order: 3 !important;
+                width: 100% !important;
+                flex: 1 1 100% !important;
+            }
+
+            .toolbar-search-box input {
+                font-size: 13px !important;
+                padding: 6px 10px !important;
             }
         }
     </style>
@@ -774,9 +945,32 @@
         {{-- SAĞ İÇERİK ALANI --}}
         <main class="profile-main-content">
 
-            {{-- YALNIZCA GÖRÜNÜM DEĞİŞTİRİCİ: Masaüstü ve Mobilde Sağa Yaslı --}}
-            <div style="display: flex; justify-content: flex-end; margin-bottom: 8px; width: 100%; flex-shrink: 0;">
-                <div class="view-switch-right">
+            {{-- 1. HEPSİ TEK SATIR OLAN MASTER TOOLBAR --}}
+            <div class="master-toolbar-row">
+                
+                {{-- Sol: Pastel 4 Buton (Panoda gizlenir) --}}
+                <div class="toolbar-pastel-group hide-on-board">
+                    <button type="button" onclick="filterStatus('all', this)" class="status-tab" data-type="all" style="border: 1.5px solid #9ccb86; background: #b8dfa4; color: #27521e; box-shadow: 0 2px 6px rgba(39, 82, 30, 0.15);">
+                        {{ __('All') }} ({{ count($userBooks ?? []) }})
+                    </button>
+                    <button type="button" onclick="filterStatus('read', this)" class="status-tab" data-type="read" style="border: 1.5px solid #f7b1c0; background: #fee2e8; color: #8e2b42;">
+                        {{ __('read') }} ({{ isset($userBooks) ? $userBooks->where('status', 'read')->count() : 0 }})
+                    </button>
+                    <button type="button" onclick="filterStatus('reading', this)" class="status-tab" data-type="reading" style="border: 1.5px solid #a8d3f5; background: #e2f0fc; color: #1e5579;">
+                        {{ __('currently reading') }} ({{ isset($userBooks) ? $userBooks->where('status', 'reading')->count() : 0 }})
+                    </button>
+                    <button type="button" onclick="filterStatus('toRead', this)" class="status-tab" data-type="toRead" style="border: 1.5px solid #fae087; background: #fef5d1; color: #7a5a0c;">
+                        {{ __('to read') }} ({{ isset($userBooks) ? $userBooks->whereIn('status', ['toRead', 'want_to_read'])->count() : 0 }})
+                    </button>
+                </div>
+
+                {{-- Orta: Arama Çubuğu (Panoda gizlenir) --}}
+                <div class="toolbar-search-box hide-on-board">
+                    <input type="text" id="profileBookSearchInput" oninput="applyProfileSearchFilter()" placeholder="🔍 {{ __('Search books or authors...') }}" autocomplete="off">
+                </div>
+
+                {{-- Sağ: Kitap Listesi / Pano Anahtarı (HER ZAMAN GÖRÜNÜR) --}}
+                <div class="toolbar-switch-box">
                     <button type="button" id="btn-list-view" onclick="switchProfileView('list')" class="view-toggle-btn active">
                         {{ __('Book List') }}
                     </button>
@@ -784,14 +978,15 @@
                         {{ __('Board') }}
                     </button>
                 </div>
+
             </div>
 
-            {{-- 1. KİTAP LİSTESİ GÖRÜNÜMÜ --}}
+            {{-- 2. KİTAP LİSTESİ GÖRÜNÜMÜ --}}
             <div id="profile-list-view" style="display: flex; flex-direction: column; flex: 1 1 0%; height: 100%; min-height: 0; overflow: hidden;">
                 @include('profile.list-view')
             </div>
 
-            {{-- 2. YENİ PANO (BOARD) GÖRÜNÜMÜ --}}
+            {{-- 3. PANO (BOARD) GÖRÜNÜMÜ --}}
             <div id="profile-board-view">
                 @include('profile.shelf-view')
             </div>
@@ -800,7 +995,7 @@
 
     </div>
 
-    {{-- SAĞDAKİ MOBİL PROFİL POST-IT BUTONU & OVERLAY --}}
+    {{-- MOBİL ÇEKMECE POST-IT & OVERLAY --}}
     <div class="mobile-profile-tab" id="openProfileDrawerBtn">
         <span>{{ __('Profile') }}</span>
     </div>
@@ -815,19 +1010,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const overlay = document.getElementById('profileDrawerOverlay');
 
     if (openDrawerBtn && drawer && overlay) {
-        function openProfile() {
-            drawer.classList.add('drawer-open');
-            overlay.classList.remove('hidden');
-        }
-
-        function closeProfile() {
-            drawer.classList.remove('drawer-open');
-            overlay.classList.add('hidden');
-        }
-
-        openDrawerBtn.addEventListener('click', openProfile);
-        overlay.addEventListener('click', closeProfile);
-        if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', closeProfile);
+        openDrawerBtn.addEventListener('click', () => { drawer.classList.add('drawer-open'); overlay.classList.remove('hidden'); });
+        overlay.addEventListener('click', () => { drawer.classList.remove('drawer-open'); overlay.classList.add('hidden'); });
+        if (closeDrawerBtn) closeDrawerBtn.addEventListener('click', () => { drawer.classList.remove('drawer-open'); overlay.classList.add('hidden'); });
     }
 });
 </script>
