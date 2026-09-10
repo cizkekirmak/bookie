@@ -11,7 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mystery+Quest&display=swap" rel="stylesheet">
 
-    {{-- MODAL FONKSİYONLARI (GLOBAL SCOPE) --}}
+    {{-- MODAL VE FİLTRELEME FONKSİYONLARI (GLOBAL SCOPE) --}}
     <script>
         window.openFriendsModal = function() {
             const modal = document.getElementById('friendsModal');
@@ -37,32 +37,52 @@
             if (mode === 'list') {
                 if (listView) listView.style.display = 'flex';
                 if (boardView) boardView.style.display = 'none';
-                if (btnList) { btnList.style.background = '#255719'; btnList.style.color = '#ffffff'; }
-                if (btnBoard) { btnBoard.style.background = 'transparent'; btnBoard.style.color = '#1a3c11'; }
+                if (btnList) { btnList.classList.add('active'); }
+                if (btnBoard) { btnBoard.classList.remove('active'); }
                 if (mainContainer) mainContainer.classList.remove('board-active');
             } else {
                 if (listView) listView.style.display = 'none';
                 if (boardView) boardView.style.display = 'flex';
-                if (btnBoard) { btnBoard.style.background = '#255719'; btnBoard.style.color = '#ffffff'; }
-                if (btnList) { btnList.style.background = 'transparent'; btnList.style.color = '#1a3c11'; }
+                if (btnBoard) { btnBoard.classList.add('active'); }
+                if (btnList) { btnList.classList.remove('active'); }
                 if (mainContainer) mainContainer.classList.add('board-active');
             }
         };
 
-        window.filterStatus = function(status, clickedBtn) {
-            document.querySelectorAll('.status-tab').forEach(btn => {
-                btn.style.background = '#eaf3e4';
-                btn.style.color = '#1a3c11';
-                btn.style.border = '1px solid #737e3d';
-            });
-            clickedBtn.style.background = '#255719';
-            clickedBtn.style.color = '#ffffff';
-            clickedBtn.style.border = 'none';
+        let currentProfileStatus = 'all';
 
+        window.filterStatus = function(status, clickedBtn) {
+            currentProfileStatus = status;
+
+            document.querySelectorAll('.status-tab').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            clickedBtn.classList.add('active');
+
+            window.applyProfileSearchFilter();
+        };
+
+        window.applyProfileSearchFilter = function() {
+            const query = (document.getElementById('profileBookSearchInput')?.value || '').toLowerCase().trim();
             const cards = document.querySelectorAll('.book-card-item');
+
             cards.forEach(card => {
                 const cardStatus = card.getAttribute('data-status');
-                if (status === 'all' || cardStatus === status) {
+                const title = (card.querySelector('h4')?.innerText || '').toLowerCase();
+                const author = (card.querySelector('span')?.innerText || '').toLowerCase();
+
+                let statusMatch = (currentProfileStatus === 'all');
+                if (!statusMatch) {
+                    if (currentProfileStatus === 'toRead') {
+                        statusMatch = (cardStatus === 'toRead' || cardStatus === 'want_to_read');
+                    } else {
+                        statusMatch = (cardStatus === currentProfileStatus);
+                    }
+                }
+
+                const searchMatch = !query || title.includes(query) || author.includes(query);
+
+                if (statusMatch && searchMatch) {
                     card.style.display = 'flex';
                 } else {
                     card.style.display = 'none';
@@ -227,7 +247,7 @@
 
         .profile-main-content {
             flex: 1;
-            padding: 25px 30px;
+            padding: 20px 24px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -317,6 +337,95 @@
             letter-spacing: 0.5px;
         }
 
+        /* ========================================================
+           YENİ KİTAPLIK KONTROL BARI (BİLGİSAYAR & MOBİL)
+           ======================================================== */
+        .profile-toolbar-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            margin-bottom: 14px;
+            flex-shrink: 0;
+        }
+
+        .status-buttons-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .status-tab {
+            font-family: 'Unkempt', cursive;
+            font-size: 14px;
+            font-weight: bold;
+            padding: 6px 14px;
+            border-radius: 16px;
+            cursor: pointer;
+            border: 1.5px solid #737e3d;
+            background: #eaf3e4;
+            color: #1a3c11;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .status-tab.active {
+            background: #255719 !important;
+            color: #ffffff !important;
+            border-color: #255719 !important;
+        }
+
+        .profile-search-middle {
+            flex: 1;
+            min-width: 140px;
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-search-middle input {
+            width: 100%;
+            padding: 7px 14px;
+            border-radius: 12px;
+            border: 1.5px solid #737e3d;
+            background: #ffffff;
+            font-family: 'Unkempt', cursive;
+            font-size: 14px;
+            color: #1a3c11;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.06);
+            box-sizing: border-box;
+        }
+
+        .view-switch-right {
+            display: flex;
+            background: #cae28c;
+            border: 2px solid #737e3d;
+            border-radius: 12px;
+            padding: 3px;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+
+        .view-toggle-btn {
+            border: none;
+            background: transparent;
+            color: #1a3c11;
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-family: 'Unkempt', cursive;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .view-toggle-btn.active {
+            background: #255719 !important;
+            color: #ffffff !important;
+        }
+
         @media (max-width: 1024px) {
             .site-header-outer {
                 height: 68px !important;
@@ -335,7 +444,6 @@
                 gap: 8px !important;
             }
 
-            /* ARTIK SADECE BUTON VE İKONLARI KAPSAR, BİLDİRİM İÇİNİ EZMEZ */
             .header-icon-box,
             .notification-icon-img,
             .header-actions-wrap > a > img {
@@ -445,7 +553,7 @@
                 flex: 1 1 0% !important;
                 height: 100% !important;
                 min-height: 0 !important;
-                padding: 12px 10px 8px 10px !important;
+                padding: 10px 8px !important;
                 border: 2px solid #4c7237 !important;
                 border-radius: 16px !important;
                 background-color: #f7faf5 !important;
@@ -456,15 +564,6 @@
                 box-sizing: border-box !important;
             }
 
-            .profile-main-content > div:first-child {
-                margin-bottom: 8px !important;
-                flex-shrink: 0 !important;
-            }
-
-            .profile-main-content h3 {
-                font-size: 22px !important;
-            }
-
             #profile-list-view,
             #profile-board-view {
                 flex: 1 1 0% !important;
@@ -473,7 +572,65 @@
                 overflow-y: auto !important;
                 overflow-x: hidden !important;
                 -webkit-overflow-scrolling: touch;
-                padding-bottom: 30px !important;
+                padding-bottom: 25px !important;
+            }
+
+            /* MOBİLDE BUTONLAR VE ARAMA DÜZENİ */
+            .profile-toolbar-container {
+                display: flex !important;
+                flex-wrap: wrap !important;
+                gap: 8px !important;
+                margin-bottom: 10px !important;
+            }
+
+            /* Sol taraftaki 4 buton: 2x2 grid */
+            .status-buttons-group {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 5px !important;
+                flex: 1 !important;
+                min-width: 0 !important;
+            }
+
+            .status-tab {
+                padding: 5px 6px !important;
+                font-size: 11.5px !important;
+                border-radius: 10px !important;
+                text-align: center !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+
+            /* Sağdaki buton grubu (2 sırayı dikeyde tam dolduracak) */
+            .view-switch-right {
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: center !important;
+                align-items: stretch !important;
+                padding: 3px !important;
+                gap: 3px !important;
+                width: 95px !important;
+                flex-shrink: 0 !important;
+            }
+
+            .view-toggle-btn {
+                padding: 4px 6px !important;
+                font-size: 11.5px !important;
+                text-align: center !important;
+                line-height: 1.1 !important;
+            }
+
+            /* Mobilde Arama Çubuğu: Butonların altında tam genişlik */
+            .profile-search-middle {
+                order: 3 !important;
+                width: 100% !important;
+                flex: 1 1 100% !important;
+            }
+
+            .profile-search-middle input {
+                font-size: 13px !important;
+                padding: 6px 12px !important;
             }
         }
     </style>
@@ -528,7 +685,7 @@
                     : '-';
             @endphp
 
-            {{-- GÜNCELLENMİŞ: LIBRARY CARD BİLEŞENİ (HEPSİ ÇEVRİLDİ) --}}
+            {{-- GÜNCELLENMİŞ: LIBRARY CARD BİLEŞENİ --}}
             <div class="library-card-wrapper">
                 {{-- Üst Damga Alanı --}}
                 <div class="library-card-header">
@@ -536,9 +693,8 @@
                     <span style="font-size: 12.5px; color: #5a7d3b; font-weight: bold;">{{ __('BOOKIE MEMBER') }}</span>
                 </div>
 
-                {{-- Orta Gövde (Fotoğraf, İsim, Rozet & Sağ Altta Tarih) --}}
+                {{-- Orta Gövde --}}
                 <div style="display: flex; gap: 10px; align-items: flex-start; position: relative;">
-                    {{-- Tam Kare Mavi Çerçeveli Fotoğraf --}}
                     <div style="width: 72px; height: 72px; min-width: 72px; min-height: 72px; border-radius: 8px; border: 2px solid #5ca0b2; background: #e8f5f8; padding: 2px; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; justify-content: center; align-items: center;">
                         @if(!empty($user->avatar))
                             <img src="{{ $userAvatar }}" 
@@ -551,13 +707,11 @@
                         @endif
                     </div>
 
-                    {{-- Unkempt İsim ve Unvan --}}
                     <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start;">
                         <div style="font-family: 'Unkempt', cursive !important; font-size: 20px; font-weight: bold; color: #1a3c11; line-height: 1.15; word-break: break-word;">
                             {{ $user->username ?? $user->name }}
                         </div>
 
-                        {{-- Tıklanabilir Unvan Rozeti --}}
                         <div style="margin-top: 4px;">
                             <button type="button" onclick="openTitlesModal()" style="background: none; border: none; padding: 0; cursor: pointer; text-align: left;">
                                 <div class="{{ !empty($title['is_admin']) ? 'admin-rainbow-badge' : '' }}" style="
@@ -584,7 +738,6 @@
                         </div>
                     </div>
 
-                    {{-- Sağ Alttaki Üyelik Tarihi Damgası --}}
                     <div style="position: absolute; right: 0; bottom: 0; font-size: 12px; color: #738b5e; font-family: 'Unkempt', cursive; line-height: 1; letter-spacing: 0.3px;">
                         {{ __('member:') }} <span style="font-weight: bold;">{{ $joinDate }}</span>
                     </div>
@@ -599,7 +752,7 @@
                 </div>
             </div>
 
-            {{-- Arkadaşlık İşlemleri (Diğer Kullanıcı Profili İse) --}}
+            {{-- Arkadaşlık İşlemleri --}}
             @if(!$isOwnProfile)
                 <div style="margin-bottom: 12px; width: 100%; display: flex; justify-content: center; margin-top: 12px;">
                     @if(!$friendship)
@@ -721,7 +874,6 @@
                 </div>
 
                 @if(!empty($readingGoal))
-                    {{-- İlerleme Çubuğu --}}
                     <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.12); border-radius: 6px; overflow: hidden; margin-top: 2px;">
                         <div style="height: 100%; width: {{ $goalProgress ?? 0 }}%; background: #255719; border-radius: 6px; transition: width 0.4s ease;"></div>
                     </div>
@@ -729,7 +881,6 @@
                         %{{ $goalProgress ?? 0 }} {{ __('completed') }}
                     </div>
                 @elseif($isOwner ?? ($isOwnProfile ?? false))
-                    {{-- Hedef Belirleme Formu --}}
                     <form onsubmit="saveReadingGoal(event)" style="display: flex; gap: 6px; margin-top: 4px;">
                         @csrf
                         <input 
@@ -781,20 +932,44 @@
         {{-- SAĞ İÇERİK ALANI --}}
         <main class="profile-main-content">
 
-            {{-- ÜST PANEL: BAŞLIK & SWITCH --}}
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
-                <h3 style="font-family: 'Henny Penny', cursive; font-size: 26px; color: #1a3c11; margin: 0;">
-                    {{ __('Bookshelf & Reviews') }}
-                </h3>
+            {{-- YENİ TEK SIRA TOOLBAR (Masaüstünde: Butonlar | Arama Çubuğu | Pano Switch) --}}
+            <div class="profile-toolbar-container">
+                
+                {{-- Sol Filtre Butonları (Mobilde 2x2 grid olur) --}}
+                <div class="status-buttons-group">
+                    <button type="button" class="status-tab active" onclick="filterStatus('all', this)">
+                        {{ __('All') }} ({{ count($userBooks ?? []) }})
+                    </button>
+                    <button type="button" class="status-tab" onclick="filterStatus('read', this)">
+                        {{ __('Read') }} ({{ isset($userBooks) ? $userBooks->where('status', 'read')->count() : 0 }})
+                    </button>
+                    <button type="button" class="status-tab" onclick="filterStatus('reading', this)">
+                        {{ __('Reading') }} ({{ isset($userBooks) ? $userBooks->where('status', 'reading')->count() : 0 }})
+                    </button>
+                    <button type="button" class="status-tab" onclick="filterStatus('toRead', this)">
+                        {{ __('To Read') }} ({{ isset($userBooks) ? $userBooks->whereIn('status', ['toRead', 'want_to_read'])->count() : 0 }})
+                    </button>
+                </div>
 
-                <div style="display: flex; background: #cae28c; border: 2px solid #737e3d; border-radius: 12px; padding: 4px; gap: 6px;">
-                    <button type="button" id="btn-list-view" onclick="switchProfileView('list')" style="border: none; background: #255719; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
+                {{-- Ortadaki Arama Çubuğu --}}
+                <div class="profile-search-middle">
+                    <input type="text" 
+                           id="profileBookSearchInput" 
+                           oninput="applyProfileSearchFilter()" 
+                           placeholder="🔍 {{ __('Search books or authors...') }}"
+                           autocomplete="off">
+                </div>
+
+                {{-- Sağdaki Görünüm Değiştirici --}}
+                <div class="view-switch-right">
+                    <button type="button" id="btn-list-view" onclick="switchProfileView('list')" class="view-toggle-btn active">
                         {{ __('Book List') }}
                     </button>
-                    <button type="button" id="btn-board-view" onclick="switchProfileView('board')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
+                    <button type="button" id="btn-board-view" onclick="switchProfileView('board')" class="view-toggle-btn">
                         {{ __('Board') }}
                     </button>
                 </div>
+
             </div>
 
             {{-- 1. KİTAP LİSTESİ GÖRÜNÜMÜ --}}
