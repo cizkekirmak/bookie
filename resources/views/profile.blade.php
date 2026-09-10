@@ -522,19 +522,23 @@
                     ? $user->avatar 
                     : $defaultAvatar;
                 $title = $user->reading_title;
+                $joinDate = !empty($user->created_at) 
+                    ? \Carbon\Carbon::parse($user->created_at)->translatedFormat('d.m.Y') 
+                    : '-';
             @endphp
 
-            {{-- YENİ: LIBRARY CARD (KÜTÜPHANE KARTI) BİLEŞENİ --}}
+            {{-- GÜNCELLENMİŞ: LIBRARY CARD BİLEŞENİ --}}
             <div class="library-card-wrapper">
                 {{-- Üst Damga Alanı --}}
                 <div class="library-card-header">
                     <span class="library-card-title">★ LIBRARY CARD</span>
-                    <span style="font-size: 11px; color: #768f63; font-weight: bold;">BOOKIE MEMBER</span>
+                    <span style="font-size: 11px; color: #5a7d3b; font-weight: bold;">BOOKIE MEMBER</span>
                 </div>
 
-                <div style="display: flex; gap: 10px; align-items: flex-start;">
-                    {{-- Mavi Çerçeveli Vesikalık Fotoğraf --}}
-                    <div style="width: 72px; height: 86px; border-radius: 8px; border: 2px solid #5ca0b2; background: #e8f5f8; padding: 2px; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                {{-- Orta Gövde (Fotoğraf, İsim, Rozet & Sağ Altta Tarih) --}}
+                <div style="display: flex; gap: 10px; align-items: flex-start; position: relative;">
+                    {{-- Tam Kare Mavi Çerçeveli Fotoğraf --}}
+                    <div style="width: 72px; height: 72px; border-radius: 8px; border: 2px solid #5ca0b2; background: #e8f5f8; padding: 2px; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; justify-content: center; align-items: center;">
                         @if(!empty($user->avatar))
                             <img src="{{ $userAvatar }}" 
                                  alt="{{ $user->username ?? $user->name }}" 
@@ -542,13 +546,13 @@
                                  style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px; display: block;" 
                                  onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                         @else
-                            <span style="font-size: 32px;">🌱</span>
+                            <span style="font-size: 30px;">🌱</span>
                         @endif
                     </div>
 
-                    {{-- Kullanıcı Adı ve Unvan --}}
-                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
-                        <div style="font-family: 'Henny Penny', cursive; font-size: 22px; color: #1a3c11; line-height: 1.15; word-break: break-word;">
+                    {{-- Unkempt İsim ve Unvan --}}
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-start;">
+                        <div style="font-family: 'Unkempt', cursive; font-size: 20px; font-weight: bold; color: #1a3c11; line-height: 1.15; word-break: break-word;">
                             {{ $user->username ?? $user->name }}
                         </div>
 
@@ -572,18 +576,23 @@
                                     line-height: 1.2;
                                 ">
                                     <span>{{ $title['icon'] }}</span>
-                                    <span>{{ __($title['name'] ?? 'certified noob') }}</span>
+                                    <span>{{ __($title['name'] ?? 'gariban üye') }}</span>
                                     <span style="font-size: 9px; opacity: 0.6;">▼</span>
                                 </div>
                             </button>
                         </div>
                     </div>
+
+                    {{-- Sağ Alttaki Üyelik Tarihi Damgası --}}
+                    <div style="position: absolute; right: 0; bottom: 0; font-size: 10.5px; color: #738b5e; font-family: 'Unkempt', cursive; line-height: 1; letter-spacing: 0.3px;">
+                        üye: <span style="font-weight: bold;">{{ $joinDate }}</span>
+                    </div>
                 </div>
 
-                {{-- Barkod Yerine Biyografi Alanı --}}
-                <div style="margin-top: 10px; background: #fdfaf0; border: 1px dashed #d5c8a8; border-radius: 6px; padding: 6px 8px; min-height: 42px; background-image: repeating-linear-gradient(transparent, transparent 17px, #faedd3 18px); line-height: 18px;">
+                {{-- Bio Not Alanı --}}
+                <div style="margin-top: 10px; background: #fdfaf0; border: 1px dashed #d5c8a8; border-radius: 6px; padding: 6px 8px; min-height: 40px; background-image: repeating-linear-gradient(transparent, transparent 17px, #faedd3 18px); line-height: 18px;">
                     <div style="font-size: 10px; color: #9c845b; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">bio :</div>
-                    <div style="font-size: 13.5px; color: #355e28; word-break: break-word; font-style: italic;">
+                    <div style="font-family: 'Unkempt', cursive; font-size: 13.5px; color: #355e28; word-break: break-word; font-style: italic;">
                         {{ !empty($user->bio) ? $user->bio : __('No note yet...') }}
                     </div>
                 </div>
