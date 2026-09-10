@@ -16,11 +16,36 @@ class BookController extends Controller
 {
     private string $googleApiKey = 'AIzaSyBGjDodZWAvBQ57QjOZ24VAGHOKf2p0Pus';
 
+    /**
+     * Kapak URL'lerini standart yüksek çözünürlüğe getiren fonksiyon
+     */
+    private function normalizeCoverUrl(?string $url): ?string
+    {
+        if (empty($url)) return null;
+
+        // Open Library ise garantili büyük boy (-L) yap
+        if (str_contains($url, 'covers.openlibrary.org')) {
+            return str_replace(['-M.jpg', '-S.jpg'], '-L.jpg', $url);
+        }
+
+        // Google Books ise zoom seviyesini büyüt ve sahte kıvrımı kaldır
+        if (str_contains($url, 'books.google.com') || str_contains($url, 'books.googleusercontent.com')) {
+            $url = str_replace('http://', 'https://', $url);
+            $url = str_replace('&edge=curl', '', $url);
+            return preg_replace('/zoom=[1-5]/', 'zoom=2', $url);
+        }
+
+        return $url;
+    }
+
     private function getCachedCoverUrl(?string $url, string $key): ?string
     {
         if (empty($url)) {
             return null;
         }
+
+        // Cloudinary'ye göndermeden önce mutlaka netleştir
+        $url = $this->normalizeCoverUrl($url);
 
         if (str_contains($url, 'res.cloudinary.com')) {
             return $url;
@@ -97,7 +122,6 @@ class BookController extends Controller
                         $cleanId = str_replace(['/works/', '/books/'], '', $rawKey);
                         $olKey = 'OL_' . $cleanId;
                         
-                        // Garantili yüksek çözünürlük için -L.jpg
                         $coverUrl = "https://covers.openlibrary.org/b/id/{$doc['cover_i']}-L.jpg";
                         $author = $doc['author_name'][0] ?? 'Bilinmeyen Yazar';
 
@@ -175,8 +199,7 @@ class BookController extends Controller
 
             $rawCover = $book->cover_image;
             if (!empty($rawCover) && !str_contains($rawCover, 'res.cloudinary.com')) {
-                // Eski Open Library -M kalıntılarını güvenle -L yap
-                $rawCover = str_replace('-M.jpg', '-L.jpg', $rawCover);
+                $rawCover = $this->normalizeCoverUrl($rawCover);
                 $cachedPath = $this->getCachedCoverUrl($rawCover, $cleanKey);
                 if ($cachedPath !== $rawCover) {
                     $book->update(['cover_image' => $cachedPath]);
@@ -210,7 +233,7 @@ class BookController extends Controller
 
             $title = $cached['title'] ?? 'Unknown book';
             $authors = $cached['authors'] ?? 'Unknown author';
-            $coverUrl = $cached['coverUrl'] ?? null;
+            $coverUrl = $this->normalizeCoverUrl($cached['coverUrl'] ?? null);
             $description = $cached['description'] ?? 'No description available.';
             $pageCount = $cached['pageCount'] ?? null;
         }
@@ -261,7 +284,7 @@ class BookController extends Controller
                     'id'      => $b->google_book_id ?? ($b->open_library_key ?? (string)$b->id),
                     'title'   => $b->title,
                     'authors' => $b->author,
-                    'cover'   => $b->cover_image,
+                    'cover'   => $this->normalizeCoverUrl($b->cover_image),
                 ];
             })->toArray();
 
@@ -301,8 +324,7 @@ class BookController extends Controller
                     $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
                     if (empty($rawCover) || empty($info['title'])) continue;
 
-                    // Orijinal zoom seviyesini bozmadan sadece bulanıklık yaratan edge=curl kaldırıldı
-                    $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover);
+                    $cover = $this->normalizeCoverUrl($rawCover);
 
                     $googleResults[] = [
                         'id'      => $item['id'],
@@ -324,7 +346,6 @@ class BookController extends Controller
 
                     $cleanId = str_replace(['/works/', '/books/'], '', $doc['key'] ?? '');
                     
-                    // Open Library için garantili net -L boyutu
                     $openLibResults[] = [
                         'id'      => 'OL_' . $cleanId,
                         'title'   => $doc['title'],
@@ -410,111 +431,6 @@ class BookController extends Controller
         return response()->json($results);
     }
 
-    private function searchGoogleBooks(string $query): array
-    {
-        try {
-            $params = [
-                'q'          => 'intitle:' . $query,
-                'maxResults' => 15,
-                'printType'  => 'books',
-            ];
-
-            if (!empty($this->googleApiKey)) {
-                $params['key'] = $this->googleApiKey;
-            }
-
-            $response = Http::withoutVerifying()
-                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->timeout(4)
-                ->get('https://www.googleapis.com/books/v1/volumes', $params);
-
-            if (!$response->successful()) {
-                return [];
-            }
-
-            $items = $response->json('items') ?? [];
-            $results = [];
-
-            foreach ($items as $item) {
-                $info = $item['volumeInfo'] ?? [];
-                
-                $rawCover = $info['imageLinks']['thumbnail'] ?? ($info['imageLinks']['smallThumbnail'] ?? null);
-                if (empty($rawCover)) {
-                    continue;
-                }
-
-                $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $rawCover);
-                $title = $info['title'] ?? null;
-                if (!$title) continue;
-
-                $authors = isset($info['authors']) ? implode(', ', array_slice($info['authors'], 0, 2)) : 'Bilinmeyen Yazar';
-
-                $results[] = [
-                    'id'      => $item['id'],
-                    'title'   => $title,
-                    'authors' => $authors,
-                    'cover'   => $cover,
-                ];
-            }
-
-            return $results;
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
-    private function searchOpenLibrary(string $query): array
-    {
-        try {
-            $response = Http::withoutVerifying()
-                ->withHeaders([
-                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) BookieApp/1.0',
-                    'Accept'     => 'application/json',
-                ])
-                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->timeout(4)
-                ->get('https://openlibrary.org/search.json', [
-                    'title' => $query,
-                    'limit' => 20,
-                ]);
-
-            if (!$response->successful()) {
-                return [];
-            }
-
-            $docs = $response->json('docs') ?? [];
-            $results = [];
-
-            foreach ($docs as $doc) {
-                $coverId = $doc['cover_i'] ?? null;
-                if (empty($coverId)) {
-                    continue;
-                }
-
-                $title = $doc['title'] ?? null;
-                if (!$title) continue;
-
-                $rawKey = $doc['key'] ?? '';
-                $cleanId = str_replace(['/works/', '/books/'], '', $rawKey);
-                $bookId = 'OL_' . $cleanId;
-
-                $authors = isset($doc['author_name']) ? implode(', ', array_slice($doc['author_name'], 0, 2)) : 'Bilinmeyen Yazar';
-                $cover = "https://covers.openlibrary.org/b/id/{$coverId}-L.jpg";
-
-                $results[] = [
-                    'id'      => $bookId,
-                    'title'   => $title,
-                    'authors' => $authors,
-                    'cover'   => $cover,
-                ];
-            }
-
-            return $results;
-        } catch (\Throwable $e) {
-            return [];
-        }
-    }
-
     public function store(Request $request)
     {
         $request->validate([
@@ -529,8 +445,7 @@ class BookController extends Controller
 
         $coverValue = $request->input('cover_image') ?? $request->input('cover_url');
         if (!empty($coverValue)) {
-            // Kaydedilirken Open Library linki geldiyse güvenle -L yap
-            $coverValue = str_replace('-M.jpg', '-L.jpg', $coverValue);
+            $coverValue = $this->normalizeCoverUrl($coverValue);
             $coverValue = $this->getCachedCoverUrl($coverValue, $cleanKey);
         }
 
@@ -638,8 +553,8 @@ class BookController extends Controller
                     $chosen = $validItems[array_rand($validItems)];
                     $info = $chosen['volumeInfo'] ?? [];
 
-                    $cover = $info['imageLinks']['thumbnail'] ?? $info['imageLinks']['smallThumbnail'];
-                    $cover = str_replace(['http://', '&edge=curl'], ['https://', ''], $cover);
+                    $rawCover = $info['imageLinks']['thumbnail'] ?? $info['imageLinks']['smallThumbnail'];
+                    $cover = $this->normalizeCoverUrl($rawCover);
 
                     Cache::put('book_meta_' . $chosen['id'], [
                         'title'       => $info['title'],
@@ -672,7 +587,7 @@ class BookController extends Controller
                     'id'         => $randomDbBook->open_library_key ?? $randomDbBook->google_book_id ?? (string)$randomDbBook->id,
                     'title'      => $randomDbBook->title,
                     'author'     => $randomDbBook->author,
-                    'cover'      => $randomDbBook->cover_image,
+                    'cover'      => $this->normalizeCoverUrl($randomDbBook->cover_image),
                     'page_count' => $randomDbBook->page_count,
                     'url'        => route('show', $randomDbBook->open_library_key ?? $randomDbBook->google_book_id ?? $randomDbBook->id),
                 ]

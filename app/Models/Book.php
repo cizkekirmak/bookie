@@ -35,11 +35,14 @@ class Book extends Model
     {
         return $this->belongsTo(User::class);
     }
-    public function likes() {
+
+    public function likes() 
+    {
         return $this->hasMany(\App\Models\ReviewLike::class, "review_id");
     }
 
-    public function isLikedBy(?User $user): bool {
+    public function isLikedBy(?User $user): bool 
+    {
         if (!$user) {
             return false;
         }
@@ -47,12 +50,43 @@ class Book extends Model
         return $this->likes()->where('user_id', $user->id)->exists();
     }
 
+    /**
+     * Google Books kapak linklerini yüksek çözünürlüğe (HD) optimize eder
+     */
+    protected function enhanceCoverUrl(?string $url): ?string
+    {
+        if (empty($url)) {
+            return null;
+        }
+
+        if (str_contains($url, 'books.google.com') || str_contains($url, 'books.googleusercontent.com')) {
+            $url = str_replace('http://', 'https://', $url);
+            $url = str_replace('&edge=curl', '', $url);
+            $url = preg_replace('/zoom=[1-5]/', 'zoom=2', $url);
+        }
+
+        return $url;
+    }
+
+    /**
+     * $book->cover_image çağrıldığında netleştirilmiş URL döner
+     */
+    public function getCoverImageAttribute($value)
+    {
+        return $this->enhanceCoverUrl($value);
+    }
+
+    /**
+     * $book->cover_url çağrıldığında varsayılan görsel ya da netleştirilmiş URL döner
+     */
     public function getCoverUrlAttribute()
     {
-        if (empty($this->cover_image)) {
+        $rawCover = $this->attributes['cover_image'] ?? ($this->attributes['cover_url'] ?? null);
+
+        if (empty($rawCover)) {
             return asset('images/default-cover.jpg');
         }
 
-        return $this->cover_image;
+        return $this->enhanceCoverUrl($rawCover);
     }
 }
