@@ -26,6 +26,7 @@
         height: 227px;
         width: 320px;
         box-sizing: border-box;
+        position: relative;
     }
 
     .continue-card-title {
@@ -91,9 +92,10 @@
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
-            height: 148px !important;
+            height: 154px !important;
             padding: 9px 8px !important;
             border-radius: 14px !important;
+            box-sizing: border-box !important;
         }
 
         .continue-card-title {
@@ -106,7 +108,7 @@
         .continue-reading-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: 88px !important;
+            height: 110px !important;
         }
 
         .continue-book-cover {
@@ -117,23 +119,15 @@
 
         .continue-book-info {
             height: 88px !important;
-            min-height: 88px !important;
-            display: flex !important;
-            flex-direction: column !important;
-            justify-content: space-between !important;
-        }
-
-        .continue-text-meta {
-            height: 56px !important;
-            overflow: hidden !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: flex-start !important;
+            position: relative !important;
         }
 
         .continue-reading-card h4 {
             font-size: 13px !important;
-            margin: 0 0 2px 0 !important;
+            margin: 0 0 1px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -141,7 +135,7 @@
         }
 
         .continue-reading-card p {
-            font-size: 11.5px !important;
+            font-size: 11px !important;
             margin: 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
@@ -152,12 +146,15 @@
         .btn-text-mobile { display: inline !important; }
         .btn-text-desktop { display: none !important; }
 
+        /* Buton kapağın alt tabanına kilitlendi */
         .continue-btn {
+            position: absolute !important;
+            bottom: 9px !important;
+            left: 74px !important;
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
             margin: 0 !important;
-            align-self: flex-start !important;
         }
     }
 </style>
@@ -183,7 +180,7 @@
             </a>
 
             <div class="continue-book-info">
-                <div class="continue-text-meta">
+                <div>
                     <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->title }}
                     </h4>

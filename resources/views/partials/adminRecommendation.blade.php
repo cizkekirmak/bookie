@@ -20,9 +20,10 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 220px;
+        height: 227px;
         width: 320px;
         box-sizing: border-box;
+        position: relative;
     }
 
     .admin-card-title {
@@ -88,9 +89,8 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: auto !important;
-            min-height: 152px !important;
-            padding: 9px 8px 10px 8px !important;
+            height: 154px !important;
+            padding: 9px 8px !important;
             border-radius: 14px !important;
             box-sizing: border-box !important;
         }
@@ -105,25 +105,22 @@
         .admin-recommendation-body {
             gap: 8px !important;
             align-items: flex-start !important;
-            height: auto !important;
-            min-height: 90px !important;
+            height: 110px !important;
         }
 
         .admin-book-cover-link {
-            width: 56px !important;
-            height: 84px !important;
+            width: 58px !important;
+            height: 88px !important;
             border-radius: 6px !important;
             flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: auto !important;
-            min-height: 84px !important;
+            height: 88px !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: flex-start !important;
-            flex: 1 !important;
-            overflow: visible !important;
+            position: relative !important;
         }
 
         .adminRecommendation-card h4 {
@@ -137,18 +134,17 @@
 
         .adminRecommendation-card p.admin-author-text {
             font-size: 11px !important;
-            margin: 0 0 3px 0 !important;
+            margin: 0 0 2px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
 
-        /* Not burada kısıtlamasız alt satıra geçer */
         .admin-note-text {
             font-size: 10px !important;
-            line-height: 1.2 !important;
-            margin: 0 0 6px 0 !important;
+            line-height: 1.15 !important;
+            margin: 0 !important;
             color: #27491d !important;
             font-style: italic !important;
             font-family: 'Unkempt', cursive !important;
@@ -156,19 +152,22 @@
             word-break: normal !important;
             overflow-wrap: break-word !important;
             display: block !important;
-            overflow: visible !important;
-            max-height: none !important;
+            max-height: 28px !important;
+            overflow: hidden !important;
         }
 
         .admin-btn-text-mobile { display: inline !important; }
         .admin-btn-text-desktop { display: none !important; }
 
+        /* Buton tam continue-reading ile aynı seviyeye (bottom: 9px) kilitlendi */
         .admin-btn {
+            position: absolute !important;
+            bottom: 9px !important;
+            left: 74px !important;
             padding: 3px 8px !important;
             font-size: 11.5px !important;
             border-radius: 6px !important;
-            margin-top: 2px !important;
-            align-self: flex-start !important;
+            margin: 0 !important;
         }
     }
 </style>
