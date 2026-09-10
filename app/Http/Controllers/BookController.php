@@ -28,11 +28,15 @@ class BookController extends Controller
             return str_replace(['-M.jpg', '-S.jpg'], '-L.jpg', $url);
         }
 
-        // Google Books ise zoom seviyesini büyüt ve sahte kıvrımı kaldır
+        // Google Books ise HTTPS yap, curl kaldır ama zoom seviyesine DOKUNMA
         if (str_contains($url, 'books.google.com') || str_contains($url, 'books.googleusercontent.com')) {
             $url = str_replace('http://', 'https://', $url);
             $url = str_replace('&edge=curl', '', $url);
-            return preg_replace('/zoom=[1-5]/', 'zoom=2', $url);
+            
+            // Eğer zoom=2 veya zoom=0 yapılmış eski bir link varsa bunu güvenli olan zoom=1'e çek
+            $url = preg_replace('/zoom=[0-9]/', 'zoom=1', $url);
+            
+            return $url;
         }
 
         return $url;
