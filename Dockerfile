@@ -28,7 +28,7 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+RUN /usr/local/bin/composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 # Tüm storage ve public klasörlerine Apache kullanıcısı için tam izin ver
 RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
