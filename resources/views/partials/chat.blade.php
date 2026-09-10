@@ -8,7 +8,7 @@
     <div class="chat-view" id="chat-view-friends">
         <div class="chat-view-header">
             <span class="chat-view-title">{{ __('Messages') }}</span>
-            <button type="button" class="chat-close-btn" id="chat-friends-close-btn">&times;</button>
+            <button type="button" class="chat-close-btn" id="chat-friends-close-btn" aria-label="{{ __('Close') }}">&times;</button>
         </div>
         <div class="chat-search-wrap">
             <input type="text" id="chat-friend-search" placeholder="{{ __('Search friends...') }}" autocomplete="off">
@@ -23,10 +23,10 @@
         <div class="chat-header">
             <button type="button" class="chat-back-btn" id="chat-back-btn" title="{{ __('Back') }}">&#8249;</button>
             <a href="#" id="chat-header-user" class="chat-header-user" style="text-decoration: none; cursor: pointer;">
-                <img id="chat-active-avatar" src="{{ asset('images/default-avatar.jpg') }}" alt="Avatar" class="chat-header-avatar">
+                <img id="chat-active-avatar" src="{{ asset('images/default-avatar.jpg') }}" alt="{{ __('Avatar') }}" class="chat-header-avatar">
                 <span id="chat-active-name" class="chat-header-name"></span>
             </a>
-            <button type="button" class="chat-close-btn" id="chat-close-btn">&times;</button>
+            <button type="button" class="chat-close-btn" id="chat-close-btn" aria-label="{{ __('Close') }}">&times;</button>
         </div>
 
         <div class="chat-messages-body" id="chat-messages-body">
@@ -36,12 +36,12 @@
         </div>
 
         <div class="chat-sticker-picker" id="chat-sticker-picker" style="display: none;">
-            <img src="{{ asset('images/sticker1.png') }}" class="sticker-item" data-sticker="sticker1.png" alt="Sticker 1" draggable="false">
-            <img src="{{ asset('images/sticker2.png') }}" class="sticker-item" data-sticker="sticker2.png" alt="Sticker 2" draggable="false">
-            <img src="{{ asset('images/sticker3.png') }}" class="sticker-item" data-sticker="sticker3.png" alt="Sticker 3" draggable="false">
-            <img src="{{ asset('images/sticker4.png') }}" class="sticker-item" data-sticker="sticker4.png" alt="Sticker 4" draggable="false">
-            <img src="{{ asset('images/sticker5.png') }}" class="sticker-item" data-sticker="sticker5.png" alt="Sticker 5" draggable="false">
-            <img src="{{ asset('images/sticker6.png') }}" class="sticker-item" data-sticker="sticker6.png" alt="Sticker 6" draggable="false">
+            <img src="{{ asset('images/sticker1.png') }}" class="sticker-item" data-sticker="sticker1.png" alt="{{ __('Sticker') }} 1" draggable="false">
+            <img src="{{ asset('images/sticker2.png') }}" class="sticker-item" data-sticker="sticker2.png" alt="{{ __('Sticker') }} 2" draggable="false">
+            <img src="{{ asset('images/sticker3.png') }}" class="sticker-item" data-sticker="sticker3.png" alt="{{ __('Sticker') }} 3" draggable="false">
+            <img src="{{ asset('images/sticker4.png') }}" class="sticker-item" data-sticker="sticker4.png" alt="{{ __('Sticker') }} 4" draggable="false">
+            <img src="{{ asset('images/sticker5.png') }}" class="sticker-item" data-sticker="sticker5.png" alt="{{ __('Sticker') }} 5" draggable="false">
+            <img src="{{ asset('images/sticker6.png') }}" class="sticker-item" data-sticker="sticker6.png" alt="{{ __('Sticker') }} 6" draggable="false">
         </div>
 
         <form id="chat-input-form" class="chat-input-area">
@@ -93,8 +93,8 @@
     position: fixed;
     bottom: 135px;
     left: 30px;
-    width: 320px;       /* 360px yerine daha derli toplu 320px */
-    height: 430px;      /* Eski tatlı yüksekliğine döndü */
+    width: 320px;
+    height: 430px;
     background: #ffffff;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.16);
@@ -119,7 +119,6 @@
     }
 }
 
-/* GÖRÜNÜM TAŞIYICILARI */
 .chat-view {
     flex: 1;
     display: flex;
@@ -130,7 +129,6 @@
     background: #fff;
 }
 
-/* 1. EKRAN: ARKADAŞ LİSTESİ BAŞLIK VE ARAMA */
 .chat-view-header {
     height: 46px;
     border-bottom: 1px solid #ffedf8;
@@ -169,7 +167,6 @@
     border-color: #eba4b4;
 }
 
-/* ARKADAŞ LİSTESİ SCROLL ALANI VE ÖZEL PASTEL SCROLLBAR */
 .chat-friends-scroll {
     flex: 1;
     overflow-y: auto;
@@ -191,7 +188,6 @@
     background: transparent;
 }
 
-/* ARKADAŞ LİSTE ELEMANI (KART) */
 .chat-friend-row {
     display: flex;
     align-items: center;
@@ -248,7 +244,6 @@
     font-family: 'Unkempt', cursive;
 }
 
-/* 2. EKRAN: SOHBET BAŞLIĞI VE GERİ BUTONU */
 .chat-header {
     height: 46px;
     border-bottom: 1px solid #ffedf8;
@@ -478,7 +473,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const stickerPicker = document.getElementById('chat-sticker-picker');
     const unreadDot = document.getElementById('chat-unread-dot');
 
-    const emptyChatText = @json(__('No messages yet. Send the first one!'));
+    // Çeviri Sözlüğü
+    const I18N = {
+        emptyChat: @json(__('No messages yet. Send the first one!')),
+        noFriendsFound: @json(__('No friends found.')),
+        newMessage: @json(__('new message')),
+        clickToChat: @json(__('Click to chat')),
+        stickerAlt: @json(__('Sticker'))
+    };
+
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
@@ -548,7 +551,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startPolling();
     }
 
-    // SÜRÜKLEME MANTIĞI
     btn.addEventListener('mousedown', (e) => {
         isDragging = false;
         shiftX = e.clientX - btn.getBoundingClientRect().left;
@@ -575,7 +577,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mouseup', onMouseUp);
     });
 
-    // BALON TIKLAMA
     btn.addEventListener('click', async () => {
         if (isDragging) return;
         const isOpen = popup.style.display === 'flex';
@@ -597,7 +598,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 popup.style.bottom = 'auto';
             }
 
-            // Açıldığında doğrudan Arkadaş Listesi görünümüne geçer
             showFriendsView();
         } else {
             activeFriendId = null;
@@ -605,7 +605,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startPolling();
     });
 
-    // KAPAT BUTONLARI
     function closePopup() {
         popup.style.display = 'none';
         activeFriendId = null;
@@ -615,12 +614,10 @@ document.addEventListener('DOMContentLoaded', () => {
     closeBtn.addEventListener('click', closePopup);
     friendsCloseBtn.addEventListener('click', closePopup);
 
-    // GERİ BUTONU (<)
     backBtn.addEventListener('click', () => {
         showFriendsView();
     });
 
-    // ARKADAŞ LİSTESİ ÇEKME & ARAMA FİLTRESİ
     async function loadFriends() {
         try {
             const res = await fetch('/messages/friends', {
@@ -637,7 +634,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const filtered = friends.filter(f => f.username.toLowerCase().includes(filter));
 
         if (filtered.length === 0) {
-            friendsList.innerHTML = `<div class="chat-empty-state" style="margin: 20px auto;">${@json(__('No friends found.'))}</div>`;
+            friendsList.innerHTML = `<div class="chat-empty-state" style="margin: 20px auto;">${I18N.noFriendsFound}</div>`;
             return;
         }
 
@@ -646,6 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
             row.className = 'chat-friend-row';
 
             const badgeHtml = (friend.unread_count > 0) ? '<span class="chat-friend-row-badge"></span>' : '';
+            const subText = friend.unread_count > 0 ? `${friend.unread_count} ${I18N.newMessage}` : I18N.clickToChat;
 
             row.innerHTML = `
                 <div class="chat-friend-avatar-wrap">
@@ -654,7 +652,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="chat-friend-info">
                     <span class="chat-friend-name">${escapeHtml(friend.username)}</span>
-                    <span class="chat-friend-sub">${friend.unread_count > 0 ? friend.unread_count + ' ' + @json(__('new message')) : @json(__('Click to chat'))}</span>
+                    <span class="chat-friend-sub">${subText}</span>
                 </div>
             `;
 
@@ -667,13 +665,11 @@ document.addEventListener('DOMContentLoaded', () => {
         renderFriends(cachedFriends);
     });
 
-    // ARKADAŞ SEÇME VE SOHBETİ AÇMA
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
         blockInChatSound = true;
 
-        // 1. Önceki arkadaşın mesajlarını ANINDA temizle (Glitch'i yok eden satır)
         messagesBody.innerHTML = '';
 
         headerUser.href = `/profile/${friend.id}`;
@@ -695,7 +691,6 @@ document.addEventListener('DOMContentLoaded', () => {
         startPolling();
     }
 
-    // MESAJLARI YÜKLEME
     async function loadMessages(forceScroll = false) {
         if (!activeFriendId) return;
         try {
@@ -722,7 +717,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             messagesBody.innerHTML = '';
             if (messages.length === 0) {
-                messagesBody.innerHTML = `<div class="chat-empty-state">${emptyChatText}</div>`;
+                messagesBody.innerHTML = `<div class="chat-empty-state">${I18N.emptyChat}</div>`;
                 return;
             }
 
@@ -737,7 +732,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (msg.message.startsWith('[sticker:') && msg.message.endsWith(']')) {
                     const stickerName = msg.message.replace('[sticker:', '').replace(']', '');
                     bubble.innerHTML = `
-                        <img src="/images/${escapeHtml(stickerName)}" class="chat-bubble-sticker" alt="Sticker">
+                        <img src="/images/${escapeHtml(stickerName)}" class="chat-bubble-sticker" alt="${I18N.stickerAlt}">
                         <div class="chat-bubble-time">${escapeHtml(msg.time)}</div>
                     `;
                 } else {
@@ -757,7 +752,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {}
     }
 
-    // MESAJ GÖNDERME
     async function sendMessage(text) {
         if (!activeFriendId || !text.trim()) return;
         try {
@@ -802,7 +796,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // CANLI KONTROL (POLLING)
     async function checkUnread() {
         if (isCheckingUnread) return;
         isCheckingUnread = true;
@@ -830,7 +823,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 lastUnreadTotal = currentCount;
             }
 
-            // Sohbet açıkken mesajları; liste açıkken de liste badge'lerini tazele
             if (isPopupOpen) {
                 if (activeFriendId) {
                     loadMessages(false);
