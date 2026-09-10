@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 227px;
+        height: 220px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -85,16 +85,16 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 145px !important; /* Boy kısaltıldı */
-            padding: 9px 8px !important;
+            height: 155px !important;
+            padding: 10px 10px !important;
             border-radius: 14px !important;
             justify-content: flex-start !important;
         }
 
         .admin-card-title {
-            font-size: 15px !important;
+            font-size: 15.5px !important; /* Popular Books ile eşitlendi */
             margin-bottom: 6px !important;
-            line-height: 1.1 !important;
+            line-height: 1.15 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
@@ -102,23 +102,23 @@
 
         .admin-recommendation-body {
             display: flex !important;
-            gap: 8px !important;
+            gap: 10px !important;
             align-items: center !important;
             flex: 1 !important;
-            height: 94px !important;
-            min-height: 94px !important;
+            height: 98px !important;
+            min-height: 98px !important;
         }
 
         .admin-book-cover-link {
-            width: 60px !important;
-            height: 90px !important;
+            width: 62px !important;
+            height: 94px !important;
             border-radius: 6px !important;
             flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: 90px !important;
-            min-height: 90px !important;
+            height: 94px !important;
+            min-height: 94px !important;
             display: flex !important;
             flex-direction: column !important;
             justify-content: space-between !important;
@@ -126,7 +126,7 @@
         }
 
         .adminRecommendation-card h4 {
-            font-size: 14px !important;
+            font-size: 14.5px !important;
             margin: 0 0 1px 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
@@ -135,7 +135,7 @@
         }
 
         .adminRecommendation-card p {
-            font-size: 12px !important;
+            font-size: 12.5px !important;
             margin: 0 !important;
             line-height: 1.15 !important;
             white-space: nowrap !important;
@@ -144,7 +144,12 @@
         }
 
         .admin-note-text {
-            display: none !important;
+            display: -webkit-box !important;
+            -webkit-line-clamp: 2 !important;
+            -webkit-box-orient: vertical !important;
+            font-size: 12px !important;
+            line-height: 1.25 !important;
+            margin: 2px 0 3px 0 !important;
         }
 
         .admin-btn {
@@ -184,7 +189,7 @@
             </div>
 
             @if(!empty($adminRecommendation->admin_note))
-                <p class="admin-note-text" style="font-size: 12px; color: #1a3c11; font-style: italic; margin: 0; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
+                <p class="admin-note-text" style="font-size: 13.5px; color: #1a3c11; font-style: italic; margin: 3px 0 4px 0; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
                     "{{ $adminRecommendation->admin_note }}"
                 </p>
             @endif
