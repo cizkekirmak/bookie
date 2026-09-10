@@ -290,17 +290,43 @@
         margin-bottom: -5px;
     }
 
+    /* ANAHTARLIK VE SARKAÇ SALINIMLARI */
     .keychain-plush-img {
         width: 100%;
         height: 100%;
         object-fit: contain;
         transform-origin: top center;
-        transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         cursor: pointer;
         filter: drop-shadow(0 4px 6px rgba(0,0,0,0.18));
         pointer-events: auto !important;
+        will-change: transform;
     }
-    .keychain-plush-img:hover { transform: rotate(8deg) scale(1.08); }
+
+    .keychain-plush-img.swing-right {
+        animation: swingKeychainRight 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .keychain-plush-img.swing-left {
+        animation: swingKeychainLeft 0.85s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    @keyframes swingKeychainRight {
+        0%   { transform: rotate(0deg) scale(1); }
+        20%  { transform: rotate(15deg) scale(1.06); }
+        40%  { transform: rotate(-10deg) scale(1.03); }
+        60%  { transform: rotate(5deg) scale(1.01); }
+        80%  { transform: rotate(-2deg); }
+        100% { transform: rotate(0deg) scale(1); }
+    }
+
+    @keyframes swingKeychainLeft {
+        0%   { transform: rotate(0deg) scale(1); }
+        20%  { transform: rotate(-15deg) scale(1.06); }
+        40%  { transform: rotate(10deg) scale(1.03); }
+        60%  { transform: rotate(-5deg) scale(1.01); }
+        80%  { transform: rotate(2deg); }
+        100% { transform: rotate(0deg) scale(1); }
+    }
 
     .is-editing-mode .keychain-plush-img:hover {
         opacity: 0.6;
@@ -1037,65 +1063,57 @@
     }
 
     function compressImageClientSide(file, maxWidth = 300, maxHeight = 300, quality = 0.75) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const dataUrl = e.target.result;
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const dataUrl = e.target.result;
+                const mimeMatch = /^data:(image\/[a-zA-Z0-9+.-]+);base64,/.exec(dataUrl);
+                const realMime = mimeMatch ? mimeMatch[1].toLowerCase() : (file.type || '').toLowerCase();
 
-            // Gerçek formatı dosya adı / File.type yerine tarayıcının ürettiği
-            // data URL'in mime önekinden alıyoruz. Böylece aslında PNG olan
-            // (şeffaf) bir görsel yanlışlıkla JPEG sanılıp alfa kanalı
-            // kaybolmuyor ve arkasında beyaz bir kutu belirmiyor.
-            const mimeMatch = /^data:(image\/[a-zA-Z0-9+.-]+);base64,/.exec(dataUrl);
-            const realMime = mimeMatch ? mimeMatch[1].toLowerCase() : (file.type || '').toLowerCase();
+                const img = new Image();
+                img.src = dataUrl;
+                img.onload = function () {
+                    let width = img.width;
+                    let height = img.height;
 
-            const img = new Image();
-            img.src = dataUrl;
-            img.onload = function () {
-                let width = img.width;
-                let height = img.height;
-
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
                     }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round((width * maxHeight) / height);
-                        height = maxHeight;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d', { alpha: true });
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    const isPng = realMime === 'image/png';
+                    const isWebp = realMime === 'image/webp';
+
+                    let compressedBase64;
+                    if (isPng) {
+                        compressedBase64 = canvas.toDataURL('image/png');
+                    } else if (isWebp) {
+                        compressedBase64 = canvas.toDataURL('image/webp', quality);
+                    } else {
+                        compressedBase64 = canvas.toDataURL('image/jpeg', quality);
                     }
-                }
 
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext('2d', { alpha: true });
-                ctx.clearRect(0, 0, width, height);
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const isPng = realMime === 'image/png';
-                const isWebp = realMime === 'image/webp';
-
-                let compressedBase64;
-                if (isPng) {
-                    // PNG: kalite parametresi verilmez, şeffaflık olduğu gibi korunur.
-                    compressedBase64 = canvas.toDataURL('image/png');
-                } else if (isWebp) {
-                    compressedBase64 = canvas.toDataURL('image/webp', quality);
-                } else {
-                    // JPEG (alfa desteklemeyen formatlar): kendi orijinal
-                    // (opak) haliyle bırakılır, ekstra bir müdahale yapılmaz.
-                    compressedBase64 = canvas.toDataURL('image/jpeg', quality);
-                }
-
-                resolve({ base64: compressedBase64, width, height });
+                    resolve({ base64: compressedBase64, width, height });
+                };
             };
-        };
-        reader.readAsDataURL(file);
-    });
-}
+            reader.readAsDataURL(file);
+        });
+    }
 
     function rescaleBoardForMobile() {
         const frame = document.getElementById('corkboardArea');
@@ -1911,7 +1929,36 @@
         };
     });
 
+    // İKİ YÖNLÜ FİZİKSEL SARKAÇ SALINIMI
+    function setupKeychainSwingPhysics() {
+        const grid = document.getElementById('keychainHooksGrid');
+        if (!grid) return;
+
+        grid.addEventListener('mouseenter', (e) => {
+            const plush = e.target.closest('.keychain-plush-img');
+            if (!plush) return;
+
+            const rect = plush.getBoundingClientRect();
+            const centerX = rect.left + (rect.width / 2);
+
+            plush.classList.remove('swing-right', 'swing-left');
+
+            // Mouse giriş noktası merkezin solunda mı sağında mı?
+            if (e.clientX < centerX) {
+                plush.classList.add('swing-right');
+            } else {
+                plush.classList.add('swing-left');
+            }
+
+            plush.addEventListener('animationend', () => {
+                plush.classList.remove('swing-right', 'swing-left');
+            }, { once: true });
+        }, true);
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
+        setupKeychainSwingPhysics();
+
         document.querySelectorAll('#boardStage .cork-postit, #corkboardArea .cork-postit').forEach(wrapper => {
             const canManage = wrapper.dataset.canManage === '1';
             setupPostitControls(wrapper, canManage);
