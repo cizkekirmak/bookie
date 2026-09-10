@@ -93,8 +93,8 @@
     position: fixed;
     bottom: 135px;
     left: 30px;
-    width: 360px;
-    height: 450px;
+    width: 320px;       /* 360px yerine daha derli toplu 320px */
+    height: 430px;      /* Eski tatlı yüksekliğine döndü */
     background: #ffffff;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.16);
@@ -107,9 +107,9 @@
 
 @media (max-width: 1024px) {
     .chat-popup {
-        width: 92vw !important;
-        max-width: 350px !important;
-        height: 450px !important;
+        width: 88vw !important;
+        max-width: 320px !important;
+        height: 430px !important;
         left: 50% !important;
         right: auto !important;
         top: auto !important;
@@ -586,7 +586,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (window.innerWidth > 768) {
                 const rect = btn.getBoundingClientRect();
                 if (rect.left < window.innerWidth / 2) {
-                    popup.style.left = `${Math.min(rect.left, window.innerWidth - 380)}px`;
+                    popup.style.left = `${Math.min(rect.left, window.innerWidth - 340)}px`;
                     popup.style.right = 'auto';
                 } else {
                     popup.style.right = `${Math.max(20, window.innerWidth - rect.right)}px`;
