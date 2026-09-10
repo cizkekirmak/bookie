@@ -77,6 +77,8 @@ class MessageController extends Controller
                         'is_mine' => (int)$msg->sender_id === (int)$user->id,
                         'message' => $msg->message,
                         'time' => $msg->created_at ? $msg->created_at->format('H:i') : '',
+                        // İŞTE KİLİT NOKTA: ISO formatında tarih damgası
+                        'created_at' => $msg->created_at ? $msg->created_at->toIso8601String() : null,
                     ];
                 });
 
@@ -110,6 +112,7 @@ class MessageController extends Controller
                     'is_mine' => true,
                     'message' => $message->message,
                     'time' => $message->created_at ? $message->created_at->format('H:i') : date('H:i'),
+                    'created_at' => $message->created_at ? $message->created_at->toIso8601String() : now()->toIso8601String(),
                 ]
             ]);
         } catch (\Exception $e) {
