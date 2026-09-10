@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 227px;
+        height: 220px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -88,49 +88,55 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 175px !important;
-            padding: 10px 10px !important;
+            height: 150px !important; /* Kare küçültüldü */
+            padding: 8px 10px !important;
             border-radius: 14px !important;
             box-sizing: border-box !important;
+            justify-content: flex-start !important;
         }
 
         .admin-card-title {
             font-size: 15px !important;
-            margin-bottom: 6px !important;
-            line-height: 1 !important;
+            margin-bottom: 2px !important;
+            line-height: 1.1 !important;
             height: 16px !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
         }
 
         .admin-recommendation-body {
             display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            flex: 1 !important;
+            padding-top: 4px !important; /* Başlıktan aşağı indirildi */
+            min-height: 0 !important;
+        }
+
+        .admin-row-top {
+            display: flex !important;
             gap: 8px !important;
-            align-items: stretch !important;
-            height: 124px !important;
-            min-height: 124px !important;
+            align-items: flex-start !important;
+            width: 100% !important;
         }
 
         .admin-book-cover-link {
-            width: 54px !important;
-            height: 82px !important;
-            border-radius: 6px !important;
+            width: 50px !important;
+            height: 72px !important;
+            border-radius: 5px !important;
             flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: 124px !important;
-            min-height: 124px !important;
+            height: auto !important;
+            min-height: 0 !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
             flex: 1 !important;
         }
 
         .adminRecommendation-card h4 {
             font-size: 13.5px !important;
-            margin: 0 0 1px 0 !important;
+            margin: 0 0 2px 0 !important;
             line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -146,13 +152,14 @@
             text-overflow: ellipsis !important;
         }
 
+        /* Not kapağın altındaki tam satıra taşındı, ferahladı */
         .admin-note-text {
             font-size: 11px !important;
-            line-height: 1.2 !important;
-            margin: 3px 0 0 0 !important;
+            line-height: 1.15 !important;
+            margin: 2px 0 0 0 !important;
             color: #27491d !important;
             display: -webkit-box !important;
-            -webkit-line-clamp: 3 !important; /* 3 satıra kadar rahat okuma */
+            -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
             overflow: hidden !important;
             word-break: break-word !important;
@@ -162,11 +169,11 @@
         .admin-btn-text-desktop { display: none !important; }
 
         .admin-btn {
-            padding: 3px 8px !important;
-            font-size: 12px !important;
+            padding: 3px 10px !important;
+            font-size: 11.5px !important;
             border-radius: 6px !important;
             align-self: flex-start !important;
-            margin-top: auto !important;
+            margin-top: 6px !important; /* Buton yukarı çekildi */
         }
     }
 </style>
@@ -175,21 +182,21 @@
     <span class="admin-card-title">{{ __('admin recommends!') }}</span>
 
     <div class="admin-recommendation-body">
-        <a href="{{ route('show', $adminBookKey) }}" class="admin-book-cover-link">
-            @if(!empty($coverSrc))
-                <img src="{{ $coverSrc }}" 
-                     alt="{{ $adminRecommendation->title ?? __('Book Cover') }}"
-                     style="width: 100%; height: 100%; object-fit: cover; display: block;"
-                     onerror="this.onerror=null; this.src='https://covers.openlibrary.org/b/id/10849922-M.jpg';">
-            @else
-                <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                    📖
-                </div>
-            @endif
-        </a>
+        <div class="admin-row-top">
+            <a href="{{ route('show', $adminBookKey) }}" class="admin-book-cover-link">
+                @if(!empty($coverSrc))
+                    <img src="{{ $coverSrc }}" 
+                         alt="{{ $adminRecommendation->title ?? __('Book Cover') }}"
+                         style="width: 100%; height: 100%; object-fit: cover; display: block;"
+                         onerror="this.onerror=null; this.src='https://covers.openlibrary.org/b/id/10849922-M.jpg';">
+                @else
+                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                        📖
+                    </div>
+                @endif
+            </a>
 
-        <div class="admin-book-info">
-            <div>
+            <div class="admin-book-info">
                 <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->title }}
                 </h4>
@@ -198,17 +205,17 @@
                 </p>
 
                 @if(!empty($adminRecommendation->admin_note))
-                    <p class="admin-note-text" style="font-size: 13px; color: #1a3c11; font-style: italic; margin: 3px 0 0 0; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
+                    <p class="admin-note-text" style="font-size: 13px; color: #1a3c11; font-style: italic; margin: 2px 0 0 0; line-height: 1.25; font-family: 'Unkempt', cursive;">
                         "{{ $adminRecommendation->admin_note }}"
                     </p>
                 @endif
             </div>
-
-            <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
-                <span class="admin-btn-text-desktop">{{ __('view book →') }}</span>
-                <span class="admin-btn-text-mobile">{{ __('view →') }}</span>
-            </a>
         </div>
+
+        <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
+            <span class="admin-btn-text-desktop">{{ __('view book →') }}</span>
+            <span class="admin-btn-text-mobile">{{ __('view →') }}</span>
+        </a>
     </div>
 </div>
 @endif

@@ -23,7 +23,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 227px;
+        height: 220px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -90,49 +90,55 @@
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
-            height: 175px !important;
-            padding: 10px 10px !important;
+            height: 150px !important; /* Kare küçültüldü */
+            padding: 8px 10px !important;
             border-radius: 14px !important;
             box-sizing: border-box !important;
+            justify-content: flex-start !important;
         }
 
         .continue-card-title {
             font-size: 15px !important;
-            margin-bottom: 6px !important;
-            line-height: 1 !important;
+            margin-bottom: 2px !important;
+            line-height: 1.1 !important;
             height: 16px !important;
-            white-space: nowrap !important;
-            overflow: hidden !important;
-            text-overflow: ellipsis !important;
         }
 
         .continue-reading-body {
             display: flex !important;
+            flex-direction: column !important;
+            justify-content: space-between !important;
+            flex: 1 !important;
+            padding-top: 4px !important; /* Başlıktan aşağı indirildi */
+            min-height: 0 !important;
+        }
+
+        .continue-row-top {
+            display: flex !important;
             gap: 8px !important;
-            align-items: stretch !important;
-            height: 124px !important;
-            min-height: 124px !important;
+            align-items: flex-start !important;
+            width: 100% !important;
         }
 
         .continue-book-cover {
-            width: 54px !important;
-            height: 82px !important;
-            border-radius: 6px !important;
+            width: 50px !important;
+            height: 72px !important;
+            border-radius: 5px !important;
             flex-shrink: 0 !important;
         }
 
         .continue-book-info {
-            height: 124px !important;
-            min-height: 124px !important;
+            height: auto !important;
+            min-height: 0 !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
             flex: 1 !important;
         }
 
         .continue-reading-card h4 {
             font-size: 13.5px !important;
-            margin: 0 0 1px 0 !important;
+            margin: 0 0 2px 0 !important;
             line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
@@ -152,11 +158,11 @@
         .btn-text-desktop { display: none !important; }
 
         .continue-btn {
-            padding: 3px 8px !important;
-            font-size: 12px !important;
+            padding: 3px 10px !important;
+            font-size: 11.5px !important;
             border-radius: 6px !important;
             align-self: flex-start !important;
-            margin-top: auto !important;
+            margin-top: 6px !important; /* Buton yukarı çekildi */
         }
     }
 </style>
@@ -166,23 +172,23 @@
 
     <div class="continue-reading-body">
         @if($currentBook)
-            <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" style="flex-shrink: 0; line-height: 0;">
-                @if(!empty($currentBook->cover_image))
-                    <img src="{{ $currentBook->cover_image }}" 
-                         alt="{{ $currentBook->title }}" 
-                         loading="eager"
-                         decoding="sync"
-                         referrerpolicy="no-referrer" 
-                         class="continue-book-cover">
-                @else
-                    <div class="continue-book-cover" style="display: flex; align-items: center; justify-content: center; font-size: 24px;">
-                        📖
-                    </div>
-                @endif
-            </a>
+            <div class="continue-row-top">
+                <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" style="flex-shrink: 0; line-height: 0;">
+                    @if(!empty($currentBook->cover_image))
+                        <img src="{{ $currentBook->cover_image }}" 
+                             alt="{{ $currentBook->title }}" 
+                             loading="eager"
+                             decoding="sync"
+                             referrerpolicy="no-referrer" 
+                             class="continue-book-cover">
+                    @else
+                        <div class="continue-book-cover" style="display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                            📖
+                        </div>
+                    @endif
+                </a>
 
-            <div class="continue-book-info">
-                <div>
+                <div class="continue-book-info">
                     <h4 style="color: #1a3c11; font-size: 16px; margin: 0 0 2px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; font-family: 'Unkempt', cursive;">
                         {{ $currentBook->title }}
                     </h4>
@@ -191,8 +197,8 @@
                     </p>
 
                     @if($hasPercentage)
-                        <div style="margin-top: 3px;">
-                            <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
+                        <div style="margin-top: 4px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 10px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
                                 <span>%{{ $pct }}</span>
                                 <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} {{ __('p.') }}</span>
                             </div>
@@ -202,12 +208,12 @@
                         </div>
                     @endif
                 </div>
-
-                <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" class="continue-btn">
-                    <span class="btn-text-desktop">{{ __('view book →') }}</span>
-                    <span class="btn-text-mobile">{{ __('view →') }}</span>
-                </a>
             </div>
+
+            <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" class="continue-btn">
+                <span class="btn-text-desktop">{{ __('view book →') }}</span>
+                <span class="btn-text-mobile">{{ __('view →') }}</span>
+            </a>
         @else
             <div style="text-align: center; width: 100%; color: #3b612d; font-size: 13px; font-family: 'Unkempt', cursive; margin: auto 0;">
                 <p style="margin: 0 0 3px 0;">{{ __('No books currently being read.') }}</p>
