@@ -503,9 +503,6 @@ document.addEventListener('DOMContentLoaded', () => {
         stickerAlt: @json(__('Sticker'))
     };
 
-    // Tarih ayracı için dil sözlüğü. document.documentElement.lang her
-    // çağrıda okunuyor, yani sayfa yenilenmeden JS ile dil değiştirilse
-    // bile ayraçlar doğru dilde çıkar.
     const DATE_I18N = {
         tr: { today: 'Bugün', yesterday: 'Dün', locale: 'tr-TR' },
         en: { today: 'Today', yesterday: 'Yesterday', locale: 'en-US' }
@@ -572,8 +569,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return lang.startsWith('en') ? 'en' : 'tr';
     }
 
-    // Laravel'in "YYYY-MM-DD HH:mm:ss" formatı Safari/iOS'ta Invalid Date
-    // verebiliyor. Boşluğu 'T' ile değiştirip ISO uyumlu hale getiriyoruz.
     function parseServerDate(raw) {
         if (!raw) return null;
         let parsed = new Date(String(raw).trim().replace(' ', 'T'));
@@ -583,26 +578,33 @@ document.addEventListener('DOMContentLoaded', () => {
         return isNaN(parsed.getTime()) ? null : parsed;
     }
 
+    // GÜN FORMATLAYICI: Bugün -> "Bugün", Dün -> "Dün", Daha Eski -> "10.09.2026"
     function formatMessageDate(dateObj) {
         if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
             dateObj = new Date();
         }
 
         const dict = DATE_I18N[getCurrentLang()];
+        const now = new Date();
 
-        const today = new Date();
-        const yesterday = new Date();
-        yesterday.setDate(today.getDate() - 1);
+        const msgDayStart = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const yesterdayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
 
-        if (dateObj.toDateString() === today.toDateString()) {
+        if (msgDayStart.getTime() === todayStart.getTime()) {
             return dict.today;
-        } else if (dateObj.toDateString() === yesterday.toDateString()) {
+        } else if (msgDayStart.getTime() === yesterdayStart.getTime()) {
             return dict.yesterday;
         }
 
-        return dateObj.toLocaleDateString(dict.locale, { day: 'numeric', month: 'long', year: 'numeric' });
+        // 2 günden eski mesajlar için açık tarih formatı: "10.09.2026"
+        const day = String(dateObj.getDate()).padStart(2, '0');
+        const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+        const year = dateObj.getFullYear();
+        return `${day}.${month}.${year}`;
     }
 
+    // HER GÜNÜN İLK MESAJINDAN ÖNCE OTOMATİK AYRAÇ KOYAN MOTOR
     function renderMessagesWithDates(messages) {
         messagesBody.innerHTML = '';
 
@@ -616,8 +618,9 @@ document.addEventListener('DOMContentLoaded', () => {
         messages.forEach(msg => {
             const raw = msg.created_at || msg.date || null;
             const msgDate = parseServerDate(raw) || new Date();
-            const dateKey = msgDate.toDateString();
+            const dateKey = `${msgDate.getFullYear()}-${msgDate.getMonth()}-${msgDate.getDate()}`;
 
+            // Farklı bir güne geçildiğinde gün ayracını araya ekle
             if (dateKey !== lastDateKey) {
                 lastDateKey = dateKey;
                 const separator = document.createElement('div');
@@ -842,16 +845,23 @@ document.addEventListener('DOMContentLoaded', () => {
         messageInput.value = '';
         stickerPicker.style.display = 'none';
 
-        // Boş mesaj uyarısını kaldır
         const emptyState = messagesBody.querySelector('.chat-empty-state');
         if (emptyState) emptyState.remove();
 
-        // Eğer hiç ayraç yoksa hemen bugünün ayracını koy
-        if (messagesBody.querySelectorAll('.chat-date-separator').length === 0) {
-            const dict = DATE_I18N[getCurrentLang()];
+        // Eğer henüz bugünün ayracı yoksa en alta "Bugün" ayracı aç
+        const dict = DATE_I18N[getCurrentLang()];
+        const todayText = `---- ${dict.today} ----`;
+        const separators = messagesBody.querySelectorAll('.chat-date-separator span');
+        let hasTodaySeparator = false;
+
+        separators.forEach(s => {
+            if (s.textContent.includes(dict.today)) hasTodaySeparator = true;
+        });
+
+        if (!hasTodaySeparator) {
             const separator = document.createElement('div');
             separator.className = 'chat-date-separator';
-            separator.innerHTML = `<span>---- ${dict.today} ----</span>`;
+            separator.innerHTML = `<span>${todayText}</span>`;
             messagesBody.appendChild(separator);
         }
 
@@ -898,7 +908,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) {
                 bubble.style.opacity = '0.5';
             } else {
-                // Sunucudaki son mesajı senkronize etmek için arkadan sessizce yükle
                 setTimeout(() => loadMessages(false), 300);
             }
         } catch (e) {
