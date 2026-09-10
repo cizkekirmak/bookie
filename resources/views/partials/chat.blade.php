@@ -322,23 +322,24 @@
     font-family: 'Unkempt', cursive;
 }
 
-.chat-date-separator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 10px 0 6px 0;
-    width: 100%;
-    user-select: none;
+..chat-date-separator {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    margin: 12px 0 8px 0 !important;
+    width: 100% !important;
+    z-index: 5 !important;
 }
 .chat-date-separator span {
-    font-family: 'Unkempt', cursive;
-    font-size: 12px;
-    color: #8c767e;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 2px 14px;
-    border-radius: 10px;
-    border: 1px dashed #e8c6d1;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    display: inline-block !important;
+    font-family: 'Unkempt', cursive !important;
+    font-size: 12.5px !important;
+    color: #5c434c !important;
+    background: #ffffff !important;
+    padding: 3px 14px !important;
+    border-radius: 12px !important;
+    border: 1.5px dashed #eba4b4 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08) !important;
 }
 
 .chat-bubble {
