@@ -322,7 +322,6 @@
     font-family: 'Unkempt', cursive;
 }
 
-/* YENİ: GÜN AYIRICI ÇİZGİSİ */
 .chat-date-separator {
     display: flex;
     align-items: center;
@@ -352,6 +351,7 @@
     cursor: pointer;
     position: relative;
     font-family: 'Unkempt', cursive;
+    transition: opacity 0.2s ease;
 }
 .chat-bubble.mine {
     align-self: flex-end;
@@ -507,7 +507,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const csrfToken = "{{ csrf_token() }}";
     const defaultAvatarUrl = "{{ asset('images/default-avatar.jpg') }}";
 
-    // GÜVENLİ SES YÖNETİMİ (ÜST ÜSTE BİNMEZ, MOBİLDE KUYRUĞA ALIP PATLATMAZ)
+    // GÜVENLİ VE HAFİF SES YÖNETİMİ
     const SOUND_URLS = {
         closed: "{{ asset('sounds/yeni-mesaj.mp3') }}",
         inChat: "{{ asset('sounds/mesaj-atma.mp3') }}"
@@ -533,14 +533,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const playPromise = audio.play();
             if (playPromise !== undefined) {
                 playPromise.catch(() => {
-                    // Mobilde izin verilmemişse sessizce geç, asla kuyrukta biriktirme!
                     currentAudio = null;
                 });
             }
         } catch (e) {}
     }
 
-    // Sayfa değişirken veya çıkarken sesleri anında durdur
     window.addEventListener('pagehide', () => {
         if (currentAudio) {
             currentAudio.pause();
@@ -557,12 +555,12 @@ document.addEventListener('DOMContentLoaded', () => {
     let pollInterval = null;
     let isCheckingUnread = false;
     let cachedFriends = [];
+    let lastRenderedDate = null;
 
     function getAvatarSrc(avatar) {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
     }
 
-    // TARİHİ "10 Eylül 2026" FORMATINA ÇEVİREN YARDIMCI
     function formatMessageDate(dateStr) {
         if (!dateStr) return '';
         const d = new Date(dateStr);
@@ -582,11 +580,23 @@ document.addEventListener('DOMContentLoaded', () => {
         return d.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
+    function checkAndAppendDateSeparator(dateObj) {
+        const msgDay = dateObj.toDateString();
+        if (msgDay !== lastRenderedDate) {
+            lastRenderedDate = msgDay;
+            const separator = document.createElement('div');
+            separator.className = 'chat-date-separator';
+            separator.innerHTML = `<span>---- ${formatMessageDate(dateObj)} ----</span>`;
+            messagesBody.appendChild(separator);
+        }
+    }
+
     function showFriendsView() {
         viewFriends.style.display = 'flex';
         viewConversation.style.display = 'none';
         activeFriendId = null;
         lastLoadedMessagesCount = 0;
+        lastRenderedDate = null;
         messagesBody.innerHTML = '';
         messageInput.disabled = true;
         sendBtn.disabled = true;
@@ -658,6 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
         popup.style.display = 'none';
         activeFriendId = null;
         lastLoadedMessagesCount = 0;
+        lastRenderedDate = null;
         startPolling();
     }
     closeBtn.addEventListener('click', closePopup);
@@ -717,6 +728,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function selectFriend(friend) {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
+        lastRenderedDate = null;
         blockInChatSound = true;
 
         messagesBody.innerHTML = '';
@@ -740,6 +752,7 @@ document.addEventListener('DOMContentLoaded', () => {
         startPolling();
     }
 
+    // AKICI & SADECE YENİLERİ EKLEYEN LOAD MESSAGES
     async function loadMessages(forceScroll = false) {
         if (!activeFriendId) return;
         try {
@@ -748,51 +761,44 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             const messages = await res.json();
 
-            if (!blockInChatSound && lastLoadedMessagesCount > 0 && messages.length > lastLoadedMessagesCount) {
-                const newestMessage = messages[messages.length - 1];
-                if (!newestMessage.is_mine) {
-                    playSound('inChat');
-                }
-            }
-
             if (messages.length === lastLoadedMessagesCount && !forceScroll) {
                 return;
             }
-            lastLoadedMessagesCount = messages.length;
 
-            const threshold = 60;
-            const isNearBottom = (messagesBody.scrollHeight - messagesBody.scrollTop - messagesBody.clientHeight) <= threshold;
-            const previousScrollTop = messagesBody.scrollTop;
+            const isFirstLoad = (lastLoadedMessagesCount === 0 || forceScroll);
 
-            messagesBody.innerHTML = '';
-            if (messages.length === 0) {
-                messagesBody.innerHTML = `<div class="chat-empty-state">${I18N.emptyChat}</div>`;
-                return;
+            if (isFirstLoad) {
+                messagesBody.innerHTML = '';
+                lastRenderedDate = null;
+
+                if (messages.length === 0) {
+                    messagesBody.innerHTML = `<div class="chat-empty-state">${I18N.emptyChat}</div>`;
+                    lastLoadedMessagesCount = 0;
+                    return;
+                }
+            } else {
+                const emptyState = messagesBody.querySelector('.chat-empty-state');
+                if (emptyState) emptyState.remove();
             }
 
-            // GÜN BAZLI AYIRICI DÖNGÜSÜ
-            let lastMessageDay = null;
+            const newMessages = isFirstLoad ? messages : messages.slice(lastLoadedMessagesCount);
 
-            messages.forEach(msg => {
-                // Backend'den created_at veya date bilgisi varsa onu, yoksa bugünü baz al
+            if (!blockInChatSound && !isFirstLoad && newMessages.length > 0) {
+                const hasIncoming = newMessages.some(m => !m.is_mine);
+                if (hasIncoming) playSound('inChat');
+            }
+
+            lastLoadedMessagesCount = messages.length;
+
+            newMessages.forEach(msg => {
                 const rawDate = msg.created_at || msg.date || null;
                 if (rawDate) {
-                    const msgDay = new Date(rawDate).toDateString();
-                    if (msgDay !== lastMessageDay) {
-                        lastMessageDay = msgDay;
-                        const dateSeparator = document.createElement('div');
-                        dateSeparator.className = 'chat-date-separator';
-                        dateSeparator.innerHTML = `<span>---- ${formatMessageDate(rawDate)} ----</span>`;
-                        messagesBody.appendChild(dateSeparator);
-                    }
+                    checkAndAppendDateSeparator(new Date(rawDate));
                 }
 
                 const bubble = document.createElement('div');
                 bubble.className = `chat-bubble ${msg.is_mine ? 'mine' : 'theirs'}`;
-
-                bubble.addEventListener('click', () => {
-                    bubble.classList.toggle('show-time');
-                });
+                bubble.addEventListener('click', () => bubble.classList.toggle('show-time'));
 
                 if (msg.message.startsWith('[sticker:') && msg.message.endsWith(']')) {
                     const stickerName = msg.message.replace('[sticker:', '').replace(']', '');
@@ -809,16 +815,55 @@ document.addEventListener('DOMContentLoaded', () => {
                 messagesBody.appendChild(bubble);
             });
 
-            if (forceScroll || isNearBottom) {
-                messagesBody.scrollTop = messagesBody.scrollHeight;
-            } else {
-                messagesBody.scrollTop = previousScrollTop;
-            }
+            messagesBody.scrollTo({
+                top: messagesBody.scrollHeight,
+                behavior: isFirstLoad ? 'auto' : 'smooth'
+            });
+
         } catch (e) {}
     }
 
+    // ANINDA EKRANA BASAN OPTIMISTIC UI SEND MESSAGE
     async function sendMessage(text) {
         if (!activeFriendId || !text.trim()) return;
+
+        const messageText = text.trim();
+        messageInput.value = '';
+        stickerPicker.style.display = 'none';
+
+        // 1. Ekrana anında bas
+        const emptyState = messagesBody.querySelector('.chat-empty-state');
+        if (emptyState) emptyState.remove();
+
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+        checkAndAppendDateSeparator(now);
+
+        const bubble = document.createElement('div');
+        bubble.className = 'chat-bubble mine';
+        bubble.addEventListener('click', () => bubble.classList.toggle('show-time'));
+
+        if (messageText.startsWith('[sticker:') && messageText.endsWith(']')) {
+            const stickerName = messageText.replace('[sticker:', '').replace(']', '');
+            bubble.innerHTML = `
+                <img src="/images/${escapeHtml(stickerName)}" class="chat-bubble-sticker" alt="${I18N.stickerAlt}">
+                <div class="chat-bubble-time">${timeStr}</div>
+            `;
+        } else {
+            bubble.innerHTML = `
+                <div>${escapeHtml(messageText)}</div>
+                <div class="chat-bubble-time">${timeStr}</div>
+            `;
+        }
+
+        messagesBody.appendChild(bubble);
+        messagesBody.scrollTo({ top: messagesBody.scrollHeight, behavior: 'smooth' });
+
+        playSound('inChat');
+        lastLoadedMessagesCount++;
+
+        // 2. Arka planda sunucuya ilet
         try {
             const res = await fetch('/messages/send', {
                 method: 'POST',
@@ -830,17 +875,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 },
                 body: JSON.stringify({
                     receiver_id: activeFriendId,
-                    message: text
+                    message: messageText
                 })
             });
 
-            if (res.ok) {
-                playSound('inChat');
-                messageInput.value = '';
-                stickerPicker.style.display = 'none';
-                await loadMessages(true);
+            if (!res.ok) {
+                bubble.style.opacity = '0.5';
+                bubble.title = 'Gönderilemedi';
             }
-        } catch (e) {}
+        } catch (e) {
+            bubble.style.opacity = '0.5';
+        }
     }
 
     inputForm.addEventListener('submit', (e) => {
@@ -903,7 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function startPolling() {
         if (pollInterval) clearInterval(pollInterval);
-        const intervalTime = (popup.style.display === 'flex') ? 1500 : 4000;
+        const intervalTime = (popup.style.display === 'flex') ? 2500 : 5000;
         pollInterval = setInterval(checkUnread, intervalTime);
     }
 
