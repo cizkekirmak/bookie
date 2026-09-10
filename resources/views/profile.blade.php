@@ -531,8 +531,8 @@
             <div class="library-card-wrapper">
                 {{-- Üst Damga Alanı --}}
                 <div class="library-card-header">
-                    <span class="library-card-title">★ LIBRARY CARD</span>
-                    <span style="font-size: 12.5px; color: #5a7d3b; font-weight: bold;">BOOKIE MEMBER</span>
+                    <span class="library-card-title">★ {{ __('LIBRARY CARD') }}</span>
+                    <span style="font-size: 12.5px; color: #5a7d3b; font-weight: bold;">{{ __('BOOKIE MEMBER') }}</span>
                 </div>
 
                 {{-- Orta Gövde (Fotoğraf, İsim, Rozet & Sağ Altta Tarih) --}}
@@ -571,7 +571,7 @@
                                     padding: 2.5px 8px;
                                     border-radius: 12px;
                                     font-family: 'Unkempt', cursive;
-                                    font-size: 13px; /* 12px -> 13px */
+                                    font-size: 13px;
                                     font-weight: bold;
                                     line-height: 1.2;
                                 ">
@@ -585,19 +585,19 @@
 
                     {{-- Sağ Alttaki Üyelik Tarihi Damgası --}}
                     <div style="position: absolute; right: 0; bottom: 0; font-size: 12px; color: #738b5e; font-family: 'Unkempt', cursive; line-height: 1; letter-spacing: 0.3px;">
-                        üye: <span style="font-weight: bold;">{{ $joinDate }}</span>
+                        {{ __('member:') }} <span style="font-weight: bold;">{{ $joinDate }}</span>
                     </div>
                 </div>
 
                 {{-- Bio Not Alanı --}}
                 <div style="margin-top: 10px; background: #fdfaf0; border: 1px dashed #d5c8a8; border-radius: 6px; padding: 6px 8px; min-height: 40px; background-image: repeating-linear-gradient(transparent, transparent 17px, #faedd3 18px); line-height: 18px;">
-                    <div style="font-size: 11.5px; color: #9c845b; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">bio :</div>
+                    <div style="font-size: 11.5px; color: #9c845b; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('bio :') }}</div>
                     <div style="font-family: 'Unkempt', cursive; font-size: 14.5px; color: #355e28; word-break: break-word; font-style: italic;">
                         {{ !empty($user->bio) ? $user->bio : __('No note yet...') }}
                     </div>
                 </div>
             </div>
-
+            
             {{-- Arkadaşlık İşlemleri (Diğer Kullanıcı Profili İse) --}}
             @if(!$isOwnProfile)
                 <div style="margin-bottom: 12px; width: 100%; display: flex; justify-content: center; margin-top: 12px;">
