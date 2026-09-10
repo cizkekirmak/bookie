@@ -3,42 +3,42 @@
     @csrf
 @endif
 
-    {{-- EKOSE TEMALI RENKLİ DURUM SEKMELERİ & SİLME BUTONU --}}
+    {{-- EKOSE TEMALI PASTEL DURUM SEKMELERİ & SİLME BUTONU --}}
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; flex-shrink: 0;">
         <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-            {{-- Tümü (Mercan / Şeftali) --}}
+            {{-- Tümü (Pastel Nane Yeşili - Başlangıçta Seçili) --}}
             <button type="button" 
                     onclick="filterStatus('all', this)" 
                     class="status-tab" 
                     data-type="all"
-                    style="border: 2px solid #e06350; background: #ff7d6b; color: #ffffff; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(224,99,80,0.25); transition: all 0.15s ease;">
+                    style="border: 1.5px solid #9ccb86; background: #b8dfa4; color: #27521e; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(39, 82, 30, 0.15); transition: all 0.15s ease;">
                 {{ __('All') }} ({{ $userBooks->count() }})
             </button>
 
-            {{-- Okundu (Çilek Pembesi) --}}
+            {{-- Okundu (Pastel Çilek Pembesi) --}}
             <button type="button" 
                     onclick="filterStatus('read', this)" 
                     class="status-tab" 
                     data-type="read"
-                    style="border: 1.5px solid #f8b4c2; background: #ffe5eb; color: #b32d4e; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
+                    style="border: 1.5px solid #f7b1c0; background: #fee2e8; color: #8e2b42; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
                 {{ __('read') }} ({{ $userBooks->where('status', 'read')->count() }})
             </button>
 
-            {{-- Şu An Okuyor (Gök Mavisi) --}}
+            {{-- Şu An Okuyor (Pastel Gök Mavisi) --}}
             <button type="button" 
                     onclick="filterStatus('reading', this)" 
                     class="status-tab" 
                     data-type="reading"
-                    style="border: 1.5px solid #b9dcf7; background: #e2f2fc; color: #21638a; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
+                    style="border: 1.5px solid #a8d3f5; background: #e2f0fc; color: #1e5579; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
                 {{ __('currently reading') }} ({{ $userBooks->where('status', 'reading')->count() }})
             </button>
 
-            {{-- Okunacak (Tereyağı Sarısı) --}}
+            {{-- Okunacak (Pastel Tereyağı Sarısı) --}}
             <button type="button" 
                     onclick="filterStatus('toRead', this)" 
                     class="status-tab" 
                     data-type="toRead"
-                    style="border: 1.5px solid #fae18c; background: #fff4cc; color: #8f680a; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
+                    style="border: 1.5px solid #fae087; background: #fef5d1; color: #7a5a0c; padding: 6px 16px; border-radius: 20px; font-family: 'Unkempt', cursive; font-size: 14.5px; font-weight: bold; cursor: pointer; transition: all 0.15s ease;">
                 {{ __('to read') }} ({{ $userBooks->where('status', 'toRead')->count() }})
             </button>
         </div>
@@ -70,13 +70,12 @@
 @endif
 
 <script>
-// Sekmeler arası geçişte her butonun kendi pastel rengini korumasını sağlar
 window.filterStatus = function(status, clickedBtn) {
     const tabStyles = {
-        'all': { bg: '#dd92dc', activeBg: '#ae4f90', color: '#fff', border: '#a7559d', shadow: 'rgba(72, 23, 69, 0.3)' },
-        'read': { bg: '#ffe5eb', activeBg: '#d64b6f', color: '#b32d4e', border: '#f8b4c2', shadow: 'rgba(214,75,111,0.3)' },
-        'reading': { bg: '#e2f2fc', activeBg: '#21638a', color: '#21638a', border: '#b9dcf7', shadow: 'rgba(33,99,138,0.3)' },
-        'toRead': { bg: '#fff4cc', activeBg: '#e2ac24', color: '#cda036', border: '#fae18c', shadow: 'rgba(170, 152, 34, 0.3)' }
+        'all':     { bg: '#dcedd2', activeBg: '#b8dfa4', color: '#27521e', border: '#9ccb86', shadow: 'rgba(39, 82, 30, 0.15)' },
+        'read':    { bg: '#fee2e8', activeBg: '#fcc2ce', color: '#8e2b42', border: '#f7b1c0', shadow: 'rgba(142, 43, 66, 0.15)' },
+        'reading': { bg: '#e2f0fc', activeBg: '#c2e1f9', color: '#1e5579', border: '#a8d3f5', shadow: 'rgba(30, 85, 121, 0.15)' },
+        'toRead':  { bg: '#fef5d1', activeBg: '#fce9a5', color: '#7a5a0c', border: '#fae087', shadow: 'rgba(122, 90, 12, 0.15)' }
     };
 
     document.querySelectorAll('.status-tab').forEach(btn => {
@@ -84,8 +83,8 @@ window.filterStatus = function(status, clickedBtn) {
         const style = tabStyles[type];
         if (style) {
             btn.style.background = style.bg;
-            btn.style.color = (type === 'all') ? '#fff' : style.color;
-            btn.style.border = (type === 'all') ? '2px solid ' + style.border : '1.5px solid ' + style.border;
+            btn.style.color = style.color;
+            btn.style.border = '1.5px solid ' + style.border;
             btn.style.boxShadow = 'none';
         }
     });
@@ -94,9 +93,9 @@ window.filterStatus = function(status, clickedBtn) {
     const activeStyle = tabStyles[activeType];
     if (activeStyle) {
         clickedBtn.style.background = activeStyle.activeBg;
-        clickedBtn.style.color = '#ffffff';
-        clickedBtn.style.border = '2px solid ' + activeStyle.activeBg;
-        clickedBtn.style.boxShadow = '0 3px 8px ' + activeStyle.shadow;
+        clickedBtn.style.color = activeStyle.color;
+        clickedBtn.style.border = '1.5px solid ' + activeStyle.border;
+        clickedBtn.style.boxShadow = '0 2px 6px ' + activeStyle.shadow;
     }
 
     const cards = document.querySelectorAll('.book-card-item');
