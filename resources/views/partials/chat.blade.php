@@ -579,7 +579,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
-    // GÜN AYIRICILARINI GARANTİLEYEN YENİ VE SAĞLAM MOTOR
     function renderMessagesWithDates(messages) {
         messagesBody.innerHTML = '';
 
@@ -588,10 +587,24 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        let lastDateKey = null;
+        // 1. En az 1 mesaj varsa en tepeye DİREKT Today / Gün ayracını koy
+        let firstDate = new Date();
+        const firstRaw = messages[0].created_at || messages[0].date || null;
+        if (firstRaw) {
+            const parsed = new Date(firstRaw);
+            if (!isNaN(parsed.getTime())) firstDate = parsed;
+        }
 
+        let lastDateKey = firstDate.toDateString();
+
+        const topSeparator = document.createElement('div');
+        topSeparator.className = 'chat-date-separator';
+        topSeparator.innerHTML = `<span>---- ${formatMessageDate(firstDate)} ----</span>`;
+        messagesBody.appendChild(topSeparator);
+
+        // 2. Mesajları dön ve gün değiştikçe yeni ayraç aç
         messages.forEach(msg => {
-            let msgDate = new Date();
+            let msgDate = firstDate;
             const raw = msg.created_at || msg.date || null;
             if (raw) {
                 const parsed = new Date(raw);
@@ -600,7 +613,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const dateKey = msgDate.toDateString();
 
-            // Gün değiştiğinde ayracı ekle
             if (dateKey !== lastDateKey) {
                 lastDateKey = dateKey;
                 const separator = document.createElement('div');
@@ -609,7 +621,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 messagesBody.appendChild(separator);
             }
 
-            // Balonu ekle
             const bubble = document.createElement('div');
             bubble.className = `chat-bubble ${msg.is_mine ? 'mine' : 'theirs'}`;
             bubble.addEventListener('click', () => bubble.classList.toggle('show-time'));
@@ -628,14 +639,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             messagesBody.appendChild(bubble);
         });
-
-        // En az bir mesaj varsa ve ayraç oluşmadıysa (tarih parse edilemediyse) Today ayracını başa koy
-        if (messages.length > 0 && messagesBody.querySelectorAll('.chat-date-separator').length === 0) {
-            const separator = document.createElement('div');
-            separator.className = 'chat-date-separator';
-            separator.innerHTML = `<span>---- ${I18N.today} ----</span>`;
-            messagesBody.insertBefore(separator, messagesBody.firstChild);
-        }
     }
 
     function showFriendsView() {
