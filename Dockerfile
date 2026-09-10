@@ -31,12 +31,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 RUN /usr/local/bin/composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
 
 # Tüm storage ve public klasörlerine Apache kullanıcısı için tam izin ver
-RUN mkdir -p /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database \
-    && touch /var/www/html/database/database.sqlite \
-    && rm -rf /var/www/html/public/storage \
-    && php artisan storage:link \
-    && chown -R www-data:www-data /var/www/html \
-    && chmod -R 777 /var/www/html/storage /var/www/html/bootstrap/cache /var/www/html/database /var/www/html/public
+RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
 
 EXPOSE 80
 
