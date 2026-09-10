@@ -19,9 +19,16 @@
     $hasProgress = $item->status === 'reading' && $currentPage > 0;
     $pct = ($totalPages > 0 && $currentPage > 0) ? min(100, round(($currentPage / $totalPages) * 100)) : null;
 
-    // Tarih Biçimlendirmeleri
-    $startDate = !empty($item->started_at) ? \Carbon\Carbon::parse($item->started_at)->translatedFormat('d M Y') : '-';
-    $finishDate = !empty($item->finished_at) ? \Carbon\Carbon::parse($item->finished_at)->translatedFormat('d M Y') : '-';
+   // Tarih Biçimlendirmeleri (Tablodaki created_at ve updated_at üzerinden)
+    $startDate = !empty($item->created_at) 
+        ? \Carbon\Carbon::parse($item->created_at)->translatedFormat('d M Y') 
+        : '-';
+
+    // Sadece kitap 'read' (okundu) durumundaysa bitiş tarihi olarak updated_at gösterilsin
+    $finishDate = ($item->status === 'read' && !empty($item->updated_at)) 
+        ? \Carbon\Carbon::parse($item->updated_at)->translatedFormat('d M Y') 
+        : '-';
+        
     $uniqueId = 'note_' . ($item->id ?? rand(1000, 9999));
 @endphp
 
