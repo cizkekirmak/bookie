@@ -9,20 +9,20 @@
                 : $defaultAvatar;
         @endphp
 
-        <div class="notification-item" style="display: flex; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #f0f4ec; align-items: flex-start;">
+        <div class="notification-item" style="display: flex; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #f0f4ec; align-items: flex-start; width: 100%; box-sizing: border-box;">
             {{-- Profil Fotoğrafı Linki --}}
             <a href="{{ route('profile', $sender?->id ?? '#') }}" 
                class="notification-avatar" 
-               style="width: 38px; height: 38px; min-width: 38px; min-height: 38px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: flex; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;">
+               style="width: 38px; height: 38px; min-width: 38px; min-height: 38px; aspect-ratio: 1 / 1; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; display: block; text-decoration: none; cursor: pointer;">
                 <img src="{{ $avatarSrc }}" 
                      alt="{{ $sender?->username ?? __('Profile') }}" 
                      referrerpolicy="no-referrer"
-                     style="width: 100%; height: 100%; min-width: 100%; min-height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
+                     style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                      onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
             </a>
 
-            <div class="notification-info" style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;">
-                <a href="{{ route('profile', $sender?->id ?? '#') }}" class="sender-name" style="font-size: 14.5px; font-weight: bold; color: #1a3c11; text-decoration: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
+            <div class="notification-info" style="flex: 1 1 0%; min-width: 0; display: flex; flex-direction: column; gap: 2px; overflow-wrap: anywhere; word-break: break-word;">
+                <a href="{{ route('profile', $sender?->id ?? '#') }}" class="sender-name" style="font-size: 14.5px; font-weight: bold; color: #1a3c11; text-decoration: none; display: block; font-family: 'Unkempt', cursive;">
                     {{ $sender?->name ?? ($sender?->username ?? __('User')) }}
                 </a>
                 <span class="notification-desc" style="font-size: 13.5px; color: #555; font-family: 'Unkempt', cursive;">{{ __('sent you a friend request.') }}</span>
@@ -63,25 +63,25 @@
         @if(($notifData['type'] ?? '') === 'review_liked')
             <div class="notification-item" 
                  @if($bookKey) onclick="window.location='{{ route('show', $bookKey) }}#review-{{ $notifData['review_id'] ?? '' }}'" @endif
-                 style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f0f4ec; transition: background 0.15s ease;"
+                 style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; cursor: pointer; border-bottom: 1px solid #f0f4ec; width: 100%; box-sizing: border-box; transition: background 0.15s ease;"
                  onmouseenter="this.style.background='#f7fbf4'"
                  onmouseleave="this.style.background='transparent'">
                 
                 {{-- Kalp Rozetli Profil Fotoğrafı --}}
-                <div style="position: relative; width: 38px; height: 38px; min-width: 38px; min-height: 38px; flex-shrink: 0;">
+                <div style="position: relative; width: 38px; height: 38px; min-width: 38px; min-height: 38px; aspect-ratio: 1 / 1; flex-shrink: 0;">
                     <a href="{{ route('profile', $senderId ?? '#') }}" 
                        onclick="event.stopPropagation();" 
-                       style="display: block; width: 38px; height: 38px; min-width: 38px; min-height: 38px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; background: #badfa0; cursor: pointer; text-decoration: none;">
+                       style="display: block; width: 100%; height: 100%; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; background: #badfa0; cursor: pointer; text-decoration: none;">
                         <img src="{{ $notifAvatarSrc }}" 
                              alt="{{ $notifData['sender_name'] ?? __('Profile') }}" 
                              referrerpolicy="no-referrer"
-                             style="width: 100%; height: 100%; min-width: 100%; min-height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
+                             style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                              onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                     </a>
                     <span style="position: absolute; bottom: -2px; right: -2px; background: #ffffff; border-radius: 50%; font-size: 11px; line-height: 1; padding: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none;">❤️</span>
                 </div>
                 
-                <div class="notification-info" style="flex: 1; min-width: 0;">
+                <div class="notification-info" style="flex: 1 1 0%; min-width: 0; overflow-wrap: anywhere; word-break: break-word;">
                     <div>
                         <a href="{{ route('profile', $senderId ?? '#') }}" 
                            onclick="event.stopPropagation();"
@@ -100,18 +100,18 @@
 
         {{-- B) DİĞER BİLDİRİMLER (Arkadaşlık Kabul vs.) --}}
         @else
-            <div class="notification-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #f0f4ec;">
+            <div class="notification-item" style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid #f0f4ec; width: 100%; box-sizing: border-box;">
                 {{-- Tıklanabilir Profil Fotoğrafı --}}
                 <a href="{{ route('profile', $senderId ?? '#') }}" 
-                   style="display: flex; width: 38px; height: 38px; min-width: 38px; min-height: 38px; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; align-items: center; justify-content: center; text-decoration: none; cursor: pointer;">
+                   style="display: block; width: 38px; height: 38px; min-width: 38px; min-height: 38px; aspect-ratio: 1 / 1; border-radius: 50%; border: 1.5px solid #4c7237; overflow: hidden; flex-shrink: 0; background: #badfa0; text-decoration: none; cursor: pointer;">
                     <img src="{{ $notifAvatarSrc }}" 
                          alt="{{ $notifData['sender_name'] ?? __('Profile') }}" 
                          referrerpolicy="no-referrer"
-                         style="width: 100%; height: 100%; min-width: 100%; min-height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
+                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%; display: block;" 
                          onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
                 </a>
 
-                <div class="notification-info" style="flex: 1; min-width: 0;">
+                <div class="notification-info" style="flex: 1 1 0%; min-width: 0; overflow-wrap: anywhere; word-break: break-word;">
                     <a href="{{ route('profile', $senderId ?? '#') }}" class="sender-name" style="color: #1a3c11; font-weight: bold; text-decoration: none; font-size: 14.5px; font-family: 'Unkempt', cursive;">
                         {{ $notifData['sender_name'] ?? ($notifUser?->username ?? __('User')) }}
                     </a>
