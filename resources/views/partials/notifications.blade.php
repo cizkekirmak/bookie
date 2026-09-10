@@ -69,15 +69,23 @@
 
 .notification-badge {
     position: absolute;
-    top: -6px;
-    right: -10px;
-    background: #d32f2f;
+    top: 4px;            /* -6px yerine aşağı indirip zarfın hizasına aldık */
+    right: 4px;          /* -10px yerine içeri aldık */
+    background: #c04e0c;
     color: #fff;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: bold;
     border-radius: 50%;
-    padding: 2px 6px;
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     line-height: 1;
+    border: 1.5px solid #fff; /* Yeşil arkaplanda ve zarfın üstünde net ayrışması için */
+    box-sizing: border-box;
+    pointer-events: none;
 }
 
 .notification-dropdown-panel {
