@@ -312,7 +312,7 @@
 
         .library-card-title {
             font-family: 'Henny Penny', cursive;
-            font-size: 14px; /* 13px -> 14px */
+            font-size: 14px;
             color: #d64b6f;
             letter-spacing: 0.5px;
         }
@@ -335,9 +335,10 @@
                 gap: 8px !important;
             }
 
+            /* ARTIK SADECE BUTON VE İKONLARI KAPSAR, BİLDİRİM İÇİNİ EZMEZ */
             .header-icon-box,
             .notification-icon-img,
-            .header-actions-wrap img {
+            .header-actions-wrap > a > img {
                 width: 50px !important;
                 height: 50px !important;
                 max-width: 50px !important;
@@ -527,7 +528,7 @@
                     : '-';
             @endphp
 
-            {{-- GÜNCELLENMİŞ: LIBRARY CARD BİLEŞENİ --}}
+            {{-- GÜNCELLENMİŞ: LIBRARY CARD BİLEŞENİ (HEPSİ ÇEVRİLDİ) --}}
             <div class="library-card-wrapper">
                 {{-- Üst Damga Alanı --}}
                 <div class="library-card-header">
@@ -538,7 +539,7 @@
                 {{-- Orta Gövde (Fotoğraf, İsim, Rozet & Sağ Altta Tarih) --}}
                 <div style="display: flex; gap: 10px; align-items: flex-start; position: relative;">
                     {{-- Tam Kare Mavi Çerçeveli Fotoğraf --}}
-                    <div style="width: 72px; height: 72px; border-radius: 8px; border: 2px solid #5ca0b2; background: #e8f5f8; padding: 2px; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                    <div style="width: 72px; height: 72px; min-width: 72px; min-height: 72px; border-radius: 8px; border: 2px solid #5ca0b2; background: #e8f5f8; padding: 2px; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; justify-content: center; align-items: center;">
                         @if(!empty($user->avatar))
                             <img src="{{ $userAvatar }}" 
                                  alt="{{ $user->username ?? $user->name }}" 
@@ -597,7 +598,7 @@
                     </div>
                 </div>
             </div>
-            
+
             {{-- Arkadaşlık İşlemleri (Diğer Kullanıcı Profili İse) --}}
             @if(!$isOwnProfile)
                 <div style="margin-bottom: 12px; width: 100%; display: flex; justify-content: center; margin-top: 12px;">
@@ -688,7 +689,7 @@
             <div style="
                 width: 100%; 
                 margin-top: 12px; 
-                background-color: #deeaa5;
+                background-color: #deeaa5; 
                 background-image: url('{{ asset('images/goal-bg.jpg') }}');
                 background-size: cover;
                 background-position: center;
@@ -930,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
             @forelse($friendsList as $friend)
                 @php
                     $friendAvatarUrl = (!empty($friend->avatar) && str_starts_with($friend->avatar, 'http'))
-                        ? $friend->avatar
+                        ? $friend->avatar 
                         : asset('images/profile.png');
                 @endphp
                 <div 
