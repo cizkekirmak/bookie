@@ -322,7 +322,7 @@
     font-family: 'Unkempt', cursive;
 }
 
-..chat-date-separator {
+.chat-date-separator {
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -500,9 +500,15 @@ document.addEventListener('DOMContentLoaded', () => {
         noFriendsFound: @json(__('No friends found.')),
         newMessage: @json(__('new message')),
         clickToChat: @json(__('Click to chat')),
-        stickerAlt: @json(__('Sticker')),
-        today: @json(__('Today')),
-        yesterday: @json(__('Yesterday'))
+        stickerAlt: @json(__('Sticker'))
+    };
+
+    // Tarih ayracı için dil sözlüğü. document.documentElement.lang her
+    // çağrıda okunuyor, yani sayfa yenilenmeden JS ile dil değiştirilse
+    // bile ayraçlar doğru dilde çıkar.
+    const DATE_I18N = {
+        tr: { today: 'Bugün', yesterday: 'Dün', locale: 'tr-TR' },
+        en: { today: 'Today', yesterday: 'Yesterday', locale: 'en-US' }
     };
 
     const csrfToken = "{{ csrf_token() }}";
@@ -561,23 +567,40 @@ document.addEventListener('DOMContentLoaded', () => {
         return (avatar && avatar.trim() !== '') ? avatar : defaultAvatarUrl;
     }
 
+    function getCurrentLang() {
+        const lang = (document.documentElement.lang || 'tr').toLowerCase();
+        return lang.startsWith('en') ? 'en' : 'tr';
+    }
+
+    // Laravel'in "YYYY-MM-DD HH:mm:ss" formatı Safari/iOS'ta Invalid Date
+    // verebiliyor. Boşluğu 'T' ile değiştirip ISO uyumlu hale getiriyoruz.
+    function parseServerDate(raw) {
+        if (!raw) return null;
+        let parsed = new Date(String(raw).trim().replace(' ', 'T'));
+        if (isNaN(parsed.getTime())) {
+            parsed = new Date(raw);
+        }
+        return isNaN(parsed.getTime()) ? null : parsed;
+    }
+
     function formatMessageDate(dateObj) {
         if (!dateObj || !(dateObj instanceof Date) || isNaN(dateObj.getTime())) {
-            return I18N.today;
+            dateObj = new Date();
         }
+
+        const dict = DATE_I18N[getCurrentLang()];
 
         const today = new Date();
         const yesterday = new Date();
         yesterday.setDate(today.getDate() - 1);
 
         if (dateObj.toDateString() === today.toDateString()) {
-            return I18N.today;
+            return dict.today;
         } else if (dateObj.toDateString() === yesterday.toDateString()) {
-            return I18N.yesterday;
+            return dict.yesterday;
         }
 
-        const locale = document.documentElement.lang || 'tr';
-        return dateObj.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' });
+        return dateObj.toLocaleDateString(dict.locale, { day: 'numeric', month: 'long', year: 'numeric' });
     }
 
     function renderMessagesWithDates(messages) {
@@ -588,30 +611,11 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // 1. En az 1 mesaj varsa en tepeye DİREKT Today / Gün ayracını koy
-        let firstDate = new Date();
-        const firstRaw = messages[0].created_at || messages[0].date || null;
-        if (firstRaw) {
-            const parsed = new Date(firstRaw);
-            if (!isNaN(parsed.getTime())) firstDate = parsed;
-        }
+        let lastDateKey = null;
 
-        let lastDateKey = firstDate.toDateString();
-
-        const topSeparator = document.createElement('div');
-        topSeparator.className = 'chat-date-separator';
-        topSeparator.innerHTML = `<span>---- ${formatMessageDate(firstDate)} ----</span>`;
-        messagesBody.appendChild(topSeparator);
-
-        // 2. Mesajları dön ve gün değiştikçe yeni ayraç aç
         messages.forEach(msg => {
-            let msgDate = firstDate;
             const raw = msg.created_at || msg.date || null;
-            if (raw) {
-                const parsed = new Date(raw);
-                if (!isNaN(parsed.getTime())) msgDate = parsed;
-            }
-
+            const msgDate = parseServerDate(raw) || new Date();
             const dateKey = msgDate.toDateString();
 
             if (dateKey !== lastDateKey) {
@@ -810,7 +814,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (!res.ok) return;
 
             const messages = await res.json();
-            console.log("GELEN MESAJLAR:", messages);
 
             if (messages.length === lastLoadedMessagesCount && !forceScroll) {
                 return;
@@ -843,11 +846,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const emptyState = messagesBody.querySelector('.chat-empty-state');
         if (emptyState) emptyState.remove();
 
-        // Eğer hiç ayraç yoksa hemen Today ayracı koy
+        // Eğer hiç ayraç yoksa hemen bugünün ayracını koy
         if (messagesBody.querySelectorAll('.chat-date-separator').length === 0) {
+            const dict = DATE_I18N[getCurrentLang()];
             const separator = document.createElement('div');
             separator.className = 'chat-date-separator';
-            separator.innerHTML = `<span>---- ${I18N.today} ----</span>`;
+            separator.innerHTML = `<span>---- ${dict.today} ----</span>`;
             messagesBody.appendChild(separator);
         }
 
