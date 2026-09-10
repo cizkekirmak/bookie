@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 220px;
+        height: 227px;
         width: 320px;
         box-sizing: border-box;
     }
@@ -85,16 +85,17 @@
     @media (max-width: 1024px) {
         .adminRecommendation-card {
             width: 100% !important;
-            height: 155px !important;
+            height: 168px !important;
             padding: 10px 10px !important;
             border-radius: 14px !important;
-            justify-content: flex-start !important;
+            box-sizing: border-box !important;
         }
 
         .admin-card-title {
-            font-size: 15.5px !important; /* Popular Books ile eşitlendi */
-            margin-bottom: 6px !important;
-            line-height: 1.15 !important;
+            font-size: 15px !important;
+            margin-bottom: 8px !important;
+            line-height: 1 !important;
+            height: 16px !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
@@ -102,60 +103,62 @@
 
         .admin-recommendation-body {
             display: flex !important;
-            gap: 10px !important;
-            align-items: center !important;
-            flex: 1 !important;
-            height: 98px !important;
-            min-height: 98px !important;
+            gap: 8px !important;
+            align-items: stretch !important;
+            height: 116px !important;
+            min-height: 116px !important;
         }
 
         .admin-book-cover-link {
             width: 62px !important;
-            height: 94px !important;
+            height: 96px !important;
             border-radius: 6px !important;
             flex-shrink: 0 !important;
         }
 
         .admin-book-info {
-            height: 94px !important;
-            min-height: 94px !important;
+            height: 116px !important;
+            min-height: 116px !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
             flex: 1 !important;
         }
 
         .adminRecommendation-card h4 {
-            font-size: 14.5px !important;
-            margin: 0 0 1px 0 !important;
-            line-height: 1.15 !important;
+            font-size: 13.5px !important;
+            margin: 0 0 2px 0 !important;
+            line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
 
         .adminRecommendation-card p {
-            font-size: 12.5px !important;
+            font-size: 11.5px !important;
             margin: 0 !important;
-            line-height: 1.15 !important;
+            line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
 
         .admin-note-text {
+            font-size: 11px !important;
+            line-height: 1.2 !important;
+            margin: 3px 0 0 0 !important;
             display: -webkit-box !important;
             -webkit-line-clamp: 2 !important;
             -webkit-box-orient: vertical !important;
-            font-size: 12px !important;
-            line-height: 1.25 !important;
-            margin: 2px 0 3px 0 !important;
+            overflow: hidden !important;
+            color: #27491d !important;
         }
 
         .admin-btn {
             padding: 4px 10px !important;
             font-size: 12px !important;
             border-radius: 8px !important;
+            margin-top: auto !important; /* Butonu en alt tabana kilitler */
             align-self: flex-start !important;
         }
     }
@@ -186,13 +189,13 @@
                 <p style="color: #3b612d; font-size: 13.5px; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: 'Unkempt', cursive;">
                     {{ $adminRecommendation->authors ?? $adminRecommendation->author }}
                 </p>
-            </div>
 
-            @if(!empty($adminRecommendation->admin_note))
-                <p class="admin-note-text" style="font-size: 13.5px; color: #1a3c11; font-style: italic; margin: 3px 0 4px 0; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
-                    "{{ $adminRecommendation->admin_note }}"
-                </p>
-            @endif
+                @if(!empty($adminRecommendation->admin_note))
+                    <p class="admin-note-text" style="font-size: 13px; color: #1a3c11; font-style: italic; margin: 3px 0 0 0; line-height: 1.25; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: 'Unkempt', cursive;">
+                        "{{ $adminRecommendation->admin_note }}"
+                    </p>
+                @endif
+            </div>
 
             <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
                 {{ __('view book →') }}

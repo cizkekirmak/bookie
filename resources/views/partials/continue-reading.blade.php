@@ -87,16 +87,17 @@
     @media (max-width: 1024px) {
         .continue-reading-card {
             width: 100% !important;
-            height: 145px !important; /* Boy kısaltıldı */
-            padding: 9px 8px !important;
+            height: 168px !important;
+            padding: 10px 10px !important;
             border-radius: 14px !important;
-            justify-content: flex-start !important;
+            box-sizing: border-box !important;
         }
 
         .continue-card-title {
             font-size: 15px !important;
-            margin-bottom: 6px !important;
-            line-height: 1.1 !important;
+            margin-bottom: 8px !important;
+            line-height: 1 !important;
+            height: 16px !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
@@ -105,41 +106,40 @@
         .continue-reading-body {
             display: flex !important;
             gap: 8px !important;
-            align-items: center !important;
-            flex: 1 !important;
-            height: 94px !important;
-            min-height: 94px !important;
+            align-items: stretch !important;
+            height: 116px !important;
+            min-height: 116px !important;
         }
 
         .continue-book-cover {
-            width: 60px !important;
-            height: 90px !important;
+            width: 62px !important;
+            height: 96px !important;
             border-radius: 6px !important;
             flex-shrink: 0 !important;
         }
 
         .continue-book-info {
-            height: 90px !important;
-            min-height: 90px !important;
+            height: 116px !important;
+            min-height: 116px !important;
             display: flex !important;
             flex-direction: column !important;
-            justify-content: space-between !important;
+            justify-content: flex-start !important;
             flex: 1 !important;
         }
 
         .continue-reading-card h4 {
-            font-size: 14px !important;
-            margin: 0 0 1px 0 !important;
-            line-height: 1.15 !important;
+            font-size: 13.5px !important;
+            margin: 0 0 2px 0 !important;
+            line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
         }
 
         .continue-reading-card p {
-            font-size: 12px !important;
+            font-size: 11.5px !important;
             margin: 0 !important;
-            line-height: 1.15 !important;
+            line-height: 1.2 !important;
             white-space: nowrap !important;
             overflow: hidden !important;
             text-overflow: ellipsis !important;
@@ -149,6 +149,7 @@
             padding: 4px 10px !important;
             font-size: 12px !important;
             border-radius: 8px !important;
+            margin-top: auto !important; /* Butonu en alt tabana hizalar */
             align-self: flex-start !important;
         }
     }
@@ -184,7 +185,7 @@
                     </p>
 
                     @if($hasPercentage)
-                        <div style="margin-top: 2px;">
+                        <div style="margin-top: 3px;">
                             <div style="display: flex; justify-content: space-between; font-size: 10.5px; color: #1a3c11; font-weight: bold; margin-bottom: 2px;">
                                 <span>%{{ $pct }}</span>
                                 <span style="font-weight: normal; color: #3b612d;">{{ $current }}/{{ $total }} {{ __('p.') }}</span>
