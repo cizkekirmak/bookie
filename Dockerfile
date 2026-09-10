@@ -28,10 +28,15 @@ WORKDIR /var/www/html
 COPY . /var/www/html
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
-RUN /usr/local/bin/composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
-
-# Tüm storage ve public klasörlerine Apache kullanıcısı için tam izin ver
 RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader --no-scripts
+
+RUN mkdir -p /var/www/html/storage/framework/views \
+             /var/www/html/storage/framework/cache \
+             /var/www/html/storage/framework/sessions \
+             /var/www/html/bootstrap/cache \
+    && chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache \
+    && chmod 1777 /tmp
 
 EXPOSE 80
 
