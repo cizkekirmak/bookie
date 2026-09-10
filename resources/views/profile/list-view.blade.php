@@ -73,10 +73,10 @@
 // Sekmeler arası geçişte her butonun kendi pastel rengini korumasını sağlar
 window.filterStatus = function(status, clickedBtn) {
     const tabStyles = {
-        'all': { bg: '#ff7d6b', activeBg: '#e06350', color: '#fff', border: '#e06350', shadow: 'rgba(224,99,80,0.3)' },
+        'all': { bg: '#dd92dc', activeBg: '#ae4f90', color: '#fff', border: '#a7559d', shadow: 'rgba(72, 23, 69, 0.3)' },
         'read': { bg: '#ffe5eb', activeBg: '#d64b6f', color: '#b32d4e', border: '#f8b4c2', shadow: 'rgba(214,75,111,0.3)' },
         'reading': { bg: '#e2f2fc', activeBg: '#21638a', color: '#21638a', border: '#b9dcf7', shadow: 'rgba(33,99,138,0.3)' },
-        'toRead': { bg: '#fff4cc', activeBg: '#c29013', color: '#8f680a', border: '#fae18c', shadow: 'rgba(194,144,19,0.3)' }
+        'toRead': { bg: '#fff4cc', activeBg: '#e2ac24', color: '#cda036', border: '#fae18c', shadow: 'rgba(170, 152, 34, 0.3)' }
     };
 
     document.querySelectorAll('.status-tab').forEach(btn => {
