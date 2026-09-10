@@ -168,7 +168,7 @@
                 </div>
 
                 <a href="{{ route('show', $currentBook->google_book_id ?? $currentBook->open_library_key) }}" class="continue-btn">
-                    {{ __('Read →') }}
+                    {{ __('view book →') }}
                 </a>
             </div>
         @else

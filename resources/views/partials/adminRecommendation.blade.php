@@ -147,7 +147,7 @@
             @endif
 
             <a href="{{ route('show', $adminBookKey) }}" class="admin-btn">
-                {{ __('Go to Book →') }}
+                {{ __('view book →') }}
             </a>
         </div>
     </div>
