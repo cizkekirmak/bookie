@@ -16,26 +16,24 @@ class BookController extends Controller
 {
     private string $googleApiKey = 'AIzaSyBGjDodZWAvBQ57QjOZ24VAGHOKf2p0Pus';
 
-    /**
-     * Kapak URL'lerini standart yüksek çözünürlüğe getiren fonksiyon
-     */
     private function normalizeCoverUrl(?string $url): ?string
     {
         if (empty($url)) return null;
 
-        // Open Library ise garantili büyük boy (-L) yap
         if (str_contains($url, 'covers.openlibrary.org')) {
             return str_replace(['-M.jpg', '-S.jpg'], '-L.jpg', $url);
         }
 
-        // Google Books ise HTTPS yap, curl kaldır ama zoom seviyesine DOKUNMA
         if (str_contains($url, 'books.google.com') || str_contains($url, 'books.googleusercontent.com')) {
             $url = str_replace('http://', 'https://', $url);
             $url = str_replace('&edge=curl', '', $url);
             
-            // Eğer zoom=2 veya zoom=0 yapılmış eski bir link varsa bunu güvenli olan zoom=1'e çek
             $url = preg_replace('/zoom=[0-9]/', 'zoom=1', $url);
-            
+
+            if (!str_contains($url, '&fife=')) {
+                $url .= '&fife=w800';
+            }
+
             return $url;
         }
 
@@ -48,7 +46,6 @@ class BookController extends Controller
             return null;
         }
 
-        // Cloudinary'ye göndermeden önce mutlaka netleştir
         $url = $this->normalizeCoverUrl($url);
 
         if (str_contains($url, 'res.cloudinary.com')) {
@@ -77,7 +74,8 @@ class BookController extends Controller
             ]);
 
             if ($response->successful()) {
-                return $response->json('secure_url');
+                $secureUrl = $response->json('secure_url');
+                return str_replace('/upload/', '/upload/q_auto,f_auto/', $secureUrl);
             }
         } catch (\Throwable $e) {
             Log::warning('Cloudinary kapak yükleme hatası: ' . $e->getMessage());
