@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    height: 222px;
+    height: 225px;
     width: 620px;
     box-sizing: border-box;
     font-family: 'Unkempt', cursive;
