@@ -35,8 +35,12 @@
 </head>
 <body>
     @php
-        $locale = app()->getLocale();
-        $imgName = ($locale === 'tr') ? '404-tr.png' : '404-en.png';
+        // Önce session'a, yoksa çerezlere (cookie), hiçbiri yoksa app diline bakar
+        $currentLocale = session('locale') 
+            ?? request()->cookie('locale') 
+            ?? app()->getLocale();
+
+        $imgName = ($currentLocale === 'tr') ? '404-tr.png' : '404-en.png';
     @endphp
 
     <a href="{{ route('dashboard') }}" class="error-link" title="{{ __('Back') }}">
