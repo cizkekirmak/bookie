@@ -20,7 +20,7 @@
         padding: 14px;
         display: flex;
         flex-direction: column;
-        height: 225px;
+        height: 227px;
         width: 320px;
         box-sizing: border-box;
     }
