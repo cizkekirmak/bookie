@@ -535,6 +535,7 @@ document.addEventListener('DOMContentLoaded', () => {
         viewConversation.style.display = 'none';
         activeFriendId = null;
         lastLoadedMessagesCount = 0;
+        messagesBody.innerHTML = '';
         messageInput.disabled = true;
         sendBtn.disabled = true;
         loadFriends();
@@ -671,6 +672,9 @@ document.addEventListener('DOMContentLoaded', () => {
         activeFriendId = friend.id;
         lastLoadedMessagesCount = 0;
         blockInChatSound = true;
+
+        // 1. Önceki arkadaşın mesajlarını ANINDA temizle (Glitch'i yok eden satır)
+        messagesBody.innerHTML = '';
 
         headerUser.href = `/profile/${friend.id}`;
         activeAvatar.src = getAvatarSrc(friend.avatar);
