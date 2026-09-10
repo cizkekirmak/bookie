@@ -801,6 +801,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function loadMessages(forceScroll = false) {
+        const messages = await res.json();
+        console.log("GELEN MESAJLAR:", messages);
         if (!activeFriendId) return;
         try {
             const res = await fetch(`/messages/${activeFriendId}`, {
