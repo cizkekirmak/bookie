@@ -188,6 +188,7 @@
         object-fit: contain;
         width: 100%;
         height: 100%;
+        background: transparent !important;
     }
 
     .postit-author {
@@ -201,14 +202,14 @@
     }
 
     .free-sticker-wrapper {
-    position: absolute;
-    cursor: default;
-    user-select: none;
-    touch-action: none;
-    display: inline-block;
-    transform-origin: center center;
-    background: transparent !important;
-}
+        position: absolute;
+        cursor: default;
+        user-select: none;
+        touch-action: none;
+        display: inline-block;
+        transform-origin: center center;
+        background: transparent !important;
+    }
     .is-editing-active .free-sticker-wrapper { cursor: grab; }
     .is-editing-active .free-sticker-wrapper:active { cursor: grabbing; }
     .is-editing-active .free-sticker-wrapper.is-selected {
@@ -216,15 +217,15 @@
         outline-offset: 4px;
     }
     .free-sticker-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    display: block;
-    pointer-events: none;
-    -webkit-user-drag: none;
-    background: transparent !important;
-    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
-}
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+        pointer-events: none;
+        -webkit-user-drag: none;
+        background: transparent !important;
+        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
+    }
 
     .handle-btn {
         display: none;
@@ -626,6 +627,7 @@
         border: 1px dashed transparent;
         touch-action: none;
         display: inline-block;
+        background: transparent !important;
     }
     .transform-box.is-selected { border-color: #2d5a27; }
 
@@ -645,17 +647,17 @@
     }
 
     .corkboard-frame { 
-        width: 100% !important;
-        max-width: 100% !important;
-        aspect-ratio: 16 / 10 !important;
+        width: 100% !important; 
+        max-width: 100% !important; 
+        aspect-ratio: 16 / 10 !important; 
         border-radius: 12px; 
-        position: relative;
-        overflow: hidden !important;
-        touch-action: pan-y !important;
+        position: relative; 
+        overflow: hidden !important; 
+        touch-action: pan-y !important; 
     }
 
-    .cork-postit, .free-sticker-wrapper {
-        pointer-events: none !important;
+    .cork-postit, .free-sticker-wrapper { 
+        pointer-events: none !important; 
     }
 
     .keychain-area-wrapper { 
@@ -672,25 +674,25 @@
         padding: 6px 4px; 
         gap: 10px; 
         -webkit-overflow-scrolling: touch;
-        touch-action: pan-x !important;
+        touch-action: pan-x !important; 
     }
 
     .keychain-hook-unit { 
         width: 56px; 
         height: 78px; 
-        flex-shrink: 0;
-        cursor: default !important;
+        flex-shrink: 0; 
+        cursor: default !important; 
     }
 
     .empty-hook-slot,
-    .keychain-plush-img {
-        pointer-events: none !important;
+    .keychain-plush-img { 
+        pointer-events: none !important; 
     }
 
     .folder-container,
-    .keychain-collection-drawer {
-        display: none !important;
-        pointer-events: none !important;
+    .keychain-collection-drawer { 
+        display: none !important; 
+        pointer-events: none !important; 
     }
     
     .board-bottom-bar,
@@ -746,6 +748,7 @@
 
     $isAdmin = auth()->check() && (
         strtolower(auth()->user()->username ?? '') === 'admin' ||
+        auth()->id() === 1 ||
         auth()->id() === 2
     );
 
@@ -1033,46 +1036,58 @@
         }
     }
 
+    // ŞEFFAFLIK VE ALFA KANALINI BOZMAYAN SIKIŞTIRMA FONKSİYONU
     function compressImageClientSide(file, maxWidth = 300, maxHeight = 300, quality = 0.75) {
-    return new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = function (e) {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = function () {
-                let width = img.width;
-                let height = img.height;
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = function () {
+                    let width = img.width;
+                    let height = img.height;
 
-                if (width > height) {
-                    if (width > maxWidth) {
-                        height = Math.round((height * maxWidth) / width);
-                        width = maxWidth;
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = Math.round((width * maxHeight) / height);
+                            height = maxHeight;
+                        }
                     }
-                } else {
-                    if (height > maxHeight) {
-                        width = Math.round((width * maxHeight) / height);
-                        height = maxHeight;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = width;
+                    canvas.height = height;
+
+                    const ctx = canvas.getContext('2d', { alpha: true });
+                    ctx.clearRect(0, 0, width, height);
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Uzantı ve MIME kontrolü (Dosya adı ve type kontrol edilir)
+                    const fileName = (file.name || '').toLowerCase();
+                    const isPng = file.type === 'image/png' || fileName.endsWith('.png');
+                    const isWebp = file.type === 'image/webp' || fileName.endsWith('.webp');
+
+                    let compressedBase64;
+                    if (isPng) {
+                        // PNG için asla kalite parametresi verilmez, doğrudan toDataURL() çağrılır!
+                        compressedBase64 = canvas.toDataURL('image/png');
+                    } else if (isWebp) {
+                        compressedBase64 = canvas.toDataURL('image/webp', quality);
+                    } else {
+                        compressedBase64 = canvas.toDataURL('image/jpeg', quality);
                     }
-                }
 
-                const canvas = document.createElement('canvas');
-                canvas.width = width;
-                canvas.height = height;
-
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, width, height);
-                ctx.drawImage(img, 0, 0, width, height);
-
-                const isTransparent = file.type === 'image/png' || file.type === 'image/webp';
-                const mimeType = isTransparent ? 'image/png' : 'image/jpeg';
-                
-                const compressedBase64 = canvas.toDataURL(mimeType, quality);
-                resolve({ base64: compressedBase64, width, height });
+                    resolve({ base64: compressedBase64, width, height });
+                };
             };
-        };
-    });
-}
+        });
+    }
 
     function rescaleBoardForMobile() {
         const frame = document.getElementById('corkboardArea');
@@ -1172,7 +1187,7 @@
             sBox.style.width = w + 'px';
             sBox.style.height = h + 'px';
             sBox.innerHTML = `
-                <img class="postit-sticker-img" src="${base64}" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none;">
+                <img class="postit-sticker-img" src="${base64}" style="width:100%; height:100%; object-fit: contain; display:block; pointer-events: none; background: transparent !important;">
                 <div class="handle-btn handle-delete" title="${I18N.handleDelete}" onclick="deleteStudioImage(event)">✕</div>
                 <div class="handle-btn handle-rotate" title="${I18N.handleRotate}">↻</div>
                 <div class="handle-btn handle-resize" title="${I18N.handleResize}">⤡</div>
@@ -1576,8 +1591,7 @@
     if (freeStickerInput) {
         freeStickerInput.addEventListener('change', async function() {
             const file = this.files[0];
-            const validTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/webp'];
-            if (file && validTypes.includes(file.type)) {
+            if (file) {
                 const { base64, width, height } = await compressImageClientSide(file, 320, 320, 0.75);
 
                 let w = 80;
