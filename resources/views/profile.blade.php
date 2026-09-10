@@ -178,7 +178,6 @@
             flex-shrink: 0;
         }
 
-        /* Üçlü Buton Grubu: Büyütüldü & BORDER TAMAMEN SIFIRLANDI */
         .header-icon-box,
         .notification-icon-img {
             width: 65px !important;
@@ -216,13 +215,14 @@
             width: 320px;
             background: #8ec46f;
             border-right: 2px solid #4c7237;
-            padding: 30px 20px;
+            padding: 24px 16px;
             display: flex;
             flex-direction: column;
             align-items: center;
             box-sizing: border-box;
             flex-shrink: 0;
             height: 100%;
+            overflow-y: auto;
         }
 
         .profile-main-content {
@@ -289,6 +289,34 @@
             display: none !important;
         }
 
+        /* Library Card Görünümü */
+        .library-card-wrapper {
+            width: 100%;
+            background: #fffdf5;
+            border: 2px solid #5a7d3b;
+            border-radius: 14px;
+            padding: 12px 10px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+            position: relative;
+            transform: rotate(-0.5deg);
+        }
+
+        .library-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1.5px dashed #c0d8b4;
+            padding-bottom: 6px;
+            margin-bottom: 8px;
+        }
+
+        .library-card-title {
+            font-family: 'Henny Penny', cursive;
+            font-size: 13px;
+            color: #d64b6f;
+            letter-spacing: 0.5px;
+        }
+
         @media (max-width: 1024px) {
             .site-header-outer {
                 height: 68px !important;
@@ -307,7 +335,6 @@
                 gap: 8px !important;
             }
 
-            /* Mobilde Üçlü Buton Grubu: Büyütüldü & BORDER TAMAMEN SIFIRLANDI */
             .header-icon-box,
             .notification-icon-img,
             .header-actions-wrap img {
@@ -339,8 +366,8 @@
                 top: 68px !important;
                 right: 0 !important;
                 left: auto !important;
-                width: 82vw !important;
-                max-width: 320px !important;
+                width: 84vw !important;
+                max-width: 330px !important;
                 height: calc(100vh - 68px) !important;
                 height: calc(100dvh - 68px) !important;
                 max-height: calc(100vh - 68px) !important;
@@ -404,7 +431,7 @@
                 padding: 7px 14px;
                 font-family: 'Unkempt', cursive;
                 font-weight: bold;
-                font-size: 14px;
+                font-size: 15px;
                 box-shadow: -3px 4px 10px rgba(0,0,0,0.18);
                 cursor: pointer;
                 z-index: 9999;
@@ -434,7 +461,7 @@
             }
 
             .profile-main-content h3 {
-                font-size: 19px !important;
+                font-size: 21px !important;
             }
 
             #profile-list-view,
@@ -494,65 +521,77 @@
                 $userAvatar = (!empty($user->avatar) && str_starts_with($user->avatar, 'http')) 
                     ? $user->avatar 
                     : $defaultAvatar;
-            @endphp
-
-            {{-- Profil Fotoğrafı --}}
-            <div style="width: 120px; height: 120px; border-radius: 50%; border: 2px solid #2d5a27; background: #eaf3e4; display: flex; justify-content: center; align-items: center; margin-bottom: 0; overflow: hidden; flex-shrink: 0;">
-                @if(!empty($user->avatar))
-                    <img src="{{ $userAvatar }}" 
-                         alt="{{ $user->username ?? $user->name }}" 
-                         referrerpolicy="no-referrer" 
-                         style="width: 100%; height: 100%; object-fit: cover; display: block;" 
-                         onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
-                @else
-                    <span style="font-size: 45px;">🌱</span>
-                @endif
-            </div>
-
-            @php
                 $title = $user->reading_title;
             @endphp
 
-            {{-- 1. Kullanıcı Adı --}}
-            <div style="font-family: 'Henny Penny', cursive; font-size: 28px; color: #1a3c11; margin-bottom: 2px;">
-                {{ $user->username ?? $user->name }}
+            {{-- YENİ: LIBRARY CARD (KÜTÜPHANE KARTI) BİLEŞENİ --}}
+            <div class="library-card-wrapper">
+                {{-- Üst Damga Alanı --}}
+                <div class="library-card-header">
+                    <span class="library-card-title">★ LIBRARY CARD</span>
+                    <span style="font-size: 11px; color: #768f63; font-weight: bold;">BOOKIE MEMBER</span>
+                </div>
+
+                <div style="display: flex; gap: 10px; align-items: flex-start;">
+                    {{-- Mavi Çerçeveli Vesikalık Fotoğraf --}}
+                    <div style="width: 72px; height: 86px; border-radius: 8px; border: 2px solid #5ca0b2; background: #e8f5f8; padding: 2px; flex-shrink: 0; box-shadow: inset 0 1px 3px rgba(0,0,0,0.1); overflow: hidden; display: flex; justify-content: center; align-items: center;">
+                        @if(!empty($user->avatar))
+                            <img src="{{ $userAvatar }}" 
+                                 alt="{{ $user->username ?? $user->name }}" 
+                                 referrerpolicy="no-referrer" 
+                                 style="width: 100%; height: 100%; object-fit: cover; border-radius: 5px; display: block;" 
+                                 onerror="this.onerror=null; this.src='{{ $defaultAvatar }}';">
+                        @else
+                            <span style="font-size: 32px;">🌱</span>
+                        @endif
+                    </div>
+
+                    {{-- Kullanıcı Adı ve Unvan --}}
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center;">
+                        <div style="font-family: 'Henny Penny', cursive; font-size: 22px; color: #1a3c11; line-height: 1.15; word-break: break-word;">
+                            {{ $user->username ?? $user->name }}
+                        </div>
+
+                        {{-- Tıklanabilir Unvan Rozeti --}}
+                        <div style="margin-top: 4px;">
+                            <button type="button" onclick="openTitlesModal()" style="background: none; border: none; padding: 0; cursor: pointer; text-align: left;">
+                                <div class="{{ !empty($title['is_admin']) ? 'admin-rainbow-badge' : '' }}" style="
+                                    display: inline-flex;
+                                    align-items: center;
+                                    gap: 5px;
+                                    @if(empty($title['is_admin']))
+                                        background-color: {{ $title['bg'] }};
+                                        border: 1px solid {{ $title['border'] }};
+                                        color: {{ $title['color'] }};
+                                    @endif
+                                    padding: 2px 8px;
+                                    border-radius: 12px;
+                                    font-family: 'Unkempt', cursive;
+                                    font-size: 12px;
+                                    font-weight: bold;
+                                    line-height: 1.2;
+                                ">
+                                    <span>{{ $title['icon'] }}</span>
+                                    <span>{{ __($title['name'] ?? 'certified noob') }}</span>
+                                    <span style="font-size: 9px; opacity: 0.6;">▼</span>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Barkod Yerine Biyografi Alanı --}}
+                <div style="margin-top: 10px; background: #fdfaf0; border: 1px dashed #d5c8a8; border-radius: 6px; padding: 6px 8px; min-height: 42px; background-image: repeating-linear-gradient(transparent, transparent 17px, #faedd3 18px); line-height: 18px;">
+                    <div style="font-size: 10px; color: #9c845b; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">bio :</div>
+                    <div style="font-size: 13.5px; color: #355e28; word-break: break-word; font-style: italic;">
+                        {{ !empty($user->bio) ? $user->bio : __('No note yet...') }}
+                    </div>
+                </div>
             </div>
 
-            {{-- 2. Unvan Rozeti --}}
-            <button type="button" onclick="openTitlesModal()" style="background: none; border: none; padding: 0; cursor: pointer;">
-                <div class="{{ !empty($title['is_admin']) ? 'admin-rainbow-badge' : '' }}" style="
-                    display: inline-flex;
-                    align-items: center;
-                    gap: 6px;
-                    @if(empty($title['is_admin']))
-                        background-color: {{ $title['bg'] }};
-                        border: 1.5px solid {{ $title['border'] }};
-                        color: {{ $title['color'] }};
-                    @endif
-                    padding: 3px 12px;
-                    border-radius: 16px;
-                    font-family: 'Unkempt', cursive;
-                    font-size: 13px;
-                    font-weight: bold;
-                    margin-top: 2px;
-                    margin-bottom: 8px;
-                    cursor: pointer;
-                ">
-                    <span>{{ $title['icon'] }}</span>
-                    <span>{{ __($title['name'] ?? 'certified noob') }}</span>
-                    <span style="font-size: 10px; opacity: 0.6;">▼</span>
-                </div>
-            </button>
-
-            {{-- 3. Bio Metni --}}
-            @if(!empty($user->bio))
-                <div style="font-family: 'Unkempt', cursive; font-size: 15px; color: #355e28; margin: 0; line-height: 1.2; text-align: center;">
-                    "{{ $user->bio }}"
-                </div>
-            @endif
-
+            {{-- Arkadaşlık İşlemleri (Diğer Kullanıcı Profili İse) --}}
             @if(!$isOwnProfile)
-                <div style="margin-bottom: 20px; width: 100%; display: flex; justify-content: center; margin-top: 10px;">
+                <div style="margin-bottom: 12px; width: 100%; display: flex; justify-content: center; margin-top: 12px;">
                     @if(!$friendship)
                         <form action="{{ route('friends.request', $user->id) }}" method="POST" style="margin: 0; width: 100%;">
                             @csrf
@@ -584,7 +623,7 @@
                         <div style="display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%;">
                             <form action="{{ route('friends.remove', $user->id) }}" method="POST" style="margin: 0; display: flex; justify-content: center; width: 100%;">
                                 @csrf
-                                <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1px solid #1d491b; padding: 4px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 13px; text-align: center; display: block;">
+                                <button type="submit" style="width: 150px; background-color: #d2f48a; color: #101e08; border: 1px solid #1d491b; padding: 5px 8px; border-radius: 6px; cursor: pointer; font-family: 'Unkempt', cursive; font-size: 13.5px; text-align: center; display: block;">
                                     {{ __('Remove Friend') }}
                                 </button>
                             </form>
@@ -593,8 +632,8 @@
                 </div>
             @endif
 
-            {{-- Friends Butonu (Arka Plan Görselli) --}}
-            <div style="width: 100%; border-top: 1.5px solid #deeaa5; padding-top: 20px; margin-top: 14px; display: flex; justify-content: center;">
+            {{-- Friends Butonu --}}
+            <div style="width: 100%; border-top: 1.5px solid #a6d88c; padding-top: 14px; margin-top: 12px; display: flex; justify-content: center;">
                 <button 
                     type="button" 
                     onclick="openFriendsModal()" 
@@ -609,7 +648,7 @@
                         background-position: center;
                         border: 1.5px solid #2d5a27; 
                         border-radius: 12px; 
-                        padding: 8px 14px; 
+                        padding: 9px 14px; 
                         cursor: pointer; 
                         font-family: 'Unkempt', cursive; 
                         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06); 
@@ -618,17 +657,17 @@
                     onmouseenter="this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.12)';"
                     onmouseleave="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.06)';"
                 >
-                    <span style="font-size: 15px; font-weight: bold; color: #1a3c11; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
+                    <span style="font-size: 16px; font-weight: bold; color: #1a3c11; display: flex; align-items: center; gap: 6px; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
                         🌱 {{ __('friends') }}
                     </span>
 
                     <span style="
                         background: #2d5a27; 
                         color: #ffffff; 
-                        font-size: 12px; 
+                        font-size: 13px; 
                         font-weight: bold; 
-                        padding: 2px 8px; 
-                        border-radius: 12px;
+                        padding: 3px 9px; 
+                        border-radius: 12px; 
                         box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                     ">
                         {{ $friendsCount }}
@@ -639,7 +678,7 @@
             {{-- Yıllık Okuma Hedefi Kartı --}}
             <div style="
                 width: 100%; 
-                margin-top: 14px; 
+                margin-top: 12px; 
                 background-color: #deeaa5;
                 background-image: url('{{ asset('images/goal-bg.jpg') }}');
                 background-size: cover;
@@ -653,17 +692,17 @@
                 gap: 6px;
             ">
                 <div style="display: flex; align-items: center; justify-content: space-between;">
-                    <span style="font-size: 14px; font-weight: bold; color: #1a3c11; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
+                    <span style="font-size: 15px; font-weight: bold; color: #1a3c11; text-shadow: 0 1px 2px rgba(255,255,255,0.7);">
                         🎯 {{ $currentYear ?? date('Y') }} {{ __('Goal') }}
                     </span>
                     @if(!empty($readingGoal))
                         <span style="
                             background: #2d5a27; 
                             color: #ffffff; 
-                            font-size: 11px; 
+                            font-size: 12px; 
                             font-weight: bold; 
                             padding: 2px 8px; 
-                            border-radius: 12px;
+                            border-radius: 12px; 
                             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
                         ">
                             {{ $readThisYear ?? 0 }} / {{ $readingGoal->target_books }}
@@ -676,11 +715,11 @@
                     <div style="width: 100%; height: 10px; background: rgba(0,0,0,0.12); border-radius: 6px; overflow: hidden; margin-top: 2px;">
                         <div style="height: 100%; width: {{ $goalProgress ?? 0 }}%; background: #255719; border-radius: 6px; transition: width 0.4s ease;"></div>
                     </div>
-                    <div style="text-align: right; font-size: 10px; color: #1a3c11; font-weight: bold;">
+                    <div style="text-align: right; font-size: 11px; color: #1a3c11; font-weight: bold;">
                         %{{ $goalProgress ?? 0 }} {{ __('completed') }}
                     </div>
                 @elseif($isOwner ?? ($isOwnProfile ?? false))
-                    {{-- Hedef Belirleme Formu (Yılda 1 kez girilebilir) --}}
+                    {{-- Hedef Belirleme Formu --}}
                     <form onsubmit="saveReadingGoal(event)" style="display: flex; gap: 6px; margin-top: 4px;">
                         @csrf
                         <input 
@@ -692,12 +731,12 @@
                             required
                             style="
                                 width: 100%; 
-                                font-size: 12px; 
-                                padding: 4px 8px; 
+                                font-size: 13px; 
+                                padding: 5px 8px; 
                                 border-radius: 6px; 
                                 border: 1.5px solid #2d5a27; 
                                 background: rgba(255,255,255,0.85); 
-                                outline: none;
+                                outline: none; 
                                 font-family: 'Unkempt', cursive;
                             "
                         >
@@ -707,22 +746,22 @@
                                 background: #2d5a27; 
                                 color: white; 
                                 border: none; 
-                                padding: 4px 10px; 
+                                padding: 5px 12px; 
                                 border-radius: 6px; 
-                                font-size: 12px; 
+                                font-size: 13px; 
                                 font-weight: bold; 
                                 cursor: pointer; 
-                                font-family: 'Unkempt', cursive; 
+                                font-family: 'Unkempt', cursive;
                             "
                         >
                             {{ __('Save') }}
                         </button>
                     </form>
-                    <span style="font-size: 9px; color: #355e28; font-style: italic;">
+                    <span style="font-size: 10px; color: #355e28; font-style: italic;">
                         *{{ __('Can only be set once a year') }}
                     </span>
                 @else
-                    <span style="font-size: 11px; color: #355e28; font-style: italic; text-align: center; margin-top: 2px;">
+                    <span style="font-size: 12px; color: #355e28; font-style: italic; text-align: center; margin-top: 2px;">
                         {{ __('No goal set for this year.') }}
                     </span>
                 @endif
@@ -734,15 +773,15 @@
 
             {{-- ÜST PANEL: BAŞLIK & SWITCH --}}
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-shrink: 0;">
-                <h3 style="font-family: 'Henny Penny', cursive; font-size: 24px; color: #1a3c11; margin: 0;">
+                <h3 style="font-family: 'Henny Penny', cursive; font-size: 26px; color: #1a3c11; margin: 0;">
                     {{ __('Bookshelf & Reviews') }}
                 </h3>
 
                 <div style="display: flex; background: #cae28c; border: 2px solid #737e3d; border-radius: 12px; padding: 4px; gap: 6px;">
-                    <button type="button" id="btn-list-view" onclick="switchProfileView('list')" style="border: none; background: #255719; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
+                    <button type="button" id="btn-list-view" onclick="switchProfileView('list')" style="border: none; background: #255719; color: #ffffff; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
                         {{ __('Book List') }}
                     </button>
-                    <button type="button" id="btn-board-view" onclick="switchProfileView('board')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
+                    <button type="button" id="btn-board-view" onclick="switchProfileView('board')" style="border: none; background: transparent; color: #1a3c11; padding: 6px 14px; border-radius: 8px; font-family: 'Unkempt', cursive; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s ease;">
                         {{ __('Board') }}
                     </button>
                 </div>
@@ -839,7 +878,7 @@ document.addEventListener('DOMContentLoaded', function() {
             <span 
                 style="
                     font-family: 'Henny Penny', cursive; 
-                    font-size: 18px; 
+                    font-size: 20px; 
                     color: #1a3c11;
                 "
             >
@@ -910,15 +949,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     >
                         <div 
                             style="
-                                width: 34px; 
-                                height: 34px; 
+                                width: 36px; 
+                                height: 36px; 
                                 border-radius: 50%; 
                                 background: #badfa0; 
                                 border: 1px solid #4c7237; 
                                 display: flex; 
                                 align-items: center; 
                                 justify-content: center; 
-                                font-size: 15px; 
+                                font-size: 16px; 
                                 color: #1a3c11; 
                                 font-weight: bold; 
                                 font-family: 'Unkempt', cursive; 
@@ -936,7 +975,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div 
                                 style="
                                     font-family: 'Unkempt', cursive; 
-                                    font-size: 15px; 
+                                    font-size: 16px; 
                                     font-weight: bold; 
                                     color: #1f5117;
                                 "
@@ -947,7 +986,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             <div 
                                 style="
                                     font-family: 'Unkempt', cursive; 
-                                    font-size: 11px; 
+                                    font-size: 12.5px; 
                                     color: #666;
                                 "
                             >
@@ -959,7 +998,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     <span 
                         style="
                             font-family: 'Unkempt', cursive; 
-                            font-size: 12px; 
+                            font-size: 13px; 
                             color: #4c7237; 
                             font-weight: bold;
                         "
@@ -974,7 +1013,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         color: #355726; 
                         font-family: 'Unkempt', cursive; 
                         padding: 25px 10px; 
-                        font-size: 14px;
+                        font-size: 15px;
                     "
                 >
                     {{ __('You dont have any friends yet :((  🌱') }}
