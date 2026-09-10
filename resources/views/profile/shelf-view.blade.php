@@ -201,13 +201,14 @@
     }
 
     .free-sticker-wrapper {
-        position: absolute;
-        cursor: default;
-        user-select: none;
-        touch-action: none;
-        display: inline-block;
-        transform-origin: center center;
-    }
+    position: absolute;
+    cursor: default;
+    user-select: none;
+    touch-action: none;
+    display: inline-block;
+    transform-origin: center center;
+    background: transparent !important;
+}
     .is-editing-active .free-sticker-wrapper { cursor: grab; }
     .is-editing-active .free-sticker-wrapper:active { cursor: grabbing; }
     .is-editing-active .free-sticker-wrapper.is-selected {
@@ -215,14 +216,15 @@
         outline-offset: 4px;
     }
     .free-sticker-wrapper img {
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-        display: block;
-        pointer-events: none;
-        -webkit-user-drag: none;
-        filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
-    }
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+    pointer-events: none;
+    -webkit-user-drag: none;
+    background: transparent !important;
+    filter: drop-shadow(0 3px 6px rgba(0,0,0,0.16));
+}
 
     .handle-btn {
         display: none;
