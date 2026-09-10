@@ -3,7 +3,7 @@
     @csrf
     {{-- Toplu Silme Butonu --}}
     <div style="display: flex; justify-content: flex-end; margin-bottom: 6px;">
-        <button type="submit" id="btnBulkDelete" style="display: none; background: #be8dd6; color: #ffffff; border: none; padding: 5px 12px; border-radius: 12px; font-family: 'Unkempt', cursive; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(217,56,56,0.25);">
+        <button type="submit" id="btnBulkDelete" style="display: none; background: #e0a55d; color: #ffffff; border: none; padding: 5px 12px; border-radius: 12px; font-family: 'Unkempt', cursive; font-size: 13px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 6px rgba(217,56,56,0.25);">
             🗑️ {{ __('Delete Selected') }} (<span id="selectedCount">0</span>)
         </button>
     </div>
