@@ -212,7 +212,7 @@ Route::middleware(['auth'])->group(function () {
         $authId = auth()->id();
         $targetId = (int)$id;
 
-        $deleted = Friendship::where('user_id', $targetId)
+        $deleted = friendship::where('user_id', $targetId)
             ->where('friend_id', $authId)
             ->where('status', 'pending')
             ->delete();
